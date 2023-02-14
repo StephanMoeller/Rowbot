@@ -15,7 +15,7 @@ Design decisions
  - Why a custom RowSource and not using IDataReader?
     - Implementing a custom IDataReader requires one to implement 27 methods, 4 Properties and 2 Indexers. Implementing a custom RowSource requires 2 methods: InitAndGetColumns() and ReadRow(...) and optionally finalizing and cleanup logic in Complete() and Dispose()
 
-Todos
+- Todos
     - Add csvHelper source and targets
     - Add som excel source and targets
     - Create tests for execution methods
