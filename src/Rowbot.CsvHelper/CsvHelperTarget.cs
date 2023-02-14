@@ -1,6 +1,8 @@
 ﻿using CsvHelper;
+using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -10,6 +12,10 @@ namespace Rowbot.CsvHelper
     {
         private readonly CsvWriter _csvWriter;
 
+        public CsvHelperTarget(Stream stream, CsvConfiguration configuration) : this(new CsvWriter(new StreamWriter(stream), configuration))
+        {
+        }
+
         public CsvHelperTarget(CsvWriter csvWriter)
         {
             _csvWriter = csvWriter;
@@ -17,7 +23,7 @@ namespace Rowbot.CsvHelper
 
         public override void Dispose()
         {
-            _csvWriter.Dispose();
+            _csvWriter?.Dispose();
         }
 
         protected override void OnComplete()
@@ -27,12 +33,18 @@ namespace Rowbot.CsvHelper
 
         protected override void OnInit(ColumnInfo[] columns)
         {
-            _csvWriter.WriteRecords(columns.Select(c => c.Name).ToArray());
+            for (var i = 0; i < columns.Length; i++)
+            {
+                _csvWriter.WriteField(columns[i].Name);
+            }
         }
 
         protected override void OnWriteRow(object[] values)
         {
-            _csvWriter.WriteRecords(values);
+            for (var i = 0; i < values.Length; i++)
+            {
+                _csvWriter.WriteField(values[i]);
+            }
         }
     }
 }
