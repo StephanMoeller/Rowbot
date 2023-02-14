@@ -11,9 +11,11 @@ namespace Rowbot.CsvHelper
     public class CsvHelperTarget : RowTarget
     {
         private readonly CsvWriter _csvWriter;
+        private readonly bool _writeHeaders;
 
-        public CsvHelperTarget(Stream stream, CsvConfiguration configuration) : this(new CsvWriter(new StreamWriter(stream), configuration))
+        public CsvHelperTarget(Stream stream, CsvConfiguration configuration, bool writeHeaders) : this(new CsvWriter(new StreamWriter(stream), configuration))
         {
+            _writeHeaders = writeHeaders;
         }
 
         public CsvHelperTarget(CsvWriter csvWriter)
@@ -33,9 +35,12 @@ namespace Rowbot.CsvHelper
 
         protected override void OnInit(ColumnInfo[] columns)
         {
-            for (var i = 0; i < columns.Length; i++)
+            if(_writeHeaders)
             {
-                _csvWriter.WriteField(columns[i].Name);
+                for (var i = 0; i < columns.Length; i++)
+                {
+                    _csvWriter.WriteField(columns[i].Name);
+                }
             }
         }
 

@@ -12,7 +12,7 @@ namespace Rowbot.CsvHelper.Test
         public void WriteColumnsAndRows_NoRows_ExpectEmptyTable_Test()
         {
             using (var ms = new MemoryStream())
-            using (var target = new CsvHelperTarget(ms, new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = ";", Quote = '\'' }))
+            using (var target = new CsvHelperTarget(ms, new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = ";", Quote = '\'' }, writeHeaders: true))
             {
                 target.Init(new ColumnInfo[]{
                         new ColumnInfo(name: "Col1", valueType: typeof(string)),
@@ -28,10 +28,10 @@ namespace Rowbot.CsvHelper.Test
         }
 
         [Fact]
-        public void WriteColumnsAndRows_Test()
+        public void WriteColumnsAndRows_WithHeaders_Test()
         {
             using (var ms = new MemoryStream())
-            using (var target = new CsvHelperTarget(ms, new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = ";", Quote = '\'' }))
+            using (var target = new CsvHelperTarget(ms, new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = ";", Quote = '\'' }, writeHeaders: true))
             {
 
                 target.Init(new ColumnInfo[]{
@@ -48,6 +48,30 @@ namespace Rowbot.CsvHelper.Test
 
                 var result = Encoding.UTF8.GetString(ms.ToArray());
                 Assert.Equal("Col1;Col2;Col3;Hello there же 1;-12.45;hi;there;Hello there же 2;12.45;;;Hello there же 3;;'This text has a \"' in it.';'And this has a \r CR'", result);
+            }
+        }
+
+        [Fact]
+        public void WriteColumnsAndRows_WithoutHeaders_Test()
+        {
+            using (var ms = new MemoryStream())
+            using (var target = new CsvHelperTarget(ms, new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = ";", Quote = '\'' }, writeHeaders: false))
+            {
+
+                target.Init(new ColumnInfo[]{
+                    new ColumnInfo(name: "Col1", valueType: typeof(string)),
+                    new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
+                    new ColumnInfo(name: "Col3", valueType: typeof(object)),
+                });
+
+                target.WriteRow(new object?[] { "Hello there же 1", -12.45m, "hi", "there" }); // non-strings
+                target.WriteRow(new object?[] { "Hello there же 2", 12.45m, null, null }); // null values
+                target.WriteRow(new object?[] { "Hello there же 3", null, "This text has a ' in it.", "And this has a \r CR" }); // Quotes are double encoded (escaped)
+
+                target.Complete();
+
+                var result = Encoding.UTF8.GetString(ms.ToArray());
+                Assert.Equal("Hello there же 1;-12.45;hi;there;Hello there же 2;12.45;;;Hello there же 3;;'This text has a \"' in it.';'And this has a \r CR'", result);
             }
         }
     }
