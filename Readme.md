@@ -2,7 +2,7 @@ Design decisions
 
 - Seperating source, execution and target
     - Easy plug and play any source with any target
-    - Exponential growth of integration possibilites when adding sources. (e.g. When creating a new source, one automatically gets N new integrations where N is the number of avilable targets. And vice versa, when creating a new target, one automatically gets M new integrations where M is the number of available sources.)
+    - Exponential growth of integration possibilites when adding sources. (e.g. When creating a new source, one automatically gets N new integrations where N is the number of available targets. And vice versa, when creating a new target, one automatically gets M new integrations where M is the number of available sources.)
     - Possible to benchmark a seperate source or target or the execution itself for both cpu and memory usage.
     - Less code to grasp at once, making it easier to understand and improve. E.g. you can look at the executor alone and only focus on the multithreaded aspect of execution without mixing the concept with loading or saving data at any point.
     - Easier to test seperate parts
