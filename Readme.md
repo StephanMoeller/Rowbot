@@ -23,3 +23,4 @@ Todos
     - Add a DynamicTarget (just because it would be an easy thing to do)
     - Add a test with Sqlite loading data and processing it to excel as a real life usage case test
     - Create use cases and benchmarks for the readme
+    - Stats for execution (Wait times per source + entry counts processed)
