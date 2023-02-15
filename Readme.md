@@ -1,9 +1,15 @@
 # Table of Contents
 
-1. [My first title](#my-first-title)
+1. [Use cases](#use-cases)
+1.1 [DataTable => CSV](#datatable-to-csv)
 2. [My second title](#my-second-title)
-## My first title
+
+## Use cases
 Some text.
+
+### Datatable to csv
+sub
+
 ## My second title
 
 Design decisions
