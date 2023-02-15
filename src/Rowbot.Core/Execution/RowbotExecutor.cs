@@ -31,11 +31,11 @@ namespace Rowbot.Execution
             target.Init(columns: columnNames);
 
             // Create buffer pool
-            var freeBufferPool = new BlockingCollection<object[]>();
-            var filledBufferPool = new BlockingCollection<object[]>();
+            var sourceBufferPool = new BlockingCollection<object[]>();
+            var targetBufferPool = new BlockingCollection<object[]>();
             for (var i = 0; i < maxQueueLength; i++)
             {
-                freeBufferPool.Add(new object[columnNames.Length]);
+                sourceBufferPool.Add(new object[columnNames.Length]);
             }
 
             Exception readerException = null;
@@ -43,24 +43,24 @@ namespace Rowbot.Execution
             {
                 try
                 {
-                    while (!freeBufferPool.IsAddingCompleted)
+                    while (!sourceBufferPool.IsAddingCompleted)
                     {
                         // freeBuffers == FILL => filledBuffers
-                        var buffer = freeBufferPool.Take();
+                        var buffer = sourceBufferPool.Take();
                         if (source.ReadRow(buffer))
                         {
-                            filledBufferPool.Add(buffer);
+                            targetBufferPool.Add(buffer);
                         }
                         else
                         {
-                            filledBufferPool.CompleteAdding();
+                            targetBufferPool.CompleteAdding();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     readerException = ex;
-                    filledBufferPool.CompleteAdding();
+                    targetBufferPool.CompleteAdding();
                 }
 
             }));
@@ -69,12 +69,12 @@ namespace Rowbot.Execution
 
             try
             {
-                while (!filledBufferPool.IsAddingCompleted)
+                while (!targetBufferPool.IsAddingCompleted)
                 {
                     // filledBuffers == PROCESS => freeBuffers
-                    var buffer = filledBufferPool.Take();
+                    var buffer = targetBufferPool.Take();
                     target.WriteRow(buffer);
-                    freeBufferPool.Add(buffer);
+                    sourceBufferPool.Add(buffer);
                 }
             }
             catch (InvalidOperationException) { }
