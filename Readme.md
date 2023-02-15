@@ -1,18 +1,66 @@
-# Table of Contents
+[TOC]
 
-1. [Use cases](#use-cases)
-1.1 [DataTable => CSV](#datatable-to-csv)
-2. [My second title](#my-second-title)
+# CSV use cases
 
-## Use cases
-Some text.
+## From DataTable to CSV
 
-### Datatable to csv
-sub
+## From DataReader to CSV
 
-## My second title
+## From class typed objects to CSV
 
-Design decisions
+## From anonymous typed objects to CSV
+
+## From dynamic objects to CSV
+
+## From custom source to CSV
+
+## From CSV to DataTable
+
+## From CSV to DataReader
+
+## From CSV to class typed objects
+
+## From CSV to anonymous typed objects
+
+## From CSV to dynamic objects
+
+## From CSV to custom target
+
+# Excel (.xlsx) use cases
+
+## From DataTable to Excel (.xlsx)
+
+## From DataReader to Excel (.xlsx)
+
+## From class typed objects to Excel (.xlsx)
+
+## From anonymous typed objects to Excel (.xlsx)
+
+## From dynamic objects to Excel (.xlsx)
+
+## From custom source to Excel (.xlsx)
+
+## From Excel (.xlsx) to DataTable
+
+## From Excel (.xlsx) to DataReader
+
+## From Excel (.xlsx) to class typed objects
+
+## From Excel (.xlsx) to anonymous typed objects
+
+## From Excel (.xlsx) to dynamic objects
+
+## From Excel (.xlsx) to custom target
+
+# Other use cases
+
+## From CSV to Excel (.xlsx)
+
+## From Excel (.xlsx) to CSV
+
+
+
+# Design decisions
 
 - Seperating source, execution and target
     - Easy plug and play any source with any target
