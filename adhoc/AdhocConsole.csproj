@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\Rowbot.Core\Rowbot.Core.csproj" />
+    <ProjectReference Include="..\src\Rowbot.CsvHelper\Rowbot.CsvHelper.csproj" />
   </ItemGroup>
 
 </Project>
