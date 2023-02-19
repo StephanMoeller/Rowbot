@@ -171,9 +171,9 @@ namespace Rowbot.Core.Targets
         {
             // Grow buffer if needed
             var requiredBufferSize = value.Length * 2 + 2;// Every char in string could be a quote, hence every char could be 2 chars in output as i would need to be escaped. And then 2 extra slots could be used for start and end quotes.
-            if (requiredBufferSize >= _charBuffer.Length)
+            if (requiredBufferSize > _charBuffer.Length)
             {
-                GrowBuffers(minimumCharSize: requiredBufferSize);
+                Array.Resize(ref _charBuffer, newSize: requiredBufferSize);
             }
 
             // value => char buffer
