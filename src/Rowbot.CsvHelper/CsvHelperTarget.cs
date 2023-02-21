@@ -12,7 +12,7 @@ namespace Rowbot.CsvHelper
     {
         private readonly CsvWriter _csvWriter;
         private readonly bool _writeHeaders;
-
+        private int _unflushedRowCount = 0;
         public CsvHelperTarget(Stream stream, CsvConfiguration configuration, bool writeHeaders) : this(new CsvWriter(new StreamWriter(stream), configuration))
         {
             _writeHeaders = writeHeaders;
@@ -30,7 +30,7 @@ namespace Rowbot.CsvHelper
 
         protected override void OnComplete()
         {
-            _csvWriter.Flush();
+            Flush();
         }
 
         protected override void OnInit(ColumnInfo[] columns)
@@ -50,6 +50,22 @@ namespace Rowbot.CsvHelper
             {
                 _csvWriter.WriteField(values[i]);
             }
+            _unflushedRowCount++;
+            FlushIfNeeded();
+        }
+
+        private void FlushIfNeeded()
+        {
+            if (_unflushedRowCount > 1000)
+            {
+                Flush();
+            }
+        }
+
+        private void Flush()
+        {
+            _csvWriter.Flush();
+            _unflushedRowCount = 0;
         }
     }
 }
