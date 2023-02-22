@@ -20,7 +20,7 @@ namespace AdhocConsole
             using (var fs = File.Create("c:\\temp\\output.csv"))
             {
                 var config = new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = ";", NewLine = "\r\n", BufferSize = 1000, };
-                using (var target = new CsvHelperTarget(stream: fs, configuration: config, writeHeaders: true))
+                using (var target = new CsvHelperTarget(stream: fs, configuration: config, writeHeaders: true, leaveOpen: true))
                 {
                     target.Init(new Rowbot.ColumnInfo[]{
                         new ColumnInfo(name: "Col1", typeof(string)),
