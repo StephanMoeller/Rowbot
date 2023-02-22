@@ -14,7 +14,7 @@ namespace Rowbot.CsvHelper
         private readonly bool _writeHeaders;
         private int _unflushedRowCount = 0;
         private bool _firstWrite = true;
-        public CsvHelperTarget(Stream stream, CsvConfiguration configuration, bool writeHeaders) : this(new CsvWriter(new StreamWriter(stream), configuration))
+        public CsvHelperTarget(Stream stream, CsvConfiguration configuration, bool writeHeaders = true, bool leaveOpen = false) : this(new CsvWriter(new StreamWriter(stream), configuration, leaveOpen: leaveOpen))
         {
             _writeHeaders = writeHeaders;
         }
@@ -32,11 +32,12 @@ namespace Rowbot.CsvHelper
         protected override void OnComplete()
         {
             Flush();
+            _csvWriter?.Dispose();
         }
 
         protected override void OnInit(ColumnInfo[] columns)
         {
-            if(_writeHeaders)
+            if (_writeHeaders)
             {
                 for (var i = 0; i < columns.Length; i++)
                 {
@@ -48,7 +49,7 @@ namespace Rowbot.CsvHelper
 
         protected override void OnWriteRow(object[] values)
         {
-            if(!_firstWrite)
+            if (!_firstWrite)
             {
                 _csvWriter.NextRecord();
             }
