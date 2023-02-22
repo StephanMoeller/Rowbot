@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Rowbot.CsvHelper\Rowbot.CsvHelper.csproj" />
+    <ProjectReference Include="..\..\src\Rowbot.CsvHelper\Rowbot.CsvHelper.csproj" />
   </ItemGroup>
 
 </Project>
