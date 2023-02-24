@@ -22,7 +22,7 @@ namespace Rowbot.ClosedXml.Test
 
                 target.Complete();
 
-                EnsureExcelContent(ms, expectedRowValues: new object[0][]);
+                EnsureExcelContent(ms, expectedSheetName: "My unittest æøå δ sheet", expectedRowValues: new object[0][]);
             }
         }
 
@@ -40,7 +40,7 @@ namespace Rowbot.ClosedXml.Test
 
                 target.Complete();
 
-                EnsureExcelContent(ms, expectedRowValues: new object[0][]);
+                EnsureExcelContent(ms, expectedSheetName: "My unittest æøå δ sheet", expectedRowValues: new object[0][]);
             }
         }
 
@@ -58,7 +58,7 @@ namespace Rowbot.ClosedXml.Test
 
                 target.Complete();
 
-                EnsureExcelContent(ms, expectedRowValues: new object[][] {
+                EnsureExcelContent(ms, expectedSheetName: "My unittest æøå δ sheet", expectedRowValues: new object[][] {
                     new object[]{ "Col1", "Col2", "Col æøå 3; and this is an inline quote: ' awdawd" }
                 });
             }
@@ -91,7 +91,7 @@ namespace Rowbot.ClosedXml.Test
                 //    fs.Close();
                 //}
 
-                EnsureExcelContent(ms, expectedRowValues: new object?[][] {
+                EnsureExcelContent(ms, expectedSheetName: "My unittest æøå δ sheet", expectedRowValues: new object?[][] {
                     new object[]{ "", "Col æøå 3; and this is an inline quote: ' awdawd", "" },
                     new object?[] { "Hello ÆØÅ", "-12,45", "8123456" },
                     new object?[] { "", "", "" },
@@ -127,7 +127,7 @@ namespace Rowbot.ClosedXml.Test
                 //    fs.Close();
                 //}
 
-                EnsureExcelContent(ms, expectedRowValues: new object?[][] {
+                EnsureExcelContent(ms, expectedSheetName: "My unittest æøå δ sheet", expectedRowValues: new object?[][] {
                     new object?[] { "Hello ÆØÅ", "-12,45", "8123456" },
                     new object?[] { "", "", "" },
                     new object?[] { "", "", "" },
@@ -136,7 +136,7 @@ namespace Rowbot.ClosedXml.Test
             }
         }
 
-        private void EnsureExcelContent(MemoryStream ms, object?[][] expectedRowValues)
+        private void EnsureExcelContent(MemoryStream ms, string expectedSheetName, object?[][] expectedRowValues)
         {
             ms.Position = 0;
 
@@ -149,6 +149,7 @@ namespace Rowbot.ClosedXml.Test
                 Assert.Equal(1, workBook.Worksheets.Count); // Ensure only one sheet in thing to open
 
                 IXLWorksheet workSheet = workBook.Worksheet(1);
+                Assert.Equal(expectedSheetName, workSheet.Name);
 
                 //Create a new DataTable.
                 DataTable dt = new DataTable();

@@ -8,6 +8,7 @@ using Rowbot.Core.Targets;
 using System.Text;
 using CsvHelper.Configuration;
 using System.Diagnostics;
+using Rowbot.ClosedXml;
 
 namespace AdhocConsole
 {
@@ -20,7 +21,7 @@ namespace AdhocConsole
             using (var fs = File.Create("c:\\temp\\output.csv"))
             {
                 var config = new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = ";", NewLine = "\r\n", BufferSize = 1000, };
-                using (var target = new CsvHelperTarget(stream: fs, configuration: config, writeHeaders: true, leaveOpen: true))
+                using (var target = new ClosedXmlExcelTarget(outputStream: fs, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
                 {
                     target.Init(new Rowbot.ColumnInfo[]{
                         new ColumnInfo(name: "Col1", typeof(string)),
