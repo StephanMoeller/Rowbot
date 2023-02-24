@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Rowbot.Core\Rowbot.Core.csproj" />
+    <ProjectReference Include="..\Rowbot.Core\Rowbot.Core.csproj" />
   </ItemGroup>
 
 </Project>

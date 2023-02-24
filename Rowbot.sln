@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{74C2EA94
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rowbot.Core", "src\Rowbot.Core\Rowbot.Core.csproj", "{C7F949ED-8D9C-44F9-9685-6AA57900D530}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rowbot.Test", "tests\Rowbot.Core.Test\Rowbot.Test.csproj", "{03922F7F-4E76-40FB-A062-46AD134547AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rowbot.Core.Test", "tests\Rowbot.Core.Test\Rowbot.Core.Test.csproj", "{03922F7F-4E76-40FB-A062-46AD134547AA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "adhoc", "adhoc", "{4FE9E565-25E5-4285-ADD9-4886A5A6DA00}"
 EndProject
