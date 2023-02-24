@@ -18,7 +18,7 @@ namespace AdhocConsole
         {
             var sw = Stopwatch.StartNew();
 
-            using (var fs = File.Create("c:\\temp\\output.csv"))
+            using (var fs = File.Create("c:\\temp\\output.xlsx"))
             {
                 var config = new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = ";", NewLine = "\r\n", BufferSize = 1000, };
                 using (var target = new ClosedXmlExcelTarget(outputStream: fs, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
