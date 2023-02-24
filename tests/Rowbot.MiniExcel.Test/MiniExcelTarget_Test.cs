@@ -1,8 +1,8 @@
 ﻿using ClosedXML.Excel;
 
-namespace Rowbot.ClosedXml.Test
+namespace Rowbot.MiniExcel.Test
 {
-    public class ClosedXmlExcelTarget_Test
+    public class MiniExcelTarget_Test
     {
         [Theory]
         [InlineData(true)]
@@ -10,7 +10,7 @@ namespace Rowbot.ClosedXml.Test
         public void EmptyColumns_ExpectNoRowsAsExcelDoesNotHaveTheConceptOfEmptySheetWithRows_Test(bool writeHeaders)
         {
             using (var ms = new MemoryStream())
-            using (var target = new ClosedXmlExcelTarget(ms, sheetName: "My unittest æøå δ sheet", writeHeaders: writeHeaders, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            using (var target = new MiniExcelTarget(ms, sheetName: "My unittest æøå δ sheet", writeHeaders: writeHeaders, leaveOpen: true)) // Leave open to be able to read from the stream after completion
             {
                 target.Init(new ColumnInfo[] { });
 
@@ -27,7 +27,7 @@ namespace Rowbot.ClosedXml.Test
         public void NoRows_WithWriteHeadersOff_ExpectNoRowsAsExcelDoesNotHaveTheConceptOfEmptySheetWithRows_Test()
         {
             using (var ms = new MemoryStream())
-            using (var target = new ClosedXmlExcelTarget(ms, sheetName: "My unittest æøå δ sheet", writeHeaders: false, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            using (var target = new MiniExcelTarget(ms, sheetName: "My unittest æøå δ sheet", writeHeaders: false, leaveOpen: true)) // Leave open to be able to read from the stream after completion
             {
                 target.Init(new ColumnInfo[]{
                         new ColumnInfo(name: "Col1", valueType: typeof(string)),
@@ -45,7 +45,7 @@ namespace Rowbot.ClosedXml.Test
         public void NoRows_WithWriteHeadersOn_ExpectEmptyTableWithDefinedColumns_Test()
         {
             using (var ms = new MemoryStream())
-            using (var target = new ClosedXmlExcelTarget(ms, sheetName: "My unittest æøå δ sheet", writeHeaders: true, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            using (var target = new MiniExcelTarget(ms, sheetName: "My unittest æøå δ sheet", writeHeaders: true, leaveOpen: true)) // Leave open to be able to read from the stream after completion
             {
                 target.Init(new ColumnInfo[]{
                         new ColumnInfo(name: "Col1", valueType: typeof(string)),
@@ -66,7 +66,7 @@ namespace Rowbot.ClosedXml.Test
         public void WithRows_WithWriteHeadersOn_ExpectTableWithDefinedColumns_Test()
         {
             using (var ms = new MemoryStream())
-            using (var target = new ClosedXmlExcelTarget(ms, sheetName: "My unittest æøå δ sheet", writeHeaders: true, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            using (var target = new MiniExcelTarget(ms, sheetName: "My unittest æøå δ sheet", writeHeaders: true, leaveOpen: true)) // Leave open to be able to read from the stream after completion
             {
                 target.Init(new ColumnInfo[]{
                         new ColumnInfo(name: "", valueType: typeof(string)),
@@ -102,7 +102,7 @@ namespace Rowbot.ClosedXml.Test
         public void WithRows_WithWriteHeadersOff_ExpectTableWithDefinedColumns_Test()
         {
             using (var ms = new MemoryStream())
-            using (var target = new ClosedXmlExcelTarget(ms, sheetName: "My unittest æøå δ sheet", writeHeaders: false, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            using (var target = new MiniExcelTarget(ms, sheetName: "My unittest æøå δ sheet", writeHeaders: false, leaveOpen: true)) // Leave open to be able to read from the stream after completion
             {
                 target.Init(new ColumnInfo[]{
                         new ColumnInfo(name: "", valueType: typeof(string)),
@@ -147,15 +147,15 @@ namespace Rowbot.ClosedXml.Test
         {
             using (var ms = new MemoryStream())
             {
-                ClosedXmlExcelTarget target;
+                MiniExcelTarget target;
                 if (leaveOpen == null)
                 {
                     // Rely on default behaviour
-                    target = new ClosedXmlExcelTarget(ms, writeHeaders: true, sheetName: "SomeName");
+                    target = new MiniExcelTarget(ms, writeHeaders: true, sheetName: "SomeName");
                 }
                 else
                 {
-                    target = new ClosedXmlExcelTarget(ms, writeHeaders: true, sheetName: "SomeName", leaveOpen: leaveOpen.Value);
+                    target = new MiniExcelTarget(ms, writeHeaders: true, sheetName: "SomeName", leaveOpen: leaveOpen.Value);
                 }
 
                 using (target)
@@ -193,6 +193,7 @@ namespace Rowbot.ClosedXml.Test
 
         }
 
+        // For ease of code copy, ClosedXml is used for validating MiniExcel's output
         private void EnsureExcelContent(MemoryStream ms, string expectedSheetName, object?[][] expectedRowValues)
         {
             ms.Position = 0;

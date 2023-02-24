@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MiniExcel" Version="1.30.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Rowbot.Core\Rowbot.Core.csproj" />
   </ItemGroup>
 
