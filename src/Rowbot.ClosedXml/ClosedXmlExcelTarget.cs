@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.IO;
 
@@ -63,9 +64,53 @@ namespace Rowbot.ClosedXml
         {
             for (var i = 0; i < values.Length; i++)
             {
-                _worksheet.Cell(row: _rowIndex, column: i + 1).Value = values[i]?.ToString();
+                _worksheet.Cell(row: _rowIndex, column: i + 1).Value = CreateCellValue(values[i]);
             }
             _rowIndex++;
+        }
+
+        // This method has been copied from 
+        public static XLCellValue CreateCellValue(object value)
+        {
+            // This list of cases has been copied from the OpenXML source code directly (From inside XLWorksheet.cs)
+            if (value == null) return Blank.Value;
+            if (value is Blank blankValue)
+                return blankValue;
+            if (value is Boolean logical)
+                return logical;
+            if (value is SByte val_sbyte)
+                return val_sbyte;
+            if (value is Byte val_byte)
+                return val_byte;
+            if (value is Int16 val_int16)
+                return val_int16;
+            if (value is UInt16 val_uint16)
+                return val_uint16;
+            if (value is Int32 val_int32)
+                return val_int32;
+            if (value is UInt32 val_uint32)
+                return val_uint32;
+            if (value is Int64 val_int64)
+                return val_int64;
+            if (value is UInt64 val_uint64)
+                return val_uint64;
+            if (value is Single val_single)
+                return val_single;
+            if (value is Double val_double)
+                return val_double;
+            if (value is Decimal val_decimal)
+                return val_decimal;
+            if (value is String text )
+                return  text;
+            if (value is XLError error )
+                return  error;
+            if (value is DateTime date )
+                return  date;
+            if (value is DateTimeOffset dateOfs )
+                return  dateOfs.DateTime;
+            if (value is TimeSpan timeSpan )
+                return  timeSpan;
+            return value.ToString(); // Other things, like chars ect are just turned to string
         }
     }
 }

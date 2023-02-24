@@ -79,7 +79,7 @@ namespace Rowbot.ClosedXml.Test
 
                 target.WriteRow(new object?[] { "Hello ÆØÅ", -12.45m, 8_123_456 });
                 target.WriteRow(new object?[] { null, null, null });
-                target.WriteRow(new object?[] { "", null, null });
+                target.WriteRow(new object?[] { "", "", "" });
                 target.WriteRow(new object?[] { "Hello again \r\n with multi lines", null, 8_123_456 });
 
                 target.Complete();
@@ -92,11 +92,11 @@ namespace Rowbot.ClosedXml.Test
                 //}
 
                 EnsureExcelContent(ms, expectedSheetName: "My unittest æøå δ sheet", expectedRowValues: new object?[][] {
-                    new object[]{ "", "Col æøå 3; and this is an inline quote: ' awdawd", "" },
-                    new object?[] { "Hello ÆØÅ", "-12,45", "8123456" },
-                    new object?[] { "", "", "" },
-                    new object?[] { "", "", "" },
-                    new object?[] { "Hello again \n with multi lines", "", "8123456" } // \r\n becomes \n when closed xml writes and reads
+                    new object?[]{ null, "Col æøå 3; and this is an inline quote: ' awdawd", null },
+                    new object?[] { "Hello ÆØÅ", -12.45m, 8123456 },
+                    new object?[] { null, null, null },
+                    new object?[] { null, null, null }, // Empty strings become blanks with the ClosedXml framework. (Or maybe in excel in general)
+                    new object?[] { "Hello again \n with multi lines", null, 8123456 } // \r\n becomes \n when closed xml writes and reads
                 });
             }
         }
@@ -115,7 +115,7 @@ namespace Rowbot.ClosedXml.Test
 
                 target.WriteRow(new object?[] { "Hello ÆØÅ", -12.45m, 8_123_456 });
                 target.WriteRow(new object?[] { null, null, null });
-                target.WriteRow(new object?[] { "", null, null });
+                target.WriteRow(new object?[] { "", "", "" });
                 target.WriteRow(new object?[] { "Hello again \r\n with multi lines", null, 8_123_456 });
 
                 target.Complete();
@@ -128,10 +128,10 @@ namespace Rowbot.ClosedXml.Test
                 //}
 
                 EnsureExcelContent(ms, expectedSheetName: "My unittest æøå δ sheet", expectedRowValues: new object?[][] {
-                    new object?[] { "Hello ÆØÅ", "-12,45", "8123456" },
-                    new object?[] { "", "", "" },
-                    new object?[] { "", "", "" },
-                    new object?[] { "Hello again \n with multi lines", "", "8123456" } // \r\n becomes \n when closed xml writes and reads
+                    new object?[] { "Hello ÆØÅ", -12.45m, 8123456 },
+                    new object?[] { null, null, null },
+                    new object?[] { null, null, null }, // Empty strings become blanks with the ClosedXml framework. (Or maybe in excel in general)
+                    new object?[] { "Hello again \n with multi lines", null, 8123456 } // \r\n becomes \n when closed xml writes and reads
                 });
             }
         }
@@ -161,7 +161,7 @@ namespace Rowbot.ClosedXml.Test
                     for (var columnIndex = 0; columnIndex < expectedRow.Length; columnIndex++)
                     {
                         var value = workSheet.Cell(row: rowIndex + 1, column: columnIndex + 1).Value;
-                        Assert.Equal((object)expectedRow[columnIndex], (object)value.ToString());
+                        Assert.Equal(ClosedXmlExcelTarget.CreateCellValue(expectedRow[columnIndex]), (object)value);
                     }
                 }
             }
