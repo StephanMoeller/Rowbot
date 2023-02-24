@@ -10,7 +10,7 @@ namespace Rowbot.Test
     public class RowSource_Test
     {
         [Fact]
-        public void Call_InitAndGetCOlumns_EnsureArrayPassedThrough()
+        public void Call_InitAndGetColumns_EnsureArrayPassedThrough()
         {
             var source = new UnitTestSource();
             Assert.Equal(0, source.OnInitCallCount);
@@ -18,6 +18,20 @@ namespace Rowbot.Test
             var columns = source.InitAndGetColumns();
             Assert.Same(source.Columns, columns);
             Assert.Equal(1, source.OnInitCallCount);
+        }
+
+        [Fact]
+        public void Call_InitAndGetColumns_EmptyColumnArray_ExpectAllowed()
+        {
+            var emptyColumnArray = new ColumnInfo[0];
+
+            var source = new UnitTestSource();
+            source.Columns = emptyColumnArray;
+
+            Assert.Equal(0, source.OnInitCallCount);
+
+            var columns = source.InitAndGetColumns();
+            Assert.Same(emptyColumnArray, columns);
         }
 
         [Fact]
