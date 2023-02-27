@@ -1,12 +1,31 @@
 ﻿using Rowbot.Core.Utils;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace Rowbot.Core.Targets
 {
+    public class CsvConfig
+    {
+        public char Delimiter { get; set; }
+        public char Quote { get; set; }
+        public string Newline { get; set; }
+        public Encoding Encoding { get; set; }
+        public CultureInfo NumberFormatter { get; set; }
+
+        public CsvConfig()
+        {
+            Quote = '"';
+            Delimiter = ';';
+            Newline = "\r\n";
+            Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+            NumberFormatter = new CultureInfo("en-US");
+        }
+    }
+
     public class CsvTarget : RowTarget
     {
         private readonly Stream _outputStream;
@@ -15,33 +34,19 @@ namespace Rowbot.Core.Targets
         private readonly NumberToStringBytesSerializer _intSerializer;
         private readonly CsvEscapingHelper _escapingHelper;
         private byte[] _newLineBytes;
-        private Func<object, byte[], int, int>[] _serializersByPropertyIndex;
 
-        private Dictionary<Type, Func<object, byte[], int, int>> _serializersByType;
-        private Func<object, byte[], int, int> _fallbackSerializer;
         private bool _initialized = false;
         private bool _completed = false;
+        private CultureInfo _numberFormatter;
         public CsvTarget(Stream outputStream, CsvConfig csvConfig)
         {
             _outputStream = outputStream ?? throw new ArgumentNullException(nameof(outputStream));
+            _numberFormatter = csvConfig.NumberFormatter;
             _encoding = csvConfig.Encoding;
             _delimiter = _encoding.GetBytes(new[] { csvConfig.Delimiter }).Single();
             _newLineBytes = _encoding.GetBytes(csvConfig.Newline);
             _intSerializer = new NumberToStringBytesSerializer(_encoding);
             _escapingHelper = new CsvEscapingHelper(delimiter: csvConfig.Delimiter, quote: csvConfig.Quote, encoding: csvConfig.Encoding);
-            _serializersByType = new Dictionary<Type, Func<object, byte[], int, int>>
-            {
-                { typeof(byte), (value, buffer, offset) => _intSerializer.SerializeToStringToBytes(val: (byte)value, buffer: buffer, offset: offset) },
-                { typeof(byte?), (value, buffer, offset) => _intSerializer.SerializeToStringToBytes(val: (byte) value, buffer: buffer, offset: offset) },
-                { typeof(short), (value, buffer, offset) => _intSerializer.SerializeToStringToBytes(val: (short) value, buffer: buffer, offset: offset) },
-                { typeof(short?), (value, buffer, offset) => _intSerializer.SerializeToStringToBytes(val: (short)value, buffer: buffer, offset: offset) },
-                { typeof(int), (value, buffer, offset) => _intSerializer.SerializeToStringToBytes(val: (int)value, buffer: buffer, offset: offset) },
-                { typeof(int?), (value, buffer, offset) => _intSerializer.SerializeToStringToBytes(val: (int)value, buffer: buffer, offset: offset) },
-                { typeof(long), (value, buffer, offset) => _intSerializer.SerializeToStringToBytes(val: (long)value, buffer: buffer, offset: offset) },
-                { typeof(long?), (value, buffer, offset) => _intSerializer.SerializeToStringToBytes(val: (long)value, buffer: buffer, offset: offset) },
-                { typeof(string), (value, buffer, offset) => _escapingHelper.WriteEscapedString(value: (string)value, buffer: buffer, offset: offset) },
-            };
-            _fallbackSerializer = (value, buffer, offset) => _escapingHelper.WriteEscapedString(value: value.ToString(), buffer: buffer, offset: offset);
         }
 
         public override void Dispose()
@@ -58,8 +63,6 @@ namespace Rowbot.Core.Targets
                 throw new InvalidOperationException("Init already called");
             _initialized = true;
 
-
-            _serializersByPropertyIndex = new Func<object, byte[], int, int>[columns.Length];
             for (var i = 0; i < columns.Length; i++)
             {
                 var column = columns[i];
@@ -69,9 +72,6 @@ namespace Rowbot.Core.Targets
                 }
                 var bytes = _escapingHelper.WriteEscapedString(column.Name, _buffer, _bufferIndex);
                 _bufferIndex += bytes;
-
-                // Create serializers pr property index for effective reference during row-writes
-                _serializersByPropertyIndex[i] = _serializersByType.ContainsKey(column.ValueType) ? _serializersByType[column.ValueType] : _fallbackSerializer;
             }
 
             FlushIfNeeded();
@@ -110,7 +110,6 @@ namespace Rowbot.Core.Targets
 
         protected override void OnWriteRow(object[] values)
         {
-
             // Write newline
             for (var i = 0; i < _newLineBytes.Length; i++)
             {
@@ -128,29 +127,68 @@ namespace Rowbot.Core.Targets
                 var value = values[i];
                 if (value != null)
                 {
-                    var serializer = _serializersByPropertyIndex[i];
-                    int byteCount = serializer(value, _buffer, _bufferIndex);
-                    _bufferIndex += byteCount;
+                    switch (value)
+                    {
+                        case bool val:
+                            if (val)
+                            {
+                                _bufferIndex += _escapingHelper.WriteEscapedString(value: "true", buffer: _buffer, offset: _bufferIndex);
+                            }
+                            else
+                            {
+                                _bufferIndex += _escapingHelper.WriteEscapedString(value: "false", buffer: _buffer, offset: _bufferIndex);
+                            }
+                            break;
+                        case SByte val:
+                            _bufferIndex += _intSerializer.SerializeToStringToBytes(val: val, buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case Byte val:
+                            _bufferIndex += _intSerializer.SerializeToStringToBytes(val: val, buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case Int16 val:
+                            _bufferIndex += _intSerializer.SerializeToStringToBytes(val: val, buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case UInt16 val:
+                            _bufferIndex += _intSerializer.SerializeToStringToBytes(val: val, buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case Int32 val:
+                            _bufferIndex += _intSerializer.SerializeToStringToBytes(val: val, buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case UInt32 val:
+                            _bufferIndex += _intSerializer.SerializeToStringToBytes(val: val, buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case Int64 val:
+                            _bufferIndex += _intSerializer.SerializeToStringToBytes(val: val, buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case UInt64 val:
+                            throw new NotImplementedException("UInt64 not yet implemented");
+                            break;
+                        case Single val:
+                            _bufferIndex += _escapingHelper.WriteEscapedString(value: val.ToString("G", _numberFormatter), buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case Double val:
+                            _bufferIndex += _escapingHelper.WriteEscapedString(value: val.ToString("G", _numberFormatter), buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case Decimal val:
+                            _bufferIndex += _escapingHelper.WriteEscapedString(value: val.ToString("G", _numberFormatter), buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case String str:
+                            _bufferIndex += _escapingHelper.WriteEscapedString(value: str, buffer: _buffer, offset: _bufferIndex);
+                            break;
+                        case DateTime val:
+                            throw new NotImplementedException();
+                        case DateTimeOffset val:
+                            throw new NotImplementedException();
+                        case TimeSpan val:
+                            throw new NotImplementedException();
+                        default:
+                            _bufferIndex += _escapingHelper.WriteEscapedString(value: value.ToString(), buffer: _buffer, offset: _bufferIndex);
+                            break;
+                    }
                 }
             }
 
             FlushIfNeeded();
-        }
-    }
-
-    public class CsvConfig
-    {
-        public char Delimiter { get; set; }
-        public char Quote { get; set; }
-        public string Newline { get; set; }
-        public Encoding Encoding { get; set; }
-
-        public CsvConfig()
-        {
-            Quote = '"';
-            Delimiter = ';';
-            Newline = "\r\n";
-            Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
         }
     }
 

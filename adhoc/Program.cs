@@ -9,6 +9,10 @@ using System.Text;
 using CsvHelper.Configuration;
 using System.Diagnostics;
 using Rowbot.ClosedXml;
+using System.IO.Compression;
+using BenchmarkDotNet.Attributes;
+using System.Security.Cryptography;
+using BenchmarkDotNet.Running;
 
 namespace AdhocConsole
 {
@@ -16,44 +20,99 @@ namespace AdhocConsole
     {
         static void Main(string[] args)
         {
-            var sw = Stopwatch.StartNew();
+            var summary = BenchmarkRunner.Run<ExcelBenchmark>();
 
-            using (var fs = File.Create("c:\\temp\\output.xlsx"))
+            //using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
+            //// using (var outputStream = new MemoryStream())
+            //{
+            //    using (var target = new ClosedXmlExcelTarget(outputStream: outputStream, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
+            //    // using (var target = targetProvider(outputStream))
+            //    {
+            //        var range = Enumerable.Range(0, 10);
+            //        target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
+
+            //        object[] data = range.Select(num => new DateTime(2001,02,03,04,05,06)).Cast<object>().ToArray();
+
+            //        for (var i = 0; i < 10; i++)
+            //        {
+            //            target.WriteRow(data);
+            //        }
+
+            //        target.Complete();
+            //    }
+            //    outputStream.Close();
+            //}
+
+            //Console.WriteLine("done");
+            //Console.ReadLine();
+        }
+    }
+
+
+    public class CsvBenchmark
+    {
+        [Benchmark]
+        public void V1() => RunInternal(outputStream => new CsvTarget(outputStream: outputStream, new CsvConfig(){ }));
+
+        //[Benchmark]
+        //public void V2() => RunInternal(outputStream => new CsvTargetV2(outputStream: outputStream, new CsvConfig() { }));
+
+        private void RunInternal(Func<Stream, RowTarget> targetProvider)
+        {
+            //using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
+            using (var outputStream = new MemoryStream())
             {
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = ";", NewLine = "\r\n", BufferSize = 1000, };
-                using (var target = new ClosedXmlExcelTarget(outputStream: fs, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
+                // using (var target = new ClosedXmlExcelTarget(outputStream: zipFileMemoryStream, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
+                using (var target = targetProvider(outputStream))
                 {
-                    target.Init(new Rowbot.ColumnInfo[]{
-                        new ColumnInfo(name: "Col1", typeof(string)),
-                        new ColumnInfo(name: "Col2", typeof(string)),
-                        new ColumnInfo(name: "Col3", typeof(string))
-                    });
-                    var values = new object[] { new string('a', 30), new string('b', 30), new string('c', 30) };
-                    for (var i = 0; i < 10_000_000; i++)
+                    var range = Enumerable.Range(0, 100);
+                    target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
+
+                    object[] data = range.Select(num => num.ToString()).ToArray();
+
+                    for (var i = 0; i < 50_000; i++)
                     {
-                        target.WriteRow(values);
-                        fs.Flush();
+                        target.WriteRow(data);
                     }
+
+                    target.Complete();
                 }
+                outputStream.Close();
             }
 
-            //using (var fs = File.Create("c:\\temp\\output_turbo.csv"))
-            //{
-            //    using (var target = new CsvTarget(outputStream: fs, csvConfig: new CsvConfig() { Delimiter = ';', Newline = "\r\n", Quote = '"', Encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false) }))
-            //    {
-            //        target.Init(new Rowbot.ColumnInfo[]{
-            //            new ColumnInfo(name: "Col1", typeof(string)),
-            //            new ColumnInfo(name: "Col2", typeof(string)),
-            //            new ColumnInfo(name: "Col3", typeof(string))
-            //        });
-            //        var values = new object[] { new string('a', 30), new string('b', 30), new string('c', 30) };
-            //        for (var i = 0; i < 10_000_000; i++)
-            //        {
-            //            target.WriteRow(values);
-            //        }
-            //    }
-            //}
-            Console.WriteLine(sw.ElapsedMilliseconds);
+        }
+    }
+
+    public class ExcelBenchmark
+    {
+        [Benchmark]
+        public void ExcelTarget() => RunInternal(outputStream => new ExcelTarget(outputStream: outputStream, writeHeaders: false, leaveOpen: true));
+        //[Benchmark]
+        //public void ExcelTargetV2() => RunInternal(outputStream => new ExcelTargetV2(outputStream: outputStream, writeHeaders: false, leaveOpen: true));
+
+        private void RunInternal(Func<Stream, RowTarget> targetProvider)
+        {
+            //using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
+            using (var outputStream = new MemoryStream())
+            {
+                // using (var target = new ClosedXmlExcelTarget(outputStream: zipFileMemoryStream, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
+                using (var target = targetProvider(outputStream))
+                {
+                    var range = Enumerable.Range(0, 100);
+                    target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
+
+                    object[] data = range.Select(num => "<" + new string('a', 100)).ToArray();
+
+                    for (var i = 0; i < 1_000; i++)
+                    {
+                        target.WriteRow(data);
+                    }
+
+                    target.Complete();
+                }
+                outputStream.Close();
+            }
+
         }
     }
 }

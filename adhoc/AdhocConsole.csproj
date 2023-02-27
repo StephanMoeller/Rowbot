@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\src\Rowbot.ClosedXml\Rowbot.ClosedXml.csproj" />
     <ProjectReference Include="..\src\Rowbot.Core\Rowbot.Core.csproj" />
     <ProjectReference Include="..\src\Rowbot.CsvHelper\Rowbot.CsvHelper.csproj" />

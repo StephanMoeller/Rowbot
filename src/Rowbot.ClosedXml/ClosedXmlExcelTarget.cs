@@ -66,6 +66,7 @@ namespace Rowbot.ClosedXml
             {
                 _worksheet.Cell(row: _rowIndex, column: i + 1).Value = CreateCellValue(values[i]);
             }
+            
             _rowIndex++;
         }
 
