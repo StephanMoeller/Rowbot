@@ -30,12 +30,16 @@ namespace Rowbot.Test.Targets
             }
         }
 
-        [Fact]
-        public void WriteColumnsAndRows_Test()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        [InlineData(null)]
+        public void WriteColumnsAndRows_Test(bool? writeHeaders)
         {
             using (var ms = new MemoryStream())
             {
-                var target = new CsvTarget(ms, new CsvConfig() { Delimiter = ';', Quote = '\'', Newline = "\r\n", NumberFormatter = new CultureInfo("da-DK") });
+                var target = writeHeaders != null ? new CsvTarget(ms, new CsvConfig() { Delimiter = ';', Quote = '\'', Newline = "\r\n", NumberFormatter = new CultureInfo("da-DK") }, writeHeaders: writeHeaders.Value)
+                                                    : new CsvTarget(ms, new CsvConfig() { Delimiter = ';', Quote = '\'', Newline = "\r\n", NumberFormatter = new CultureInfo("da-DK") });
 
                 target.Init(new ColumnInfo[]{
                     new ColumnInfo(name: "Col1", valueType: typeof(string)),
@@ -53,12 +57,22 @@ namespace Rowbot.Test.Targets
                 target.Complete();
 
                 var result = Encoding.UTF8.GetString(ms.ToArray());
-                Assert.Equal("Col1;Col2;Col3;'Col æøå 3; and this is an inline quote: '' awdawd'\r\n"
-                           + "Hello there æå 1;-12,45;hi;there\r\n"
-                           + "Hello there æå 2;12,45;;\r\n"
-                           + "Hello there æå 3;;'This text has a '' in it.';'And this has a \r CR'\r\n"
-                           + "'Here is a \n LF';0;'And this one has\r\n both CRLF';'This one has \r\n multiple \r \r occurrenced \n \n of each'\r\n"
-                           + "'This one contains the delimier as value; hence it should also be wrapped in quotes';0;Hey;Hoo", result);
+                if(writeHeaders != false) // Null is expected to be treated as true
+                {
+                    Assert.Equal("Col1;Col2;Col3;'Col æøå 3; and this is an inline quote: '' awdawd'\r\n"
+                               + "Hello there æå 1;-12,45;hi;there\r\n"
+                               + "Hello there æå 2;12,45;;\r\n"
+                               + "Hello there æå 3;;'This text has a '' in it.';'And this has a \r CR'\r\n"
+                               + "'Here is a \n LF';0;'And this one has\r\n both CRLF';'This one has \r\n multiple \r \r occurrenced \n \n of each'\r\n"
+                               + "'This one contains the delimier as value; hence it should also be wrapped in quotes';0;Hey;Hoo", result);
+                }else{
+                    Assert.Equal("Hello there æå 1;-12,45;hi;there\r\n"
+                                + "Hello there æå 2;12,45;;\r\n"
+                                + "Hello there æå 3;;'This text has a '' in it.';'And this has a \r CR'\r\n"
+                                + "'Here is a \n LF';0;'And this one has\r\n both CRLF';'This one has \r\n multiple \r \r occurrenced \n \n of each'\r\n"
+                                + "'This one contains the delimier as value; hence it should also be wrapped in quotes';0;Hey;Hoo", result);
+                }
+                
             }
         }
 

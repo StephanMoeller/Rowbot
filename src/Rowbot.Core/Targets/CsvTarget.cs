@@ -29,6 +29,7 @@ namespace Rowbot.Core.Targets
     public class CsvTarget : RowTarget
     {
         private readonly Stream _outputStream;
+        private readonly bool _writeHeaders;
         private readonly Encoding _encoding;
         private readonly byte _delimiter;
         private readonly NumberToStringBytesSerializer _intSerializer;
@@ -38,9 +39,11 @@ namespace Rowbot.Core.Targets
         private bool _initialized = false;
         private bool _completed = false;
         private CultureInfo _numberFormatter;
-        public CsvTarget(Stream outputStream, CsvConfig csvConfig)
+        private bool _startNextRowWithNewLine = false;
+        public CsvTarget(Stream outputStream, CsvConfig csvConfig, bool writeHeaders = true)
         {
             _outputStream = outputStream ?? throw new ArgumentNullException(nameof(outputStream));
+            _writeHeaders = writeHeaders;
             _numberFormatter = csvConfig.NumberFormatter;
             _encoding = csvConfig.Encoding;
             _delimiter = _encoding.GetBytes(new[] { csvConfig.Delimiter }).Single();
@@ -63,15 +66,23 @@ namespace Rowbot.Core.Targets
                 throw new InvalidOperationException("Init already called");
             _initialized = true;
 
-            for (var i = 0; i < columns.Length; i++)
+            if (_writeHeaders)
             {
-                var column = columns[i];
-                if (i > 0)
+                for (var i = 0; i < columns.Length; i++)
                 {
-                    _buffer[_bufferIndex++] = _delimiter;
+                    var column = columns[i];
+                    if (i > 0)
+                    {
+                        _buffer[_bufferIndex++] = _delimiter;
+                    }
+                    var bytes = _escapingHelper.WriteEscapedString(column.Name, _buffer, _bufferIndex);
+                    _bufferIndex += bytes;
                 }
-                var bytes = _escapingHelper.WriteEscapedString(column.Name, _buffer, _bufferIndex);
-                _bufferIndex += bytes;
+                _startNextRowWithNewLine = true;
+            }
+            else
+            {
+                _startNextRowWithNewLine = false;
             }
 
             FlushIfNeeded();
@@ -107,14 +118,17 @@ namespace Rowbot.Core.Targets
             }
         }
 
-
         protected override void OnWriteRow(object[] values)
         {
-            // Write newline
-            for (var i = 0; i < _newLineBytes.Length; i++)
+            if (_startNextRowWithNewLine)
             {
-                _buffer[_bufferIndex++] = _newLineBytes[i];
+                // Write newline
+                for (var i = 0; i < _newLineBytes.Length; i++)
+                {
+                    _buffer[_bufferIndex++] = _newLineBytes[i];
+                }
             }
+
 
             for (var i = 0; i < values.Length; i++)
             {
@@ -189,6 +203,8 @@ namespace Rowbot.Core.Targets
             }
 
             FlushIfNeeded();
+
+            _startNextRowWithNewLine = true;
         }
     }
 

@@ -24,7 +24,7 @@ namespace AdhocConsole
             // using (var outputStream = new MemoryStream())
             {
                 //using (var target = new ClosedXmlExcelTarget(outputStream: outputStream, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
-                using (var target = new ExcelTarget(outputStream: outputStream, writeHeaders: false, leaveOpen: true))
+                using (var target = new ExcelTarget(outputStream: outputStream, sheetName: "MySheet", writeHeaders: false, leaveOpen: true))
                 {
                     var range = Enumerable.Range(0, 10);
                     target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
@@ -84,7 +84,7 @@ namespace AdhocConsole
     public class ExcelBenchmark
     {
         [Benchmark]
-        public void ExcelTarget() => RunInternal(outputStream => new ExcelTarget(outputStream: outputStream, writeHeaders: false, leaveOpen: true));
+        public void ExcelTarget() => RunInternal(outputStream => new ExcelTarget(outputStream: outputStream, sheetName: "MySheet", writeHeaders: false, leaveOpen: true));
         //[Benchmark]
         //public void ExcelTargetV2() => RunInternal(outputStream => new ExcelTargetV2(outputStream: outputStream, writeHeaders: false, leaveOpen: true));
 
