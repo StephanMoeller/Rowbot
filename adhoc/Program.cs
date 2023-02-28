@@ -20,31 +20,29 @@ namespace AdhocConsole
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<ExcelBenchmark>();
+            using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
+            // using (var outputStream = new MemoryStream())
+            {
+                //using (var target = new ClosedXmlExcelTarget(outputStream: outputStream, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
+                using (var target = new ExcelTarget(outputStream: outputStream, writeHeaders: false, leaveOpen: true))
+                {
+                    var range = Enumerable.Range(0, 10);
+                    target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
 
-            //using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
-            //// using (var outputStream = new MemoryStream())
-            //{
-            //    using (var target = new ClosedXmlExcelTarget(outputStream: outputStream, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
-            //    // using (var target = targetProvider(outputStream))
-            //    {
-            //        var range = Enumerable.Range(0, 10);
-            //        target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
+                    object[] data = range.Select(num => num.ToString()).Cast<object>().ToArray();
 
-            //        object[] data = range.Select(num => new DateTime(2001,02,03,04,05,06)).Cast<object>().ToArray();
+                    for (var i = 0; i < 10; i++)
+                    {
+                        target.WriteRow(data);
+                    }
 
-            //        for (var i = 0; i < 10; i++)
-            //        {
-            //            target.WriteRow(data);
-            //        }
+                    target.Complete();
+                }
+                outputStream.Close();
+            }
 
-            //        target.Complete();
-            //    }
-            //    outputStream.Close();
-            //}
-
-            //Console.WriteLine("done");
-            //Console.ReadLine();
+            Console.WriteLine("done");
+            Console.ReadLine();
         }
     }
 

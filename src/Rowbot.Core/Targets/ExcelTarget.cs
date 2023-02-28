@@ -12,6 +12,7 @@ namespace Rowbot.Core.Targets
 {
     public class ExcelTarget : RowTarget
     {
+        private readonly string _sheetName;
         private readonly bool _writeHeaders;
         private ColumnInfo[] _columns;
         private ZipArchive _zipArchive;
@@ -23,9 +24,15 @@ namespace Rowbot.Core.Targets
         private string[] _excelColumnNames = null;
         private int _rowIndex = 0;
         private string _cache_minMaxColString;
-        public ExcelTarget(Stream outputStream, bool writeHeaders, bool leaveOpen = false)
+        public ExcelTarget(Stream outputStream, string sheetName, bool writeHeaders, bool leaveOpen = false)
         {
+            if (string.IsNullOrEmpty(sheetName))
+            {
+                throw new ArgumentException($"'{nameof(sheetName)}' cannot be null or empty.", nameof(sheetName));
+            }
+
             _zipArchive = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: leaveOpen);
+            _sheetName = sheetName;
             _writeHeaders = writeHeaders;
             _utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
         }
@@ -183,13 +190,13 @@ namespace Rowbot.Core.Targets
                             break;
                     }
                 };
-
-                WriteSheetBytes("</row>");
-
-                _rowIndex++;
-                if (_rowIndex % 1000 == 0)
-                    FlushSheetStreamIfNeeded();
             }
+
+            WriteSheetBytes("</row>");
+
+            _rowIndex++;
+            if (_rowIndex % 1000 == 0)
+                FlushSheetStreamIfNeeded();
         }
 
 
@@ -240,6 +247,7 @@ namespace Rowbot.Core.Targets
     <Relationship Id=""rId1"" Type=""http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"" Target=""worksheets/sheet1.xml""/>
 </Relationships>");
 
+            var escapedSheetname = _sheetName.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
             WriteStatic(path: "xl/workbook.xml", @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>
 <workbook xmlns=""http://schemas.openxmlformats.org/spreadsheetml/2006/main"" xmlns:r=""http://schemas.openxmlformats.org/officeDocument/2006/relationships"" xmlns:mc=""http://schemas.openxmlformats.org/markup-compatibility/2006"" mc:Ignorable=""x15 xr xr6 xr10 xr2"" xmlns:x15=""http://schemas.microsoft.com/office/spreadsheetml/2010/11/main"" xmlns:xr=""http://schemas.microsoft.com/office/spreadsheetml/2014/revision"" xmlns:xr6=""http://schemas.microsoft.com/office/spreadsheetml/2016/revision6"" xmlns:xr10=""http://schemas.microsoft.com/office/spreadsheetml/2016/revision10"" xmlns:xr2=""http://schemas.microsoft.com/office/spreadsheetml/2015/revision2"">
     <fileVersion appName=""xl"" lastEdited=""7"" lowestEdited=""7"" rupBuild=""26026""/>
@@ -254,7 +262,7 @@ namespace Rowbot.Core.Targets
         <workbookView xWindow=""10680"" yWindow=""0"" windowWidth=""31365"" windowHeight=""21000"" xr2:uid=""{4C7AFD97-58A3-4092-BBCA-D87C64F9BACE}""/>
     </bookViews>
     <sheets>
-        <sheet name=""Sheet1"" sheetId=""1"" r:id=""rId1""/>
+        <sheet name=""" + escapedSheetname + @""" sheetId=""1"" r:id=""rId1""/>
     </sheets>
     <calcPr calcId=""191029""/>
     <extLst>

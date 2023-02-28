@@ -40,7 +40,7 @@ namespace Rowbot.Core.Test.Targets
         [InlineData("X", 24)]
         [InlineData("Y", 25)]
         [InlineData("Z", 26)]
-        [InlineData("AA",27)]
+        [InlineData("AA", 27)]
         [InlineData("AB", 28)]
         [InlineData("AC", 29)]
         [InlineData("AY", 26 + 26 - 1)]
@@ -61,7 +61,7 @@ namespace Rowbot.Core.Test.Targets
         public void EmptyColumns_ExpectNoRowsAsExcelDoesNotHaveTheConceptOfEmptySheetWithRows_Test(bool writeHeaders)
         {
             using (var ms = new MemoryStream())
-            using (var target = new ExcelTarget(ms, writeHeaders: writeHeaders, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            using (var target = new ExcelTarget(ms, sheetName: "My sheet < > \" and Φ╚", writeHeaders: writeHeaders, leaveOpen: true)) // Leave open to be able to read from the stream after completion
             {
                 target.Init(new ColumnInfo[] { });
 
@@ -70,10 +70,41 @@ namespace Rowbot.Core.Test.Targets
 
                 target.Complete();
 
-                EnsureExcelContent(ms, expectedSheetName: "My unittest æøå δ sheet", expectedRowValues: new object[0][]);
+                EnsureExcelContent(ms, expectedSheetName: "My sheet < > \" and Φ╚", expectedRowValues: new object[0][]);
             }
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void SimpleTest_WithColumns(bool writeHeaders)
+        {
+            using (var ms = new MemoryStream())
+            using (var target = new ExcelTarget(ms, sheetName: "My sheet", writeHeaders: writeHeaders, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            {
+                target.Init(new ColumnInfo[] { new ColumnInfo(name: "ColA", typeof(string)), new ColumnInfo(name: "Hey ÆØÅ <", typeof(string)) });
+
+                target.WriteRow(new object[] { "Hey \" and < and > in the text", "There" });
+                target.WriteRow(new object[] { "There", "Over there" });
+
+                target.Complete();
+
+                if(writeHeaders){
+                    EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new object[][]{
+                        new object[]{ "ColA", "Hey ÆØÅ <" },
+                        new object[]{ "Hey \" and < and > in the text", "There" },
+                        new object[] { "There", "Over there" }
+                    });
+                }
+                else{
+                    EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new object[][]{
+                        new object[]{ "Hey \" and < and > in the text", "There" },
+                        new object[] { "There", "Over there" }
+                    });
+                }
+                
+            }
+        }
 
 
         public const int Call_Complete = 1;
@@ -94,11 +125,11 @@ namespace Rowbot.Core.Test.Targets
                 if (leaveOpen == null)
                 {
                     // Rely on default behaviour
-                    target = new ExcelTarget(ms, writeHeaders: true);
+                    target = new ExcelTarget(ms, sheetName: "My sheet", writeHeaders: true);
                 }
                 else
                 {
-                    target = new ExcelTarget(ms, writeHeaders: true, leaveOpen: leaveOpen.Value);
+                    target = new ExcelTarget(ms, sheetName: "My sheet", writeHeaders: true, leaveOpen: leaveOpen.Value);
                 }
 
                 using (target)
