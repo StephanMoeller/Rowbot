@@ -174,17 +174,11 @@ namespace Rowbot.Core.Targets
                             WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(_numberFormatter), "</v></c>");
                             break;
                         case String str:
-                            // TODO: Escape in a faster manner
                             WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @""" t=""inlineStr""><is><t>", Escape(str), "</t></is></c>");
                             break;
                         case DateTime val:
                             WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @""" t=""inlineStr""><is><t>", val.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"), "</t></is></c>");
                             break;
-                        case DateTimeOffset val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @""" t=""inlineStr""><is><t>", val.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"), "</t></is></c>");
-                            break;
-                        case TimeSpan val:
-                            throw new NotImplementedException("TimeSpans not supported yet");
                         default:
                             WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @""" t=""inlineStr""><is><t>", Escape(value.ToString()), "</t></is></c>");
                             break;

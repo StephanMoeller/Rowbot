@@ -148,7 +148,7 @@ namespace Rowbot.Core.Test.Targets
         [Fact]
         public void DataTypeTesting_DateTime()
         {
-            RunTypeTest<DateTime>(value: new DateTime(2001,02,03,04,05,06),
+            RunTypeTest<DateTime>(value: new DateTime(2001, 02, 03, 04, 05, 06),
                                 expectedValue: new DateTime(2001, 02, 03, 04, 05, 06));
 
             throw new NotImplementedException("Why does this work??");
