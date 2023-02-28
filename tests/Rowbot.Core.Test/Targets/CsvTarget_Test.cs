@@ -98,5 +98,65 @@ namespace Rowbot.Test.Targets
             }
         }
 
+        public const int Call_Complete = 1;
+        public const int Call_Dispose = 2;
+
+        [Theory]
+        [InlineData(Call_Complete, true, true)]
+        [InlineData(Call_Complete, false, false)]
+        [InlineData(Call_Complete, null, false)]
+        [InlineData(Call_Dispose, true, true)]
+        [InlineData(Call_Dispose, false, false)]
+        [InlineData(Call_Dispose, null, false)]
+        public void LeaveOpen_EnsureDisposingStreamAccordingToLeaveOpenValue_Test(int whatToCall, bool? leaveOpen, bool expectToLeaveOpen)
+        {
+            using (var ms = new MemoryStream())
+            {
+                CsvTarget target;
+                if (leaveOpen == null)
+                {
+                    // Rely on default behaviour
+                    target = new CsvTarget(ms, new CsvConfig() { Delimiter = ';', Quote = '\'', Newline = "\r\n", NumberFormatter = new CultureInfo("da-DK") }, writeHeaders: true);
+                }
+                else
+                {
+                    target = new CsvTarget(ms, new CsvConfig() { Delimiter = ';', Quote = '\'', Newline = "\r\n", NumberFormatter = new CultureInfo("da-DK") }, writeHeaders: true, leaveOpen: leaveOpen.Value);
+                }
+
+                using (target)
+                {
+                    // Ensure init and writeWrote are allowed and stream not disposed as of yet
+                    target.Init(new ColumnInfo[]{
+                        new ColumnInfo(name: "Col1", valueType: typeof(string)),
+                        new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
+                        new ColumnInfo(name: "Col3", valueType: typeof(object)),
+                    });
+
+                    target.WriteRow(new object?[] { "Hello there æå 1", -12.45m, "hi" }); // non-strings
+
+                    // Now call complete
+                    if (whatToCall == Call_Complete)
+                    {
+                        target.Complete();
+                    }
+                    else
+                    {
+                        target.Dispose();
+                    }
+
+                    // And ensure memory stream is disposed only if leaveOpen was false
+                    if (expectToLeaveOpen)
+                    {
+                        ms.WriteByte(1);
+                    }
+                    else
+                    {
+                        Assert.Throws<ObjectDisposedException>(() => ms.WriteByte(1));
+                    }
+                }
+            }
+
+        }
+
     }
 }

@@ -30,6 +30,7 @@ namespace Rowbot.Core.Targets
     {
         private readonly Stream _outputStream;
         private readonly bool _writeHeaders;
+        private readonly bool _leaveOpen;
         private readonly Encoding _encoding;
         private readonly byte _delimiter;
         private readonly NumberToStringBytesSerializer _intSerializer;
@@ -40,10 +41,11 @@ namespace Rowbot.Core.Targets
         private bool _completed = false;
         private CultureInfo _numberFormatter;
         private bool _startNextRowWithNewLine = false;
-        public CsvTarget(Stream outputStream, CsvConfig csvConfig, bool writeHeaders = true)
+        public CsvTarget(Stream outputStream, CsvConfig csvConfig, bool writeHeaders = true, bool leaveOpen = false)
         {
             _outputStream = outputStream ?? throw new ArgumentNullException(nameof(outputStream));
             _writeHeaders = writeHeaders;
+            _leaveOpen = leaveOpen;
             _numberFormatter = csvConfig.NumberFormatter;
             _encoding = csvConfig.Encoding;
             _delimiter = _encoding.GetBytes(new[] { csvConfig.Delimiter }).Single();
@@ -55,6 +57,10 @@ namespace Rowbot.Core.Targets
         public override void Dispose()
         {
             // Nothing to dispose
+            if (!_leaveOpen)
+            {
+                _outputStream?.Dispose();
+            }
         }
 
 
@@ -106,6 +112,11 @@ namespace Rowbot.Core.Targets
             _completed = true;
 
             Flush();
+            if (!_leaveOpen)
+            {
+                _outputStream?.Close();
+                _outputStream?.Dispose();
+            }
         }
 
 
