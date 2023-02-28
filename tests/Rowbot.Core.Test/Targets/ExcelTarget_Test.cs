@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml;
 using Rowbot.Core.Targets;
 using System;
 using System.Collections.Generic;
@@ -70,7 +71,7 @@ namespace Rowbot.Core.Test.Targets
 
                 target.Complete();
 
-                EnsureExcelContent(ms, expectedSheetName: "My sheet < > \" and Φ╚", expectedRowValues: new object[0][]);
+                EnsureExcelContent(ms, expectedSheetName: "My sheet < > \" and Φ╚", expectedRowValues: new XLCellValue[0][]);
             }
         }
 
@@ -89,23 +90,80 @@ namespace Rowbot.Core.Test.Targets
 
                 target.Complete();
 
-                if(writeHeaders){
-                    EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new object[][]{
-                        new object[]{ "ColA", "Hey ÆØÅ <" },
-                        new object[]{ "Hey \" and < and > in the text", "There" },
-                        new object[] { "There", "Over there" }
+                if (writeHeaders)
+                {
+                    EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new XLCellValue[][]{
+                        new XLCellValue[]{ "ColA", "Hey ÆØÅ <" },
+                        new XLCellValue[]{ "Hey \" and < and > in the text", "There" },
+                        new XLCellValue[] { "There", "Over there" }
                     });
                 }
-                else{
-                    EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new object[][]{
-                        new object[]{ "Hey \" and < and > in the text", "There" },
-                        new object[] { "There", "Over there" }
+                else
+                {
+                    EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new XLCellValue[][]{
+                        new XLCellValue[]{ "Hey \" and < and > in the text", "There" },
+                        new XLCellValue[] { "There", "Over there" }
                     });
                 }
-                
+
             }
         }
 
+        [Fact]
+        public void DataTypeTesting_Null()
+        {
+            RunTypeTest<string>(null, expectedValue: Blank.Value);
+            RunTypeTest<object>(null, expectedValue: Blank.Value);
+            RunTypeTest<UnitTestCustomType>(null, expectedValue: Blank.Value);
+        }
+
+        [Fact]
+        public void DataTypeTesting_String()
+        {
+            RunTypeTest<string>(value: "Hello there with line break \r\n and < and > and also a \" for that it not shall be a lie",
+                                expectedValue: "Hello there with line break \r\n and < and > and also a \" for that it not shall be a lie");
+        }
+
+        [Fact]
+        public void DataTypeTesting_IntFamily()
+        {
+            RunTypeTest<SByte>(12, 12);
+            RunTypeTest<Byte>(12, 12);
+            RunTypeTest<Int16>(12, 12);
+            RunTypeTest<UInt16>(12, 12);
+            RunTypeTest<Int32>(12, 12);
+            RunTypeTest<UInt32>(12, 12);
+            RunTypeTest<Int64>(12, 12);
+            RunTypeTest<UInt64>(12, 12);
+        }
+
+        [Fact]
+        public void DataTypeTesting_DecimalFamily()
+        {
+            RunTypeTest<Decimal>(12.3456m, 12.3456m);
+            RunTypeTest<Single>(12.3456f, 12.3456f, numberCompareTolerance: 0.00001);
+            RunTypeTest<Double>(12.3456, 12.3456, numberCompareTolerance: 0.00001);
+        }
+
+        private void RunTypeTest<T>(T? value, XLCellValue expectedValue, double numberCompareTolerance = 0.0)
+        {
+            using (var ms = new MemoryStream())
+            using (var target = new ExcelTarget(ms, sheetName: "My sheet", writeHeaders: true, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            {
+                target.Init(new ColumnInfo[] {
+                    new ColumnInfo(name: "ColA", typeof(T))
+                });
+
+                target.WriteRow(new object?[] { value });
+                
+                target.Complete();
+
+                EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new XLCellValue[][]{
+                        new XLCellValue[]{ "ColA" },
+                        new XLCellValue[]{ expectedValue }
+                    }, numberCompareTolerance: numberCompareTolerance);
+            }
+        }
 
         public const int Call_Complete = 1;
         public const int Call_Dispose = 2;
@@ -168,7 +226,7 @@ namespace Rowbot.Core.Test.Targets
         }
 
 
-        private void EnsureExcelContent(MemoryStream ms, string expectedSheetName, object?[][] expectedRowValues)
+        private void EnsureExcelContent(MemoryStream ms, string expectedSheetName, XLCellValue[][] expectedRowValues, double numberCompareTolerance = 0.0)
         {
             ms.Position = 0;
 
@@ -190,55 +248,22 @@ namespace Rowbot.Core.Test.Targets
                     for (var columnIndex = 0; columnIndex < expectedRow.Length; columnIndex++)
                     {
                         var value = workSheet.Cell(row: rowIndex + 1, column: columnIndex + 1).Value;
-                        Assert.Equal(CreateCellValue(expectedRow[columnIndex]), (object)value);
+
+                        // If value type is double or single, compare with a little tolerance
+                        var expectedValue = expectedRow[columnIndex];
+                        if(expectedValue.IsNumber)
+                        {
+                            var expectedNumberValue = expectedValue.GetNumber();
+                            Assert.Equal((double)expectedNumberValue, (double)value, tolerance: numberCompareTolerance);
+                        }
                     }
                 }
             }
         }
+    }
 
+    public class UnitTestCustomType
+    {
 
-        // This method has been copied from 
-        private static XLCellValue CreateCellValue(object value)
-        {
-            // This list of cases has been copied from the OpenXML source code directly (From inside XLWorksheet.cs)
-            if (value == null) return Blank.Value;
-            if (value is Blank blankValue)
-                return blankValue;
-            if (value is Boolean logical)
-                return logical;
-            if (value is SByte val_sbyte)
-                return val_sbyte;
-            if (value is Byte val_byte)
-                return val_byte;
-            if (value is Int16 val_int16)
-                return val_int16;
-            if (value is UInt16 val_uint16)
-                return val_uint16;
-            if (value is Int32 val_int32)
-                return val_int32;
-            if (value is UInt32 val_uint32)
-                return val_uint32;
-            if (value is Int64 val_int64)
-                return val_int64;
-            if (value is UInt64 val_uint64)
-                return val_uint64;
-            if (value is Single val_single)
-                return val_single;
-            if (value is Double val_double)
-                return val_double;
-            if (value is Decimal val_decimal)
-                return val_decimal;
-            if (value is String text)
-                return text;
-            if (value is XLError error)
-                return error;
-            if (value is DateTime date)
-                return date;
-            if (value is DateTimeOffset dateOfs)
-                return dateOfs.DateTime;
-            if (value is TimeSpan timeSpan)
-                return timeSpan;
-            return value.ToString(); // Other things, like chars ect are just turned to string
-        }
     }
 }

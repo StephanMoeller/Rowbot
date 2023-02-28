@@ -26,12 +26,14 @@ namespace AdhocConsole
                 //using (var target = new ClosedXmlExcelTarget(outputStream: outputStream, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
                 using (var target = new ExcelTarget(outputStream: outputStream, sheetName: "MySheet", writeHeaders: false, leaveOpen: true))
                 {
-                    var range = Enumerable.Range(0, 10);
-                    target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
+                    int colNum = 1;
 
-                    object[] data = range.Select(num => num.ToString()).Cast<object>().ToArray();
+                    var range = Enumerable.Range(0, colNum);
+                    target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(decimal))).ToArray());
 
-                    for (var i = 0; i < 10; i++)
+                    object[] data = range.Select(num => 123.45678m).Cast<object>().ToArray();
+
+                    for (var i = 0; i < colNum; i++)
                     {
                         target.WriteRow(data);
                     }

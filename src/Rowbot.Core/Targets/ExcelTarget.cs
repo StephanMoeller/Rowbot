@@ -165,13 +165,13 @@ namespace Rowbot.Core.Targets
                             WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(), "</v></c>");
                             break;
                         case Single val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString("N", _numberFormatter), "</v></c>");
+                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(_numberFormatter), "</v></c>");
                             break;
                         case Double val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString("N", _numberFormatter), "</v></c>");
+                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(_numberFormatter), "</v></c>");
                             break;
                         case Decimal val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString("N", _numberFormatter), "</v></c>");
+                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(_numberFormatter), "</v></c>");
                             break;
                         case String str:
                             // TODO: Escape in a faster manner
