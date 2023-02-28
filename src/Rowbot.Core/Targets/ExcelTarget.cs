@@ -23,7 +23,7 @@ namespace Rowbot.Core.Targets
         private string[] _excelColumnNames = null;
         private int _rowIndex = 0;
         private string _cache_minMaxColString;
-        public ExcelTarget(Stream outputStream, bool writeHeaders, bool leaveOpen)
+        public ExcelTarget(Stream outputStream, bool writeHeaders, bool leaveOpen = false)
         {
             _zipArchive = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: leaveOpen);
             _writeHeaders = writeHeaders;
@@ -32,6 +32,7 @@ namespace Rowbot.Core.Targets
 
         public override void Dispose()
         {
+            _zipArchive?.Dispose();
             _sheetStream?.Dispose();
         }
 
