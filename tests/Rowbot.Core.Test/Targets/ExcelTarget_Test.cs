@@ -145,6 +145,15 @@ namespace Rowbot.Core.Test.Targets
             RunTypeTest<Double>(12.3456, 12.3456, numberCompareTolerance: 0.00001);
         }
 
+        [Fact]
+        public void DataTypeTesting_DateTime()
+        {
+            RunTypeTest<DateTime>(value: new DateTime(2001,02,03,04,05,06),
+                                expectedValue: new DateTime(2001, 02, 03, 04, 05, 06));
+
+            throw new NotImplementedException("Why does this work??");
+        }
+
         private void RunTypeTest<T>(T? value, XLCellValue expectedValue, double numberCompareTolerance = 0.0)
         {
             using (var ms = new MemoryStream())
