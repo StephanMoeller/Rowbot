@@ -8,7 +8,10 @@ namespace AdhocConsole
     {
         static void Main(string[] args)
         {
-            RowbotConvert.FromDataTable(null).ToExcel(null, null, false).Execute();
+            RowbotConvert
+                .FromCustomSource(null)
+                .ToCustomTarget(null)
+                .Execute();
 
             using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
             // using (var outputStream = new MemoryStream())

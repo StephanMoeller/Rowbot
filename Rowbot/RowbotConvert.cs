@@ -13,7 +13,7 @@ namespace Rowbot
         public static RowbotExecutorBuilder FromDataTable(DataTable dataTable) { throw new NotImplementedException(); }
         public static RowbotExecutorBuilder FromDataReader(IDataReader dataReader) { throw new NotImplementedException(); }
         public static RowbotExecutorBuilder FromObjects<TObjectType>(IEnumerable<TObjectType> objects) { throw new NotImplementedException(); }
-        public static RowbotExecutorBuilder FromCustom(IRowSource customRowSource) { throw new NotImplementedException(); }
+        public static RowbotExecutorBuilder FromCustomSource(IRowSource customRowSource) { throw new NotImplementedException(); }
     }
 
     public class RowbotExecutorBuilder
@@ -55,7 +55,7 @@ namespace Rowbot
             return GetExecutor(new PropertyReflectionTarget<TObjectType>());
         }
 
-        public RowbotExecutor ToCustomer(IRowTarget customRowTarget)
+        public RowbotExecutor ToCustomTarget(IRowTarget customRowTarget)
         {
             return GetExecutor(customRowTarget);
         }
