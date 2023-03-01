@@ -263,7 +263,7 @@ namespace Rowbot.Core.Test.Targets
                         if(expectedValue.IsNumber)
                         {
                             var expectedNumberValue = expectedValue.GetNumber();
-                            Assert.Equal((double)expectedNumberValue, (double)value, tolerance: numberCompareTolerance);
+                            Assert.Equal(expectedNumberValue, (double)value, tolerance: numberCompareTolerance);
                         }
                         else
                         {

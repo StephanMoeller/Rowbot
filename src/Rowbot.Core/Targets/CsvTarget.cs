@@ -31,15 +31,14 @@ namespace Rowbot.Core.Targets
         private readonly Stream _outputStream;
         private readonly bool _writeHeaders;
         private readonly bool _leaveOpen;
-        private readonly Encoding _encoding;
         private readonly byte _delimiter;
         private readonly NumberToStringBytesSerializer _intSerializer;
         private readonly CsvEscapingHelper _escapingHelper;
-        private byte[] _newLineBytes;
+        private readonly byte[] _newLineBytes;
 
         private bool _initialized = false;
         private bool _completed = false;
-        private CultureInfo _numberFormatter;
+        private readonly CultureInfo _numberFormatter;
         private bool _startNextRowWithNewLine = false;
         public CsvTarget(Stream outputStream, CsvConfig csvConfig, bool writeHeaders = true, bool leaveOpen = false)
         {
@@ -47,10 +46,9 @@ namespace Rowbot.Core.Targets
             _writeHeaders = writeHeaders;
             _leaveOpen = leaveOpen;
             _numberFormatter = csvConfig.NumberFormatter;
-            _encoding = csvConfig.Encoding;
-            _delimiter = _encoding.GetBytes(new[] { csvConfig.Delimiter }).Single();
-            _newLineBytes = _encoding.GetBytes(csvConfig.Newline);
-            _intSerializer = new NumberToStringBytesSerializer(_encoding);
+            _delimiter = csvConfig.Encoding.GetBytes(new[] { csvConfig.Delimiter }).Single();
+            _newLineBytes = csvConfig.Encoding.GetBytes(csvConfig.Newline);
+            _intSerializer = new NumberToStringBytesSerializer(csvConfig.Encoding);
             _escapingHelper = new CsvEscapingHelper(delimiter: csvConfig.Delimiter, quote: csvConfig.Quote, encoding: csvConfig.Encoding);
         }
 
@@ -64,7 +62,7 @@ namespace Rowbot.Core.Targets
         }
 
 
-        private byte[] _buffer = new byte[1_000_000];
+        private readonly byte[] _buffer = new byte[1_000_000];
         private int _bufferIndex = 0;
         protected override void OnInit(ColumnInfo[] columns)
         {
@@ -185,9 +183,8 @@ namespace Rowbot.Core.Targets
                         case Int64 val:
                             _bufferIndex += _intSerializer.SerializeToStringToBytes(val: val, buffer: _buffer, offset: _bufferIndex);
                             break;
-                        case UInt64 val:
+                        case UInt64 _:
                             throw new NotImplementedException("UInt64 not yet implemented");
-                            break;
                         case Single val:
                             _bufferIndex += _escapingHelper.WriteEscapedString(value: val.ToString("G", _numberFormatter), buffer: _buffer, offset: _bufferIndex);
                             break;
@@ -200,11 +197,11 @@ namespace Rowbot.Core.Targets
                         case String str:
                             _bufferIndex += _escapingHelper.WriteEscapedString(value: str, buffer: _buffer, offset: _bufferIndex);
                             break;
-                        case DateTime val:
+                        case DateTime _:
                             throw new NotImplementedException();
-                        case DateTimeOffset val:
+                        case DateTimeOffset _:
                             throw new NotImplementedException();
-                        case TimeSpan val:
+                        case TimeSpan _:
                             throw new NotImplementedException();
                         default:
                             _bufferIndex += _escapingHelper.WriteEscapedString(value: value.ToString(), buffer: _buffer, offset: _bufferIndex);
@@ -274,11 +271,6 @@ namespace Rowbot.Core.Targets
             // Char buffer => byte buffer
             var byteCount = _encoding.GetBytes(chars: _charBuffer, charIndex: startIndex, charCount: charCount, bytes: buffer, byteIndex: offset);
             return byteCount;
-        }
-
-        private void GrowBuffers(int minimumCharSize)
-        {
-            _charBuffer = new char[Math.Max(minimumCharSize, _charBuffer.Length * 2)];
         }
     }
 }
