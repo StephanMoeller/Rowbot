@@ -9,9 +9,9 @@ namespace Rowbot.Sources
     public class PropertyReflectionSource : RowSource
     {
         private readonly IEnumerator _elements;
-        private PropertyInfo[] _properties;
-        private ColumnInfo[] _columns;
-        private PropertyReflectionSource(IEnumerable elements, Type elementType)
+        private readonly PropertyInfo[] _properties;
+        private readonly ColumnInfo[] _columns;
+        private PropertyReflectionSource(IEnumerator elements, Type elementType)
         {
             if (elements is null)
             {
@@ -23,7 +23,7 @@ namespace Rowbot.Sources
                 throw new ArgumentNullException(nameof(elementType));
             }
 
-            _elements = elements.GetEnumerator();
+            _elements = elements;
             _properties = elementType.GetProperties();
             _columns = _properties.Select(p => new ColumnInfo(name: p.Name, valueType: p.PropertyType)).ToArray();
         }
@@ -35,8 +35,19 @@ namespace Rowbot.Sources
                 throw new ArgumentNullException(nameof(elements));
             }
 
+            return new PropertyReflectionSource(elements.GetEnumerator(), typeof(T));
+        }
+
+        public static PropertyReflectionSource Create<T>(IEnumerator<T> elements)
+        {
+            if (elements is null)
+            {
+                throw new ArgumentNullException(nameof(elements));
+            }
+
             return new PropertyReflectionSource(elements, typeof(T));
         }
+
 
         public override void Dispose()
         {
