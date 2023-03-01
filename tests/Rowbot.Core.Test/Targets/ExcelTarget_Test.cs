@@ -265,6 +265,10 @@ namespace Rowbot.Core.Test.Targets
                             var expectedNumberValue = expectedValue.GetNumber();
                             Assert.Equal((double)expectedNumberValue, (double)value, tolerance: numberCompareTolerance);
                         }
+                        else
+                        {
+                            Assert.Equal(expectedValue, value);
+                        }
                     }
                 }
             }
