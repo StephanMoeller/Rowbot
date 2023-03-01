@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Rowbot.CsvHelper
 {
-    public class CsvHelperSource : RowSource
+    public class CsvHelperSource : IRowSource
     {
         private readonly CsvReader _csvReader;
         private readonly bool _readFirstLineAsHeaders = false;
@@ -21,17 +21,17 @@ namespace Rowbot.CsvHelper
             _csvReader = csvReader;
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             _csvReader.Dispose();
         }
 
-        protected override void OnComplete()
+        public void Complete()
         {
             // Nothing to complete
         }
 
-        protected override ColumnInfo[] OnInitAndGetColumns()
+        public ColumnInfo[] InitAndGetColumns()
         {
             _csvReader.Read();
             _csvReader.ReadHeader();
@@ -52,7 +52,7 @@ namespace Rowbot.CsvHelper
             }
         }
 
-        protected override bool OnReadRow(object[] values)
+        public bool ReadRow(object[] values)
         {
             _readCallCount++;
             if (_readCallCount == 1 && !_readFirstLineAsHeaders)

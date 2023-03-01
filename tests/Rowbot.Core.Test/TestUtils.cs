@@ -8,7 +8,7 @@ namespace Rowbot.Test
 {
     internal class TestUtils
     {
-        public static object[][] ReadAllLines(RowSource source, int columnCount)
+        public static object[][] ReadAllLines(IRowSource source, int columnCount)
         {
             var allLines = new List<object[]>();
             var buffer = new object[columnCount];

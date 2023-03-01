@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Rowbot.Sources
 {
-    public class PropertyReflectionSource : RowSource
+    public class PropertyReflectionSource : IRowSource
     {
         private readonly IEnumerator _elements;
         private readonly PropertyInfo[] _properties;
@@ -49,22 +49,22 @@ namespace Rowbot.Sources
         }
 
 
-        public override void Dispose()
+        public void Dispose()
         {
             // Nothing to dispose
         }
 
-        protected override void OnComplete()
+        public void Complete()
         {
             // Nothing to complete in this source
         }
 
-        protected override ColumnInfo[] OnInitAndGetColumns()
+        public ColumnInfo[] InitAndGetColumns()
         {
             return _columns;
         }
 
-        protected override bool OnReadRow(object[] values)
+        public bool ReadRow(object[] values)
         {
             if (values.Length != _properties.Length)
                 throw new ArgumentException($"Object array of size {values.Length} provided, but {_properties.Length} columns exist");

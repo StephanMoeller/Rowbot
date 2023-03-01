@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rowbot.Core.Execution;
+using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,12 +8,12 @@ namespace Rowbot.Execution
 {
     public class RowbotExecutor
     {
-        private readonly RowSource _source;
+        private readonly IRowSource _source;
         private readonly RowTarget _target;
 
-        public RowbotExecutor(RowSource source, RowTarget target)
+        public RowbotExecutor(IRowSource source, RowTarget target)
         {
-            _source = source;
+            _source = new SourceGuard(source);
             _target = target;
         }
 

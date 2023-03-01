@@ -17,9 +17,9 @@ namespace Rowbot
 
     public class RowbotExecutorBuilder
     {
-        private readonly RowSource _rowSource;
+        private readonly IRowSource _rowSource;
 
-        public RowbotExecutorBuilder(RowSource rowSource)
+        public RowbotExecutorBuilder(IRowSource rowSource)
         {
             _rowSource = rowSource ?? throw new ArgumentNullException(nameof(rowSource));
         }

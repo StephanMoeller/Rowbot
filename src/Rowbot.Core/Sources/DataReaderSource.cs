@@ -7,7 +7,7 @@ using System.Data.Common;
 
 namespace Rowbot.Sources
 {
-    public class DataReaderSource : RowSource
+    public class DataReaderSource : IRowSource
     {
         private readonly IDataReader _dataReader;
         private string[] _columnNames;
@@ -17,23 +17,23 @@ namespace Rowbot.Sources
             _columnNames = _dataReader.GetSchemaTable().Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray();
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             _dataReader?.Dispose();
         }
 
-        protected override void OnComplete()
+        public void Complete()
         {
             // Nothing to complete in this source
         }
 
-        protected override ColumnInfo[] OnInitAndGetColumns()
+        public ColumnInfo[] InitAndGetColumns()
         {
             var columnInfos = _dataReader.GetSchemaTable().Rows.Cast<DataRow>().Select(row => new ColumnInfo(name: (string)row[0], valueType: (Type)row[5])).ToArray();
             return columnInfos;
         }
 
-        protected override bool OnReadRow(object[] values)
+        public bool ReadRow(object[] values)
         {
             if (_dataReader.Read())
             {
