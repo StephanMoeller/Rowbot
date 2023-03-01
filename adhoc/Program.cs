@@ -49,7 +49,7 @@ namespace AdhocConsole
         //[Benchmark]
         //public void V2() => RunInternal(outputStream => new CsvTargetV2(outputStream: outputStream, new CsvConfig() { }));
 
-        private void RunInternal(Func<Stream, RowTarget> targetProvider)
+        private void RunInternal(Func<Stream, IRowTarget> targetProvider)
         {
             //using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
             using (var outputStream = new MemoryStream())
@@ -82,7 +82,7 @@ namespace AdhocConsole
         //[Benchmark]
         //public void ExcelTargetV2() => RunInternal(outputStream => new ExcelTargetV2(outputStream: outputStream, writeHeaders: false, leaveOpen: true));
 
-        private void RunInternal(Func<Stream, RowTarget> targetProvider)
+        private void RunInternal(Func<Stream, IRowTarget> targetProvider)
         {
             //using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
             using (var outputStream = new MemoryStream())

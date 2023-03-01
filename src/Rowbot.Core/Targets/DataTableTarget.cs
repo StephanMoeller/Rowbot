@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Rowbot.Targets
 {
-    public class DataTableTarget : RowTarget
+    public class DataTableTarget : IRowTarget
     {
         private DataTable _table = null;
         private bool _initialized = false;
@@ -18,13 +18,13 @@ namespace Rowbot.Targets
 
         public DataTable GetResult()
         {
-            if (!Completed)
+            if (!_completed)
                 throw new InvalidOperationException("Completed not called yet!");
 
             return _table;
         }
 
-        protected override void OnComplete()
+        public void Complete()
         {
             if (!_initialized)
                 throw new InvalidOperationException("Init must be called before Complete()");
@@ -33,12 +33,12 @@ namespace Rowbot.Targets
             _completed = true;
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             _table?.Dispose();
         }
 
-        protected override void OnInit(ColumnInfo[] columns)
+        public void Init(ColumnInfo[] columns)
         {
             if (_initialized)
                 throw new InvalidOperationException("Init has already been called and can only be called once.");
@@ -50,7 +50,7 @@ namespace Rowbot.Targets
             }
         }
 
-        protected override void OnWriteRow(object[] values)
+        public void WriteRow(object[] values)
         {
             if (!_initialized)
                 throw new InvalidOperationException("Init must be called before WriteRows");

@@ -26,7 +26,7 @@ namespace Rowbot.Core.Targets
         }
     }
 
-    public class CsvTarget : RowTarget
+    public class CsvTarget : IRowTarget
     {
         private readonly Stream _outputStream;
         private readonly bool _writeHeaders;
@@ -52,7 +52,7 @@ namespace Rowbot.Core.Targets
             _escapingHelper = new CsvEscapingHelper(delimiter: csvConfig.Delimiter, quote: csvConfig.Quote, encoding: csvConfig.Encoding);
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             // Nothing to dispose
             if (!_leaveOpen)
@@ -64,7 +64,7 @@ namespace Rowbot.Core.Targets
 
         private readonly byte[] _buffer = new byte[1_000_000];
         private int _bufferIndex = 0;
-        protected override void OnInit(ColumnInfo[] columns)
+        public void Init(ColumnInfo[] columns)
         {
             if (_initialized)
                 throw new InvalidOperationException("Init already called");
@@ -101,7 +101,7 @@ namespace Rowbot.Core.Targets
         }
 
 
-        protected override void OnComplete()
+        public void Complete()
         {
             if (!_initialized)
                 throw new InvalidOperationException("Init must be called before Complete()");
@@ -127,7 +127,7 @@ namespace Rowbot.Core.Targets
             }
         }
 
-        protected override void OnWriteRow(object[] values)
+        public void WriteRow(object[] values)
         {
             if (_startNextRowWithNewLine)
             {

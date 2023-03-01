@@ -14,7 +14,7 @@ namespace Rowbot.Core.Test.Execution
         public void Call_InitAndGetColumns_EnsureArrayPassedThrough()
         {
             var source = new UnitTestSource();
-            var guard = new SourceGuard(source);
+            var guard = new SourceGuards(source);
             Assert.Equal(0, source.OnInitCallCount);
 
             var columns = guard.InitAndGetColumns();
@@ -28,7 +28,7 @@ namespace Rowbot.Core.Test.Execution
             var emptyColumnArray = new ColumnInfo[0];
 
             var source = new UnitTestSource();
-            var guard = new SourceGuard(source);
+            var guard = new SourceGuards(source);
             source.Columns = emptyColumnArray;
 
             Assert.Equal(0, source.OnInitCallCount);
@@ -41,7 +41,7 @@ namespace Rowbot.Core.Test.Execution
         public void Call_InitTwice_ExpectException()
         {
             var source = new UnitTestSource();
-            var guard = new SourceGuard(source);
+            var guard = new SourceGuards(source);
             Assert.Equal(0, source.OnInitCallCount);
 
             guard.InitAndGetColumns();
@@ -54,7 +54,7 @@ namespace Rowbot.Core.Test.Execution
         public void Call_CompleteBeforeInit_ExpectException()
         {
             var source = new UnitTestSource();
-            var guard = new SourceGuard(source);
+            var guard = new SourceGuards(source);
             Assert.Throws<InvalidOperationException>(() => guard.Complete());
             Assert.Equal(0, source.OnCompleteCallCount);
         }
@@ -63,7 +63,7 @@ namespace Rowbot.Core.Test.Execution
         public void Call_CompleteMultipleTimes_ExpectException()
         {
             var source = new UnitTestSource();
-            var guard = new SourceGuard(source);
+            var guard = new SourceGuards(source);
             guard.InitAndGetColumns();
             guard.Complete();
             Assert.Equal(1, source.OnCompleteCallCount);
@@ -76,7 +76,7 @@ namespace Rowbot.Core.Test.Execution
         public void Successful_Run_AssertAllMethodsCalled()
         {
             var source = new UnitTestSource();
-            var guard = new SourceGuard(source);
+            var guard = new SourceGuards(source);
 
             Assert.Equal(0, source.OnInitCallCount);
             Assert.Equal(0, source.OnReadRowCallCount);
@@ -129,7 +129,7 @@ namespace Rowbot.Core.Test.Execution
         public void ReadCalledWithWrongArraySize_ExpectExceptions(int arraySize)
         {
             var source = new UnitTestSource();
-            var guard = new SourceGuard(source);
+            var guard = new SourceGuards(source);
 
             var columns = guard.InitAndGetColumns();
 

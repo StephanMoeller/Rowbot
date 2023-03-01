@@ -8,7 +8,7 @@ namespace Rowbot.Core.Execution
     /// <summary>
     /// This helper class wraps a source and handles all input and output parameter validation as well as ensuring methods not called out of order.
     /// </summary>
-    public class SourceGuard : IRowSource
+    public class SourceGuards : IRowSource
     {
         protected bool Initialized { get; private set; } = false;
         protected bool Completed { get; private set; } = false;
@@ -16,7 +16,7 @@ namespace Rowbot.Core.Execution
         private bool? _previousReadResult = null;
         private readonly IRowSource _rowSource;
 
-        public SourceGuard(IRowSource rowSource)
+        public SourceGuards(IRowSource rowSource)
         {
             _rowSource = rowSource ?? throw new ArgumentNullException(nameof(rowSource));
         }

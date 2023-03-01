@@ -54,7 +54,7 @@ namespace Rowbot
             return GetExecutor(new PropertyReflectionTarget<TObjectType>());
         }
 
-        private RowbotExecutor GetExecutor(RowTarget target)
+        private RowbotExecutor GetExecutor(IRowTarget target)
         {
             if (target is null)
             {

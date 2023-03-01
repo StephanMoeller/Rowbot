@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Rowbot.ClosedXml
 {
-    public class ClosedXmlExcelTarget : RowTarget
+    public class ClosedXmlExcelTarget : IRowTarget
     {
         private Stream _stream;
         private readonly string _sheetName;
@@ -22,7 +22,7 @@ namespace Rowbot.ClosedXml
             _leaveOpen = leaveOpen;
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             _workbook?.Dispose();
             if (!_leaveOpen)
@@ -31,7 +31,7 @@ namespace Rowbot.ClosedXml
             }
         }
 
-        protected override void OnComplete()
+        public void Complete()
         {
             _workbook.SaveAs(_stream);
             _workbook.Dispose();
@@ -41,7 +41,7 @@ namespace Rowbot.ClosedXml
             }
         }
 
-        protected override void OnInit(ColumnInfo[] columns)
+        public void Init(ColumnInfo[] columns)
         {
             _workbook = new XLWorkbook();
             _worksheet = _workbook.Worksheets.Add(_sheetName);
@@ -60,7 +60,7 @@ namespace Rowbot.ClosedXml
 
         }
 
-        protected override void OnWriteRow(object[] values)
+        public void WriteRow(object[] values)
         {
             for (var i = 0; i < values.Length; i++)
             {

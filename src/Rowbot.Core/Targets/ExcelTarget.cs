@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Rowbot.Core.Targets
 {
-    public class ExcelTarget : RowTarget
+    public class ExcelTarget : IRowTarget
     {
         private readonly string _sheetName;
         private readonly bool _writeHeaders;
@@ -37,7 +37,7 @@ namespace Rowbot.Core.Targets
             _utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             _zipArchive?.Dispose();
             _sheetStream?.Dispose();
@@ -57,7 +57,7 @@ namespace Rowbot.Core.Targets
             return sb.ToString();
         }
 
-        protected override void OnInit(ColumnInfo[] columns)
+        public void Init(ColumnInfo[] columns)
         {
             _columns = columns;
             WriteStaticFilesToArchive();
@@ -81,11 +81,11 @@ namespace Rowbot.Core.Targets
 
             if (_writeHeaders)
             {
-                OnWriteRow(columns.Select(c => c.Name).Cast<object>().ToArray());
+                WriteRow(columns.Select(c => c.Name).Cast<object>().ToArray());
             }
         }
 
-        protected override void OnComplete()
+        public void Complete()
         {
             WriteSheetEndToSheetStream();
             Flush();
@@ -95,7 +95,7 @@ namespace Rowbot.Core.Targets
         }
 
         private CultureInfo _numberFormatter = new CultureInfo("en-US");
-        protected override void OnWriteRow(object[] values)
+        public void WriteRow(object[] values)
         {
             WriteSheetBytes(@"<row r=""", _rowIndex.ToString(), @""" spans=""", _cache_minMaxColString, @""" x14ac:dyDescent=""0.25"">");
 

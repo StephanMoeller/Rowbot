@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Rowbot.CsvHelper
 {
-    public class CsvHelperTarget : RowTarget
+    public class CsvHelperTarget : IRowTarget
     {
         private readonly CsvWriter _csvWriter;
         private readonly bool _writeHeaders;
@@ -24,18 +24,18 @@ namespace Rowbot.CsvHelper
             _csvWriter = csvWriter;
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             _csvWriter?.Dispose();
         }
 
-        protected override void OnComplete()
+        public void Complete()
         {
             Flush();
             _csvWriter?.Dispose();
         }
 
-        protected override void OnInit(ColumnInfo[] columns)
+        public void Init(ColumnInfo[] columns)
         {
             if (_writeHeaders)
             {
@@ -47,7 +47,7 @@ namespace Rowbot.CsvHelper
             }
         }
 
-        protected override void OnWriteRow(object[] values)
+        public void WriteRow(object[] values)
         {
             if (!_firstWrite)
             {

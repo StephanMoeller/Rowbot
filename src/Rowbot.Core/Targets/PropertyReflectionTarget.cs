@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Rowbot.Core.Targets
 {
-    public class PropertyReflectionTarget<T> : RowTarget where T : new()
+    public class PropertyReflectionTarget<T> : IRowTarget where T : new()
     {
         private PropertyInfo[] _propertiesByColumnIndex;
         private int[] _supportedIndexes;
@@ -25,17 +25,17 @@ namespace Rowbot.Core.Targets
             return _elements;
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
 
         }
 
-        protected override void OnComplete()
+        public void Complete()
         {
 
         }
 
-        protected override void OnInit(ColumnInfo[] columns)
+        public void Init(ColumnInfo[] columns)
         {
             _propertiesByColumnIndex = new PropertyInfo[columns.Length];
             _throwIfSourceValuesIsNullByIndex = new bool[columns.Length];
@@ -94,7 +94,7 @@ namespace Rowbot.Core.Targets
             throw new TypeMismatchException($"Column with name {columnInfo.Name} at index {columnIndex} is of type {columnInfo.ValueType.FullName} but matching property on type {typeof(T).FullName} is of type {property.PropertyType.FullName}");
         }
 
-        protected override void OnWriteRow(object[] values)
+        public void WriteRow(object[] values)
         {
             var element = new T();
             for (var i = 0; i < _supportedIndexes.Length; i++)

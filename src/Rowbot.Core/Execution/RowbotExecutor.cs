@@ -9,12 +9,12 @@ namespace Rowbot.Execution
     public class RowbotExecutor
     {
         private readonly IRowSource _source;
-        private readonly RowTarget _target;
+        private readonly IRowTarget _target;
 
-        public RowbotExecutor(IRowSource source, RowTarget target)
+        public RowbotExecutor(IRowSource source, IRowTarget target)
         {
-            _source = new SourceGuard(source);
-            _target = target;
+            _source = new SourceGuards(source);
+            _target = new TargetGuards(target);
         }
 
         public void Execute()

@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Rowbot
+namespace Rowbot.Core.Execution
 {
-    public abstract class RowTarget : IDisposable
+    public class TargetGuards : IRowTarget
     {
+        private readonly IRowTarget _rowTarget;
+
         protected bool Completed { get; private set; } = false;
         protected bool Initialized { get; private set; } = false;
+        public TargetGuards(IRowTarget rowTarget)
+        {
+            _rowTarget = rowTarget ?? throw new ArgumentNullException(nameof(rowTarget));
+        }
 
         public void Complete()
         {
@@ -16,10 +22,13 @@ namespace Rowbot
             if (Completed)
                 throw new InvalidOperationException("Complete already called and can only be called once.");
             Completed = true;
-            OnComplete();
+            _rowTarget.Complete();
         }
 
-        public abstract void Dispose();
+        public void Dispose()
+        {
+            _rowTarget.Dispose();
+        }
 
         public void Init(ColumnInfo[] columns)
         {
@@ -31,7 +40,7 @@ namespace Rowbot
             if (Initialized)
                 throw new InvalidOperationException("Init has already been called and can only be called once.");
             Initialized = true;
-            OnInit(columns);
+            _rowTarget.Init(columns);
         }
 
         public void WriteRow(object[] values)
@@ -45,22 +54,7 @@ namespace Rowbot
                 throw new InvalidOperationException("Init must be called before WriteRows");
             if (Completed)
                 throw new InvalidOperationException("Complete already called. Not allowed to write more rows");
-            OnWriteRow(values);
+            _rowTarget.WriteRow(values);
         }
-
-        /// <summary>
-        ///  Guaranteed to only be called once and never be called before init.
-        /// </summary>
-        protected abstract void OnComplete();
-        /// <summary>
-        /// Guaraneteed to only be called once.
-        /// </summary>
-        /// <param name="columns"></param>
-        protected abstract void OnInit(ColumnInfo[] columns);
-        /// <summary>
-        /// Guaranteed to never be called before init or after completed.
-        /// </summary>
-        /// <param name="values"></param>
-        protected abstract void OnWriteRow(object[] values);
     }
 }

@@ -6,16 +6,16 @@ using System.Text;
 
 namespace Rowbot.Core.Targets
 {
-    public class DynamicObjectTarget : RowTarget
+    public class DynamicObjectTarget : IRowTarget
     {
         private string[] _columnNames;
         private LinkedList<dynamic> _dynamicList = new LinkedList<dynamic>();
-        public override void Dispose()
+        public void Dispose()
         {
             
         }
 
-        protected override void OnComplete()
+        public void Complete()
         {
             
         }
@@ -25,12 +25,12 @@ namespace Rowbot.Core.Targets
             return _dynamicList;
         }
 
-        protected override void OnInit(ColumnInfo[] columns)
+        public void Init(ColumnInfo[] columns)
         {
             _columnNames = columns.Select(c => c.Name).ToArray();
         }
 
-        protected override void OnWriteRow(object[] values)
+        public void WriteRow(object[] values)
         {
             IDictionary<string, object> newObject = new ExpandoObject();
             for (var i = 0; i < values.Length; i++)

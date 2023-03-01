@@ -1,29 +1,32 @@
-﻿using System;
+﻿using Rowbot.Core.Execution;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rowbot.Test
+namespace Rowbot.Core.Test.Execution
 {
-    public class RowTarget_Test
+    public class TargetGuard_Test
     {
         [Fact]
         public void CallingWriteRowAfterCompleted_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            target.Init(new ColumnInfo[]{
+            var guard = new TargetGuards(target);
+
+            guard.Init(new ColumnInfo[]{
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
             });
 
-            target.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            target.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
 
-            target.Complete();
+            guard.Complete();
 
-            Assert.Throws<InvalidOperationException>(() => target.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 }));
+            Assert.Throws<InvalidOperationException>(() => guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 }));
 
             Assert.Equal(2, target.OnWriteRowCallCount);
         }
@@ -32,24 +35,25 @@ namespace Rowbot.Test
         public void CallingWriteRow_NullValues_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            target.Init(new ColumnInfo[]{
+            var guard = new TargetGuards(target);
+            guard.Init(new ColumnInfo[]{
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
             });
 
-            target.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            target.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            target.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            target.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
             Assert.Equal(4, target.OnWriteRowCallCount);
 
-            Assert.Throws<ArgumentNullException>(() => target.WriteRow(null));
+            Assert.Throws<ArgumentNullException>(() => guard.WriteRow(null));
             Assert.Equal(4, target.OnWriteRowCallCount);
 
             // Ensure possible to call with non-values afterwards
-            target.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            target.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
 
             Assert.Equal(6, target.OnWriteRowCallCount);
         }
@@ -58,8 +62,9 @@ namespace Rowbot.Test
         public void Call_WriteRowBeforeCallingInit_ExpectException_Test()
         {
             var target = new UnitTestTarget();
+            var guard = new TargetGuards(target);
 
-            Assert.Throws<InvalidOperationException>(() => target.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 }));
+            Assert.Throws<InvalidOperationException>(() => guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 }));
             Assert.Equal(0, target.OnWriteRowCallCount);
         }
 
@@ -67,14 +72,15 @@ namespace Rowbot.Test
         public void Call_InitTwice_ExpectException_Test()
         {
             var target = new UnitTestTarget();
+            var guard = new TargetGuards(target);
 
-            target.Init(new ColumnInfo[]{
+            guard.Init(new ColumnInfo[]{
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
             });
 
-            Assert.Throws<InvalidOperationException>(() => target.Init(new ColumnInfo[]{
+            Assert.Throws<InvalidOperationException>(() => guard.Init(new ColumnInfo[]{
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
@@ -87,12 +93,13 @@ namespace Rowbot.Test
         public void Call_Init_WithNull_ExpectException_Test()
         {
             var target = new UnitTestTarget();
+            var guard = new TargetGuards(target);
 
-            Assert.Throws<ArgumentNullException>(() => target.Init(null));
+            Assert.Throws<ArgumentNullException>(() => guard.Init(null));
             Assert.Equal(0, target.OnInitCallCount);
 
             // Ensure possible to call init once afterwards
-            target.Init(new ColumnInfo[]{
+            guard.Init(new ColumnInfo[]{
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
@@ -104,8 +111,9 @@ namespace Rowbot.Test
         public void Call_CompleteBeforeInit_ExpectException_Test()
         {
             var target = new UnitTestTarget();
+            var guard = new TargetGuards(target);
 
-            Assert.Throws<InvalidOperationException>(() => target.Complete());
+            Assert.Throws<InvalidOperationException>(() => guard.Complete());
 
             Assert.Equal(0, target.OnCompleteCallCount);
         }
@@ -114,42 +122,44 @@ namespace Rowbot.Test
         public void Call_CompleteTwice_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            target.Init(new ColumnInfo[]{
+            var guard = new TargetGuards(target);
+
+            guard.Init(new ColumnInfo[]{
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
             });
 
-            target.Complete();
+            guard.Complete();
 
-            Assert.Throws<InvalidOperationException>(() => target.Complete());
+            Assert.Throws<InvalidOperationException>(() => guard.Complete());
 
             Assert.Equal(1, target.OnCompleteCallCount);
         }
     }
 
-    public class UnitTestTarget : RowTarget
+    public class UnitTestTarget : IRowTarget
     {
         public int OnCompleteCallCount = 0;
         public int OnInitCallCount = 0;
         public int OnWriteRowCallCount = 0;
         public int DispoeCallCount = 0;
-        public override void Dispose()
+        public void Dispose()
         {
             DispoeCallCount++;
         }
 
-        protected override void OnComplete()
+        public void Complete()
         {
             OnCompleteCallCount++;
         }
 
-        protected override void OnInit(ColumnInfo[] columns)
+        public void Init(ColumnInfo[] columns)
         {
             OnInitCallCount++;
         }
 
-        protected override void OnWriteRow(object[] values)
+        public void WriteRow(object[] values)
         {
             OnWriteRowCallCount++;
         }
