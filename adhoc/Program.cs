@@ -1,18 +1,6 @@
-﻿using Rowbot.CsvHelper;
-using Rowbot.Execution;
-using Rowbot.Sources;
-using Rowbot.Targets;
-using Rowbot;
-using System.Globalization;
+﻿using Rowbot;
 using Rowbot.Core.Targets;
-using System.Text;
-using CsvHelper.Configuration;
-using System.Diagnostics;
-using Rowbot.ClosedXml;
-using System.IO.Compression;
 using BenchmarkDotNet.Attributes;
-using System.Security.Cryptography;
-using BenchmarkDotNet.Running;
 
 namespace AdhocConsole
 {
@@ -20,6 +8,8 @@ namespace AdhocConsole
     {
         static void Main(string[] args)
         {
+            var result = RowbotConvert.FromObjects(null).ToExcel(null, null, false).Execute();
+
             using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
             // using (var outputStream = new MemoryStream())
             {

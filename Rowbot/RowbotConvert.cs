@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Rowbot.Core.Targets;
+using Rowbot.Execution;
+using Rowbot.Targets;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -7,28 +10,58 @@ namespace Rowbot
 {
     public static class RowbotConvert
     {
-        public static void DataTable_Csv(DataTable dataTable, Stream outputStream) { }
-        public static void DataTable_Excel(DataTable dataTable, Stream outputStream) { }
-        public static IEnumerable<TObjectType> DataTable_Objects<TObjectType>(DataTable dataTable) where TObjectType : new() { throw new NotImplementedException(); }
-        public static IEnumerable<dynamic> DataTable_Dynamic(DataTable dataTable) { throw new NotImplementedException(); }
-        public static IDataReader DataTable_DataReader(DataTable dataTable) { throw new NotImplementedException(); }
+        public static RowbotExecutorBuilder FromDataTable(DataTable dataTable) { throw new NotImplementedException(); }
+        public static RowbotExecutorBuilder FromDataReader(IDataReader dataReader) { throw new NotImplementedException(); }
+        public static RowbotExecutorBuilder FromObjects<TObjectType>(IEnumerable<TObjectType> objects) { throw new NotImplementedException(); }
+    }
 
-        public static void DataReader_Csv(IDataReader dataReader, Stream outputStream) { }
-        public static void DataReader_Excel(IDataReader dataReader, Stream outputStream) { }
-        public static IEnumerable<TObjectType> DataReader_Objects<TObjectType>(IDataReader dataReader) where TObjectType : new() { throw new NotImplementedException(); }
-        public static IEnumerable<dynamic> DataReader_Dynamic(IDataReader dataReader) { throw new NotImplementedException(); }
-        public static DataTable DataReader_DataTable(IDataReader dataReader) { throw new NotImplementedException(); }
+    public class RowbotExecutorBuilder
+    {
+        private readonly RowSource _rowSource;
 
-        public static void Objects_Csv<TObjectType>(IEnumerable<TObjectType> objects, Stream outputStream) { }
-        public static void Objects_Excel<TObjectType>(IEnumerable<TObjectType> objects, Stream outputStream) { }
-        public static IEnumerable<dynamic> Objects_Dynamic<TObjectType>(IEnumerable<TObjectType> objects) { throw new NotImplementedException(); }
-        public static DataTable Objects_DataTable<TObjectType>(IEnumerable<TObjectType> objects) { throw new NotImplementedException(); }
-        public static IDataReader Objects_DataReader<TObjectType>(IEnumerable<TObjectType> objects) { throw new NotImplementedException(); }
+        public RowbotExecutorBuilder(RowSource rowSource)
+        {
+            _rowSource = rowSource ?? throw new ArgumentNullException(nameof(rowSource));
+        }
 
-        public static void Csv_Excel(Stream csvInputSource, Stream excelOutputStream) { }
-        public static IEnumerable<TObjectType> Csv_Objects<TObjectType>(Stream csvInputSource) where TObjectType : new() { throw new NotImplementedException(); }
-        public static IEnumerable<dynamic> Csv_Dynamic<TObjectType>(Stream csvInputSource) { throw new NotImplementedException(); }
-        public static DataTable Csv_DataTable<TObjectType>(Stream csvInputSource) { throw new NotImplementedException(); }
-        public static IDataReader Csv_DataReader<TObjectType>(Stream csvInputSource) { throw new NotImplementedException(); }
+        public RowbotExecutor ToCsv(Stream outputStream, CsvConfig config, bool writeHeaders)
+        {
+            return GetExecutor(new CsvTarget(outputStream: outputStream, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: true));
+        }
+
+        public RowbotExecutor ToExcel(Stream outputStream, string sheetName, bool writeHeaders)
+        {
+            return GetExecutor(new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: true));
+        }
+
+        public RowbotExecutor ToDataTable()
+        {
+            return GetExecutor(new DataTableTarget());
+        }
+
+        public RowbotExecutor ToDataReader()
+        {
+            throw new NotImplementedException();
+        }
+
+        public RowbotExecutor ToDynamic()
+        {
+            return GetExecutor(new DynamicObjectTarget());
+        }
+
+        public RowbotExecutor ToObjects<TObjectType>() where TObjectType : new()
+        {
+            return GetExecutor(new PropertyReflectionTarget<TObjectType>());
+        }
+
+        private RowbotExecutor GetExecutor(RowTarget target)
+        {
+            if (target is null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
+
+            return new RowbotExecutor(source: _rowSource, target: target);
+        }
     }
 }
