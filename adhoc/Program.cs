@@ -1,6 +1,7 @@
 ﻿using Rowbot;
 using Rowbot.Core.Targets;
 using BenchmarkDotNet.Attributes;
+using Rowbot.Core.Execution;
 
 namespace AdhocConsole
 {
@@ -8,10 +9,7 @@ namespace AdhocConsole
     {
         static void Main(string[] args)
         {
-            new RowbotExecutorBuilder()
-                .FromDataReader(null)
-                .Execute();
-
+            
             using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
             // using (var outputStream = new MemoryStream())
             {

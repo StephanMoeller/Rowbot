@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rowbot.Test.IntegrationTests
+namespace Rowbot.Test.Core.Execution
 {
-    public class RowbotExecutorTest
+    public class RowbotExecutor_Test
     {
         [Fact]
         public void Execute_Test()
@@ -30,7 +30,7 @@ namespace Rowbot.Test.IntegrationTests
 
             // Assert columns
             Assert.Equal("ColA", columns[0].Name);
-            Assert.Equal(typeof(String), columns[0].ValueType);
+            Assert.Equal(typeof(string), columns[0].ValueType);
 
             Assert.Equal("ColB", columns[1].Name);
             Assert.Equal(typeof(int), columns[1].ValueType);

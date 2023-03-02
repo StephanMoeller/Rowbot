@@ -8,7 +8,7 @@ using System.Data;
 using System.IO;
 using System.Xml.Linq;
 
-namespace Rowbot
+namespace Rowbot.Core.Execution
 {
     public class RowbotExecutorBuilder
     {
@@ -46,9 +46,9 @@ namespace Rowbot
             return ToCustomTarget(new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: true));
         }
 
-        public RowbotExecutor ToDataTable()
+        public RowbotExecutor ToDataTable(DataTable tableToFill)
         {
-            return ToCustomTarget(new DataTableTarget());
+            return ToCustomTarget(new DataTableTarget(tableToFill));
         }
 
         public RowbotExecutor ToDataReader()

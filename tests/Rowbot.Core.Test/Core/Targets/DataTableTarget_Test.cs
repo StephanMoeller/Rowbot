@@ -9,7 +9,8 @@ namespace Rowbot.Test.Core.Targets
         [Fact]
         public void WriteColumnsAndRows_NoRows_ExpectEmptyTable_Test()
         {
-            var target = new DataTableTarget();
+            var table = new DataTable();
+            var target = new DataTableTarget(table);
 
             target.Init(new ColumnInfo[]{
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
@@ -18,7 +19,7 @@ namespace Rowbot.Test.Core.Targets
             });
 
             target.Complete();
-            var table = target.GetResult();
+            
             Assert.NotNull(table);
             Assert.Equal(3, table.Columns.Count);
 
@@ -37,7 +38,8 @@ namespace Rowbot.Test.Core.Targets
         [Fact]
         public void WriteColumnsAndRows_Test()
         {
-            var target = new DataTableTarget();
+            var table = new DataTable();
+            var target = new DataTableTarget(table);
 
             target.Init(new ColumnInfo[]{
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
@@ -51,7 +53,7 @@ namespace Rowbot.Test.Core.Targets
             target.WriteRow(new object?[] { null, "123", int.MaxValue });
 
             target.Complete();
-            var table = target.GetResult();
+            
             Assert.NotNull(table);
             Assert.Equal(3, table.Columns.Count);
 
@@ -75,7 +77,9 @@ namespace Rowbot.Test.Core.Targets
         [Fact]
         public void WriteColumnsAndRows_IncompatibaleTypeInRow_ExpectExceptionFromDataTableRethrown_Test()
         {
-            var target = new DataTableTarget();
+            var table = new DataTable();
+            var target = new DataTableTarget(table);
+
             target.Init(new ColumnInfo[]{
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
@@ -89,7 +93,8 @@ namespace Rowbot.Test.Core.Targets
         [Fact]
         public void Call_GetResultBeforeCallingCompleted_ExpectException_Test()
         {
-            var target = new DataTableTarget();
+            var table = new DataTable();
+            var target = new DataTableTarget(table);
 
             target.Init(new ColumnInfo[]{
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),

@@ -8,12 +8,14 @@ namespace Rowbot.Targets
 {
     public class DataTableTarget : IRowTarget
     {
-        private DataTable _table = null;
+        private readonly DataTable _table = null;
         private bool _initialized = false;
         private bool _completed = false;
-        public DataTableTarget()
+        public DataTableTarget(DataTable tableToFill)
         {
-
+            if (tableToFill.Columns.Count > 0 || tableToFill.Rows.Count > 0)
+                throw new ArgumentException("Provided table must be empty. Columns and/or rows found.");
+            _table = tableToFill;
         }
 
         public DataTable GetResult()
@@ -43,7 +45,6 @@ namespace Rowbot.Targets
             if (_initialized)
                 throw new InvalidOperationException("Init has already been called and can only be called once.");
             _initialized = true;
-            _table = new DataTable();
             foreach (var columnInfo in columns)
             {
                 _table.Columns.Add(new DataColumn(columnName: columnInfo.Name, dataType: columnInfo.ValueType));
