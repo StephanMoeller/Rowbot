@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Rowbot.Test.Core.Execution.TargetGuard_Test;
 
 namespace Rowbot.Test.Core.Execution
 {
@@ -140,6 +141,28 @@ namespace Rowbot.Test.Core.Execution
             Assert.Equal(1, target.OnCompleteCallCount);
         }
 
+        [Fact]
+        public void Dispose_EnsureCallingDisposeIfTargetImplementsIDisposable()
+        {
+            var target = new UnitTestTargetWithDispose();
+            var guard = new EnumerableTargetGuards<int>(target);
+
+            guard.Init(new ColumnInfo[0]);
+            guard.WriteRow(new object[0]);
+            guard.Complete();
+
+            Assert.Equal(0, target.DisposeCallCount);
+
+            guard.Dispose();
+
+            Assert.Equal(1, target.DisposeCallCount);
+
+#pragma warning disable S3966 // Objects should not be disposed more than once
+            guard.Dispose();
+#pragma warning restore S3966 // Objects should not be disposed more than once
+
+            Assert.Equal(2, target.DisposeCallCount);
+        }
 
         public sealed class UnitTestTarget : IEnumerableRowTarget<int>
         {
@@ -168,6 +191,30 @@ namespace Rowbot.Test.Core.Execution
                 OnWriteRowCallCount++;
                 _writeCounter++;
                 return _writeCounter;
+            }
+        }
+
+        public sealed class UnitTestTargetWithDispose : IEnumerableRowTarget<int>, IDisposable
+        {
+            public int DisposeCallCount { get; private set; } = 0;
+            public void Dispose()
+            {
+                DisposeCallCount++;
+            }
+
+            public void Complete()
+            {
+                //
+            }
+
+            public void Init(ColumnInfo[] columns)
+            {
+                //
+            }
+
+            public int WriteRow(object[] values)
+            {
+                return 42;
             }
         }
     }

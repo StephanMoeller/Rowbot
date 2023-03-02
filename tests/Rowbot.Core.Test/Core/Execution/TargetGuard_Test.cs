@@ -137,17 +137,36 @@ namespace Rowbot.Test.Core.Execution
             Assert.Equal(1, target.OnCompleteCallCount);
         }
 
+        [Fact]
+        public void Dispose_EnsureCallingDisposeIfTargetImplementsIDisposable()
+        {
+            var target = new UnitTestTargetWithDispose();
+            var guard = new TargetGuards(target);
+
+            guard.Init(new ColumnInfo[0]);
+            guard.WriteRow(new object[0]);
+            guard.Complete();
+
+            Assert.Equal(0, target.DisposeCallCount);
+
+            guard.Dispose();
+
+            Assert.Equal(1, target.DisposeCallCount);
+
+#pragma warning disable S3966 // Objects should not be disposed more than once
+            guard.Dispose();
+#pragma warning restore S3966 // Objects should not be disposed more than once
+
+            Assert.Equal(2, target.DisposeCallCount);
+        }
+
         public sealed class UnitTestTarget : IRowTarget
         {
             public int OnCompleteCallCount = 0;
             public int OnInitCallCount = 0;
             public int OnWriteRowCallCount = 0;
-            public int DispoeCallCount = 0;
-            public void Dispose()
-            {
-                DispoeCallCount++;
-            }
-
+            public int DisposeCallCount = 0;
+            
             public void Complete()
             {
                 OnCompleteCallCount++;
@@ -161,6 +180,30 @@ namespace Rowbot.Test.Core.Execution
             public void WriteRow(object[] values)
             {
                 OnWriteRowCallCount++;
+            }
+        }
+
+        public sealed class UnitTestTargetWithDispose : IRowTarget, IDisposable
+        {
+            public int DisposeCallCount { get; private set; } = 0;
+            public void Dispose()
+            {
+                DisposeCallCount++;
+            }
+
+            public void Complete()
+            {
+                //
+            }
+
+            public void Init(ColumnInfo[] columns)
+            {
+                //
+            }
+
+            public void WriteRow(object[] values)
+            {
+                //
             }
         }
     }
