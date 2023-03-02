@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Rowbot\Rowbot.csproj" />
     <ProjectReference Include="..\src\Rowbot.ClosedXml\Rowbot.ClosedXml.csproj" />
-    <ProjectReference Include="..\src\Rowbot.CsvHelper\Rowbot.CsvHelper.csproj" />
   </ItemGroup>
 
 </Project>
