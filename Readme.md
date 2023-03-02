@@ -124,14 +124,6 @@ new RowbotExecutorBuilder()
     - Still possible to work with bulks, isolated to a single source or target. A source can still choose to prefetch X elements and feed them one by one. The targets can also work in bulk if they choose, by accepting up to X elements before processing in a bulk.
 
 - Todos
-    - O(1) space allocation for e.g. Csv => Objects / Dynamic
-    - CancellationToken in ReadRow and WriteRow?
-    - Add a DynamicTarget (just because it would be an easy thing to do)
-    - Add a test with Sqlite loading data and processing it to excel as a real life usage case test
-    - Create use cases and benchmarks for the readme
     - Stats for execution (Wait times per source + entry counts processed)
-    - Allow sheet as input in ClosedXmlExcelTarget to allow composing a multi sheet document using Rowbot
-    - Make the different sources and targets easily discovarable
-    - Make is visible to the consumer which source and targets are non-allocating and which holds the enties workload in memory during processing.
-    - Ranem entire project to RowGun.net
-    - CsvTarget should have a writeHeaders flag in it to allow on/off
+    - CancellationToken in ReadRow and WriteRow?
+    - Add a test with Sqlite loading data and processing it to excel as a real life usage case test
