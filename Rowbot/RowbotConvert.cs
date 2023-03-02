@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Xml.Linq;
 
 namespace Rowbot
 {
@@ -27,17 +28,17 @@ namespace Rowbot
 
         public RowbotExecutor ToCsv(Stream outputStream, CsvConfig config, bool writeHeaders)
         {
-            return GetExecutor(new CsvTarget(outputStream: outputStream, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: true));
+            return ToCustomTarget(new CsvTarget(outputStream: outputStream, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: true));
         }
 
         public RowbotExecutor ToExcel(Stream outputStream, string sheetName, bool writeHeaders)
         {
-            return GetExecutor(new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: true));
+            return ToCustomTarget(new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: true));
         }
 
         public RowbotExecutor ToDataTable()
         {
-            return GetExecutor(new DataTableTarget());
+            return ToCustomTarget(new DataTableTarget());
         }
 
         public RowbotExecutor ToDataReader()
@@ -45,29 +46,24 @@ namespace Rowbot
             throw new NotImplementedException();
         }
 
-        public RowbotExecutor ToDynamic()
+        public RowbotExecutor<dynamic> ToDynamic()
         {
-            return GetExecutor(new DynamicObjectTarget());
+            return new RowbotExecutor(_rowSource, new DynamicObjectTarget());
         }
 
-        public RowbotExecutor ToObjects<TObjectType>() where TObjectType : new()
+        public RowbotExecutor<TObjectType> ToObjects<TObjectType>() where TObjectType : new()
         {
-            return GetExecutor(new PropertyReflectionTarget<TObjectType>());
+            return ToCustomTarget<TObjectType>(new PropertyReflectionTarget<TObjectType>());
         }
 
-        public RowbotExecutor ToCustomTarget(IRowTarget customRowTarget)
+        public RowbotExecutor ToCustomTarget(IRowTarget target)
         {
-            return GetExecutor(customRowTarget);
+            return new RowbotExecutor(_rowSource, target);
         }
 
-        private RowbotExecutor GetExecutor(IRowTarget target)
+        public RowbotExecutor<TElement> ToCustomTarget<TElement>(IEnumerableRowTarget<TElement> target)
         {
-            if (target is null)
-            {
-                throw new ArgumentNullException(nameof(target));
-            }
-
-            return new RowbotExecutor(source: _rowSource, target: target);
+            return new RowbotExecutor<TElement>(source: _rowSource, target: target);
         }
     }
 }

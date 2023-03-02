@@ -25,34 +25,27 @@ namespace Rowbot.Test.Targets
                     new ColumnInfo(name: "B", typeof(int))
                 });
 
-                target.WriteRow(new object[] { "Hello", 42 });
-                target.WriteRow(new object[] { "Hello again", 82 });
+                {
+                    var e = target.WriteRow(new object[] { "Hello", 42 });
+                    Assert.Null(e.String_GetOnly);
+                    Assert.Null(e.Get_String_SetOnly_Value());
+                    Assert.Null(e.String_GetAndSet);
+                    Assert.Equal(0, e.Int_GetAndSet);
+                    Assert.Equal(0, e.AnotherInt_GetAndSet);
+                    Assert.Null(e.NullableInt_GetAndSet);
+                }
+
+                {
+                    var e = target.WriteRow(new object[] { "Hello again", 82 });
+                    Assert.Null(e.String_GetOnly);
+                    Assert.Null(e.Get_String_SetOnly_Value());
+                    Assert.Null(e.String_GetAndSet);
+                    Assert.Equal(0, e.Int_GetAndSet);
+                    Assert.Equal(0, e.AnotherInt_GetAndSet);
+                    Assert.Null(e.NullableInt_GetAndSet);
+                }
 
                 target.Complete();
-
-                var result = target.GetResult().ToArray();
-
-                Assert.Equal(2, result.Length);
-
-                {
-                    var e = result[0];
-                    Assert.Null(e.String_GetOnly);
-                    Assert.Null(e.Get_String_SetOnly_Value());
-                    Assert.Null(e.String_GetAndSet);
-                    Assert.Equal(0, e.Int_GetAndSet);
-                    Assert.Equal(0, e.AnotherInt_GetAndSet);
-                    Assert.Null(e.NullableInt_GetAndSet);
-                }
-
-                {
-                    var e = result[1];
-                    Assert.Null(e.String_GetOnly);
-                    Assert.Null(e.Get_String_SetOnly_Value());
-                    Assert.Null(e.String_GetAndSet);
-                    Assert.Equal(0, e.Int_GetAndSet);
-                    Assert.Equal(0, e.AnotherInt_GetAndSet);
-                    Assert.Null(e.NullableInt_GetAndSet);
-                }
             }
         }
 
@@ -67,17 +60,8 @@ namespace Rowbot.Test.Targets
                     new ColumnInfo(name: "int_getandset", typeof(int))
                 });
 
-                target.WriteRow(new object[] { "Hello", "ignored", 42 });
-                target.WriteRow(new object[] { "Hello again", "ignored", 82 });
-
-                target.Complete();
-
-                var result = target.GetResult().ToArray();
-
-                Assert.Equal(2, result.Length);
-
                 {
-                    var e = result[0];
+                    var e = target.WriteRow(new object[] { "Hello", "ignored", 42 });
                     Assert.Null(e.String_GetOnly);
                     Assert.Equal("Hello", e.Get_String_SetOnly_Value());
                     Assert.Null(e.String_GetAndSet);
@@ -87,7 +71,7 @@ namespace Rowbot.Test.Targets
                 }
 
                 {
-                    var e = result[1];
+                    var e = target.WriteRow(new object[] { "Hello again", "ignored", 82 });
                     Assert.Null(e.String_GetOnly);
                     Assert.Equal("Hello again", e.Get_String_SetOnly_Value());
                     Assert.Null(e.String_GetAndSet);
@@ -95,6 +79,8 @@ namespace Rowbot.Test.Targets
                     Assert.Equal(0, e.AnotherInt_GetAndSet);
                     Assert.Null(e.NullableInt_GetAndSet);
                 }
+
+                target.Complete();
             }
         }
 
@@ -107,14 +93,11 @@ namespace Rowbot.Test.Targets
                     new ColumnInfo(name: "NullableInt_GetAndSet", typeof(int))
                 });
 
-                target.WriteRow(new object[] { 42 });
+                var dummy = target.WriteRow(new object[] { 42 });
 
                 target.Complete();
 
-                var result = target.GetResult().ToArray();
-
-                Assert.Single(result);
-                Assert.Equal(42, result.Single().NullableInt_GetAndSet);
+                Assert.Equal(42, dummy.NullableInt_GetAndSet);
             }
         }
 
@@ -129,14 +112,11 @@ namespace Rowbot.Test.Targets
                     new ColumnInfo(name: "NullableInt_GetAndSet", typeof(int?))
                 });
 
-                target.WriteRow(new object?[] { inputValue });
+                var dummy = target.WriteRow(new object?[] { inputValue });
 
                 target.Complete();
 
-                var result = target.GetResult().ToArray();
-
-                Assert.Single(result);
-                Assert.Equal(inputValue, result.Single().NullableInt_GetAndSet);
+                Assert.Equal(inputValue, dummy.NullableInt_GetAndSet);
             }
         }
 
@@ -153,14 +133,11 @@ namespace Rowbot.Test.Targets
 
                 if (expectSuccess)
                 {
-                    target.WriteRow(new object?[] { inputValue });
+                    var dummy = target.WriteRow(new object?[] { inputValue });
 
                     target.Complete();
 
-                    var result = target.GetResult().ToArray();
-
-                    Assert.Single(result);
-                    Assert.Equal(inputValue, result.Single().Int_GetAndSet);
+                    Assert.Equal(inputValue, dummy.Int_GetAndSet);
                 }
                 else
                 {

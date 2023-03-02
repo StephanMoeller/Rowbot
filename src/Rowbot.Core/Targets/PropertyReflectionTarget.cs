@@ -6,23 +6,17 @@ using System.Text;
 
 namespace Rowbot.Core.Targets
 {
-    public class PropertyReflectionTarget<T> : IRowTarget where T : new()
+    public class PropertyReflectionTarget<T> : IEnumerableRowTarget<T> where T : new()
     {
         private PropertyInfo[] _propertiesByColumnIndex;
         private int[] _supportedIndexes;
         private bool[] _throwIfSourceValuesIsNullByIndex;
-        private LinkedList<T> _elements = new LinkedList<T>();
         private PropertyInfo[] _allWritableProperties;
         public PropertyReflectionTarget()
         {
             _allWritableProperties = typeof(T).GetProperties().Where(p => p.CanWrite).ToArray();
             if (_allWritableProperties.Length == 0)
                 throw new ArgumentException($"No writable properties found on type {typeof(T).FullName}");
-        }
-
-        public LinkedList<T> GetResult()
-        {
-            return _elements;
         }
 
         public void Dispose()
@@ -94,7 +88,7 @@ namespace Rowbot.Core.Targets
             throw new TypeMismatchException($"Column with name {columnInfo.Name} at index {columnIndex} is of type {columnInfo.ValueType.FullName} but matching property on type {typeof(T).FullName} is of type {property.PropertyType.FullName}");
         }
 
-        public void WriteRow(object[] values)
+        public T WriteRow(object[] values)
         {
             var element = new T();
             for (var i = 0; i < _supportedIndexes.Length; i++)
@@ -106,10 +100,8 @@ namespace Rowbot.Core.Targets
                     throw new ArgumentNullException($"Property {property.Name} on type {typeof(T).FullName} cannot be set to NULL");
                 property.SetValue(element, value);
             }
-            _elements.AddLast(element);
+            return element;
         }
-
-        
     }
 
     public class TypeMismatchException : Exception

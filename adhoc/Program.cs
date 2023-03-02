@@ -8,10 +8,10 @@ namespace AdhocConsole
     {
         static void Main(string[] args)
         {
-            RowbotConvert
-                .FromCustomSource(null)
-                .ToCustomTarget(null)
-                .Execute();
+            foreach(var e in RowbotConvert.FromCustomSource(null).ToCustomTarget<int>(null).CreateEnumerable())
+            {
+                
+            }
 
             using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
             // using (var outputStream = new MemoryStream())
