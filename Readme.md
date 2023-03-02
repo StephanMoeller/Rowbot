@@ -6,6 +6,7 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 Objects => Excel
 
 ``|                               Method |         Mean |      Error |     StdDev |``
+
 ``|------------------------------------- |-------------:|-----------:|-----------:|``
 ``|      Rowbot_AnonymousToExcel_1k_Rows |     12.89 ms |   0.079 ms |   0.066 ms |``
 ``|   MiniExcel_AnonymousToExcel_1k_Rows |     27.57 ms |   0.182 ms |   0.161 ms |``
