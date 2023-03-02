@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Rowbot.Core.Targets
 {
-    public class DynamicObjectTarget : IEnumerableRowTarget<dynamic>
+    public class DynamicObjectTarget : IDisposable // Not possible: : IEnumerableRowTarget<dynamic>
     {
         private string[] _columnNames;
 
