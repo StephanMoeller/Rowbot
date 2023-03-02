@@ -38,9 +38,8 @@ namespace Rowbot.Sources
 
         public ColumnInfo[] InitAndGetColumns()
         {
-            throw new NotImplementedException(); // Ensure use of column names instead of indexes here!
-            //var columnInfos = _dataReader.GetSchemaTable().Rows.Cast<DataRow>().Select(row => new ColumnInfo(name: (string)row[0], valueType: (Type)row[5])).ToArray();
-            //return columnInfos;
+            var columnInfos = _dataReader.GetSchemaTable().Rows.Cast<DataRow>().Select(row => new ColumnInfo(name: (string)row["ColumnName"], valueType: (Type)row["DataType"])).ToArray();
+            return columnInfos;
         }
 
         public bool ReadRow(object[] values)
