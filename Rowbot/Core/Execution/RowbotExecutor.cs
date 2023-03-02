@@ -60,12 +60,12 @@ namespace Rowbot.Execution
     public sealed class RowbotEnumerableExecutor<TElement> : IDisposable
     {
         private readonly SourceGuards _source;
-        private readonly IEnumerableTargetGuards<TElement> _target;
+        private readonly EnumerableTargetGuards<TElement> _target;
 
         public RowbotEnumerableExecutor(IRowSource source, IEnumerableRowTarget<TElement> target)
         {
             _source = new SourceGuards(source);
-            _target = new IEnumerableTargetGuards<TElement>(target);
+            _target = new EnumerableTargetGuards<TElement>(target);
         }
 
         public void Execute(Action<IEnumerable<TElement>> consumer)

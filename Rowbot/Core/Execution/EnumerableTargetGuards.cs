@@ -4,13 +4,13 @@ using System.Text;
 
 namespace Rowbot.Core.Execution
 {
-    public class IEnumerableTargetGuards<T> : IEnumerableRowTarget<T>
+    public sealed class EnumerableTargetGuards<T> : IEnumerableRowTarget<T>
     {
         private readonly IEnumerableRowTarget<T> _rowTarget;
 
-        protected bool Completed { get; private set; } = false;
-        protected bool Initialized { get; private set; } = false;
-        public IEnumerableTargetGuards(IEnumerableRowTarget<T> rowTarget)
+        private bool Completed { get; set; } = false;
+        private bool Initialized { get; set; } = false;
+        public EnumerableTargetGuards(IEnumerableRowTarget<T> rowTarget)
         {
             _rowTarget = rowTarget ?? throw new ArgumentNullException(nameof(rowTarget));
         }
