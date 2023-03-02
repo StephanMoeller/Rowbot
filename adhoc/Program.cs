@@ -41,7 +41,7 @@ namespace AdhocConsole
             {
                 // Define the compression level
                 // 0 - store only to 9 - means best compression
-                OutputStream.SetLevel((int)CompressionLevel.NoCompression);
+                OutputStream.SetLevel(9);
 
                 byte[] buffer = new byte[4096];
 
