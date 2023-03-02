@@ -4,33 +4,43 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Data.Common;
+using Microsoft.Win32.SafeHandles;
+using System.Runtime.InteropServices;
 
 namespace Rowbot.Sources
 {
-    public class DataReaderSource : IRowSource
+    public sealed class DataReaderSource : IRowSource, IDisposable
     {
         private readonly IDataReader _dataReader;
-        private string[] _columnNames;
-        public DataReaderSource(IDataReader dataReader)
+        private readonly bool _leaveOpen;
+
+        public DataReaderSource(IDataReader dataReader, bool leaveOpen = false)
         {
             _dataReader = dataReader ?? throw new ArgumentNullException(nameof(dataReader));
-            _columnNames = _dataReader.GetSchemaTable().Rows.Cast<DataRow>().Select(row => row[0].ToString()).ToArray();
-        }
-
-        public void Dispose()
-        {
-            _dataReader?.Dispose();
+            _leaveOpen = leaveOpen;
         }
 
         public void Complete()
         {
-            // Nothing to complete in this source
+            if (!_leaveOpen)
+            {
+                _dataReader.Close();
+            }
+        }
+
+        public void Dispose()
+        {
+            if (!_leaveOpen)
+            {
+                _dataReader.Dispose();
+            }
         }
 
         public ColumnInfo[] InitAndGetColumns()
         {
-            var columnInfos = _dataReader.GetSchemaTable().Rows.Cast<DataRow>().Select(row => new ColumnInfo(name: (string)row[0], valueType: (Type)row[5])).ToArray();
-            return columnInfos;
+            throw new NotImplementedException(); // Ensure use of column names instead of indexes here!
+            //var columnInfos = _dataReader.GetSchemaTable().Rows.Cast<DataRow>().Select(row => new ColumnInfo(name: (string)row[0], valueType: (Type)row[5])).ToArray();
+            //return columnInfos;
         }
 
         public bool ReadRow(object[] values)

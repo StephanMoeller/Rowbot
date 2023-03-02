@@ -4,12 +4,12 @@ using System.Text;
 
 namespace Rowbot.Core.Execution
 {
-    public class TargetGuards : IRowTarget
+    public sealed class TargetGuards : IRowTarget, IDisposable
     {
         private readonly IRowTarget _rowTarget;
 
-        protected bool Completed { get; private set; } = false;
-        protected bool Initialized { get; private set; } = false;
+        private bool Completed { get; set; } = false;
+        private bool Initialized { get; set; } = false;
         public TargetGuards(IRowTarget rowTarget)
         {
             _rowTarget = rowTarget ?? throw new ArgumentNullException(nameof(rowTarget));
@@ -27,7 +27,7 @@ namespace Rowbot.Core.Execution
 
         public void Dispose()
         {
-            _rowTarget.Dispose();
+            (_rowTarget as IDisposable)?.Dispose();
         }
 
         public void Init(ColumnInfo[] columns)

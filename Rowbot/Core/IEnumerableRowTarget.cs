@@ -2,7 +2,7 @@
 
 namespace Rowbot
 {
-    public interface IEnumerableRowTarget<TOutputType> : IDisposable
+    public interface IEnumerableRowTarget<TOutputType>
     {
         void Init(ColumnInfo[] columns);
         TOutputType WriteRow(object[] values);

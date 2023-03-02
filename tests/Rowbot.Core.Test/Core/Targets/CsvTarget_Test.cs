@@ -125,6 +125,7 @@ namespace Rowbot.Test.Core.Targets
                     target = new CsvTarget(ms, new CsvConfig() { Delimiter = ';', Quote = '\'', Newline = "\r\n", NumberFormatter = new CultureInfo("da-DK") }, writeHeaders: true, leaveOpen: leaveOpen.Value);
                 }
 
+#pragma warning disable S3966 // Objects should not be disposed more than once
                 using (target)
                 {
                     // Ensure init and writeWrote are allowed and stream not disposed as of yet
@@ -156,6 +157,7 @@ namespace Rowbot.Test.Core.Targets
                         Assert.Throws<ObjectDisposedException>(() => ms.WriteByte(1));
                     }
                 }
+#pragma warning restore S3966 // Objects should not be disposed more than once
             }
 
         }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Rowbot.Core.Execution
 {
-    public sealed class EnumerableTargetGuards<T> : IEnumerableRowTarget<T>
+    public sealed class EnumerableTargetGuards<T> : IEnumerableRowTarget<T>, IDisposable
     {
         private readonly IEnumerableRowTarget<T> _rowTarget;
 
@@ -27,7 +27,7 @@ namespace Rowbot.Core.Execution
 
         public void Dispose()
         {
-            _rowTarget.Dispose();
+            (_rowTarget as IDisposable)?.Dispose();
         }
 
         public void Init(ColumnInfo[] columns)

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Rowbot
 {
-    public interface IRowTarget : IDisposable
+    public interface IRowTarget
     {
         void Init(ColumnInfo[] columns);
         void WriteRow(object[] values);

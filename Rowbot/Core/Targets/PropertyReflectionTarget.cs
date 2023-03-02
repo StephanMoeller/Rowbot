@@ -11,22 +11,17 @@ namespace Rowbot.Core.Targets
         private PropertyInfo[] _propertiesByColumnIndex;
         private int[] _supportedIndexes;
         private bool[] _throwIfSourceValuesIsNullByIndex;
-        private PropertyInfo[] _allWritableProperties;
         public PropertyReflectionTarget()
         {
-            _allWritableProperties = typeof(T).GetProperties().Where(p => p.CanWrite).ToArray();
-            if (_allWritableProperties.Length == 0)
+            // Sanity check that there is anything to write on this object
+            var allWritableProperties = typeof(T).GetProperties().Where(p => p.CanWrite).ToArray();
+            if (allWritableProperties.Length == 0)
                 throw new ArgumentException($"No writable properties found on type {typeof(T).FullName}");
-        }
-
-        public void Dispose()
-        {
-
         }
 
         public void Complete()
         {
-
+            // Nothing to complete in this source
         }
 
         public void Init(ColumnInfo[] columns)

@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Rowbot.ClosedXml
 {
-    public class ClosedXmlExcelTarget : IRowTarget
+    public class ClosedXmlExcelTarget : IRowTarget, IDisposable
     {
         private Stream _stream;
         private readonly string _sheetName;

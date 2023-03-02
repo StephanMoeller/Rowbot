@@ -137,6 +137,30 @@ namespace Rowbot.Test.Core.Execution
             Assert.True(source.ReadRow(new object[columns.Length]));
             Assert.Throws<InvalidOperationException>(() => guard.ReadRow(new object[arraySize]));
         }
+
+        [Fact]
+        public void Dispose_EnsureCallingDisposeIfSourceImplementsIDisposable()
+        {
+            var source = new UnitTestSourceWithDispose();
+            var guard = new SourceGuards(source);
+
+            guard.InitAndGetColumns();
+            guard.ReadRow(new object[0]);
+
+            guard.Complete();
+
+            Assert.Equal(0, source.DisposeCallCount);
+
+            guard.Dispose();
+
+            Assert.Equal(1, source.DisposeCallCount);
+
+#pragma warning disable S3966 // Objects should not be disposed more than once
+            guard.Dispose();
+#pragma warning restore S3966 // Objects should not be disposed more than once
+
+            Assert.Equal(2, source.DisposeCallCount);
+        }
     }
 
 
@@ -147,15 +171,9 @@ namespace Rowbot.Test.Core.Execution
         public int OnReadRowCallCount = 0;
         public ColumnInfo[] Columns = new ColumnInfo[] { new ColumnInfo("col1", typeof(string)), new ColumnInfo("col2", typeof(int)) };
         private bool _nextReadReturnValue = true;
-
         public void SetNextReadReturnValue(bool nextReadReturnValue)
         {
             _nextReadReturnValue = nextReadReturnValue;
-        }
-
-        public void Dispose()
-        {
-
         }
 
         public void Complete()
@@ -173,6 +191,31 @@ namespace Rowbot.Test.Core.Execution
         {
             OnReadRowCallCount++;
             return _nextReadReturnValue;
+        }
+    }
+
+    public sealed class UnitTestSourceWithDispose : IRowSource, IDisposable
+    {
+        public int DisposeCallCount { get; private set; } = 0;
+
+        public void Complete()
+        {
+            //
+        }
+
+        public ColumnInfo[] InitAndGetColumns()
+        {
+            return new ColumnInfo[0];
+        }
+
+        public bool ReadRow(object[] values)
+        {
+            return true;
+        }
+
+        public void Dispose()
+        {
+            DisposeCallCount++;
         }
     }
 }

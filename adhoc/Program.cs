@@ -52,26 +52,26 @@ namespace AdhocConsole
 
         private void RunInternal(Func<Stream, IRowTarget> targetProvider)
         {
-            //using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
-            using (var outputStream = new MemoryStream())
-            {
-                // using (var target = new ClosedXmlExcelTarget(outputStream: zipFileMemoryStream, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
-                using (var target = targetProvider(outputStream))
-                {
-                    var range = Enumerable.Range(0, 100);
-                    target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
+            ////using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
+            //using (var outputStream = new MemoryStream())
+            //{
+            //    // using (var target = new ClosedXmlExcelTarget(outputStream: zipFileMemoryStream, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
+            //    using (var target = targetProvider(outputStream))
+            //    {
+            //        var range = Enumerable.Range(0, 100);
+            //        target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
 
-                    object[] data = range.Select(num => num.ToString()).ToArray();
+            //        object[] data = range.Select(num => num.ToString()).ToArray();
 
-                    for (var i = 0; i < 50_000; i++)
-                    {
-                        target.WriteRow(data);
-                    }
+            //        for (var i = 0; i < 50_000; i++)
+            //        {
+            //            target.WriteRow(data);
+            //        }
 
-                    target.Complete();
-                }
-                outputStream.Close();
-            }
+            //        target.Complete();
+            //    }
+            //    outputStream.Close();
+            //}
 
         }
     }
@@ -89,21 +89,21 @@ namespace AdhocConsole
             using (var outputStream = new MemoryStream())
             {
                 // using (var target = new ClosedXmlExcelTarget(outputStream: zipFileMemoryStream, sheetName: "SheetName", writeHeaders: true, leaveOpen: true))
-                using (var target = targetProvider(outputStream))
-                {
-                    var range = Enumerable.Range(0, 100);
-                    target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
+                //using (var target = targetProvider(outputStream))
+                //{
+                //    var range = Enumerable.Range(0, 100);
+                //    target.Init(range.Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray());
 
-                    object[] data = range.Select(num => "<" + new string('a', 100)).ToArray();
+                //    object[] data = range.Select(num => "<" + new string('a', 100)).ToArray();
 
-                    for (var i = 0; i < 1_000; i++)
-                    {
-                        target.WriteRow(data);
-                    }
+                //    for (var i = 0; i < 1_000; i++)
+                //    {
+                //        target.WriteRow(data);
+                //    }
 
-                    target.Complete();
-                }
-                outputStream.Close();
+                //    target.Complete();
+                //}
+                //outputStream.Close();
             }
 
         }

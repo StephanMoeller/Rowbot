@@ -8,11 +8,11 @@ namespace Rowbot.Core.Execution
     /// <summary>
     /// This helper class wraps a source and handles all input and output parameter validation as well as ensuring methods not called out of order.
     /// </summary>
-    public class SourceGuards : IRowSource
+    public sealed class SourceGuards : IRowSource, IDisposable
     {
-        protected bool Initialized { get; private set; } = false;
-        protected bool Completed { get; private set; } = false;
-        protected int _columnCount = -1;
+        private bool Initialized { get; set; } = false;
+        private bool Completed { get; set; } = false;
+        private int _columnCount = -1;
         private bool? _previousReadResult = null;
         private readonly IRowSource _rowSource;
 
@@ -69,7 +69,7 @@ namespace Rowbot.Core.Execution
 
         public void Dispose()
         {
-            _rowSource.Dispose();
+            (_rowSource as IDisposable)?.Dispose();
         }
     }
 }

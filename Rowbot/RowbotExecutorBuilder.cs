@@ -18,8 +18,7 @@ namespace Rowbot
         {
         }
 
-        public RowbotExecutorBuilder FromDataTable(DataTable dataTable) => SetSource(new DataTableSource(dataTable));
-
+        public RowbotExecutorBuilder FromDataTable(DataTable dataTable) => SetSource(new DataReaderSource(dataTable.CreateDataReader()));
         public RowbotExecutorBuilder FromDataReader(IDataReader dataReader) => SetSource(new DataReaderSource(dataReader));
         public RowbotExecutorBuilder FromObjects<TObjectType>(IEnumerable<TObjectType> objects) => SetSource(PropertyReflectionSource.Create(objects));
         public RowbotExecutorBuilder FromCustomSource(IRowSource customRowSource) => SetSource(customRowSource);

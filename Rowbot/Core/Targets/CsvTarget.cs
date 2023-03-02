@@ -26,7 +26,7 @@ namespace Rowbot.Core.Targets
         }
     }
 
-    public class CsvTarget : IRowTarget
+    public class CsvTarget : IRowTarget, IDisposable
     {
         private readonly Stream _outputStream;
         private readonly bool _writeHeaders;

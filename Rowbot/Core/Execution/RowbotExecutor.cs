@@ -9,8 +9,8 @@ namespace Rowbot.Execution
 {
     public sealed class RowbotExecutor : IDisposable
     {
-        private readonly IRowSource _source;
-        private readonly IRowTarget _target;
+        private readonly SourceGuards _source;
+        private readonly TargetGuards _target;
 
         public RowbotExecutor(IRowSource source, IRowTarget target)
         {
@@ -24,13 +24,13 @@ namespace Rowbot.Execution
 #pragma warning disable S108 // Nested blocks of code should not be left empty
             try
             {
-                _source?.Dispose();
+                _source.Dispose();
             }
             catch { }
 
             try
             {
-                _target?.Dispose();
+                _target.Dispose();
             }
             catch { }
 #pragma warning restore S108 // Nested blocks of code should not be left empty
@@ -98,13 +98,13 @@ namespace Rowbot.Execution
 #pragma warning disable S108 // Nested blocks of code should not be left empty
             try
             {
-                _source?.Dispose();
+                _source.Dispose();
             }
             catch { }
 
             try
             {
-                _target?.Dispose();
+                _target.Dispose();
             }
             catch { }
 #pragma warning restore S108 // Nested blocks of code should not be left empty

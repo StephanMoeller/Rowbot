@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Rowbot.Core.Targets
 {
-    public class ExcelTarget : IRowTarget
+    public class ExcelTarget : IRowTarget, IDisposable
     {
         private readonly string _sheetName;
         private readonly bool _writeHeaders;

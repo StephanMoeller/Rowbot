@@ -18,87 +18,85 @@ namespace Rowbot.Test.Core.Targets
         [Fact]
         public void NoMatchingPropertiesWithColumnNames_Test()
         {
-            using (var target = new PropertyReflectionTarget<UnitTestDummy>())
-            {
-                target.Init(new ColumnInfo[]{
+            var target = new PropertyReflectionTarget<UnitTestDummy>();
+
+            target.Init(new ColumnInfo[]{
                     new ColumnInfo(name: "A", typeof(string)),
                     new ColumnInfo(name: "B", typeof(int))
                 });
 
-                {
-                    var e = target.WriteRow(new object[] { "Hello", 42 });
-                    Assert.Null(e.String_GetOnly);
-                    Assert.Null(e.Get_String_SetOnly_Value());
-                    Assert.Null(e.String_GetAndSet);
-                    Assert.Equal(0, e.Int_GetAndSet);
-                    Assert.Equal(0, e.AnotherInt_GetAndSet);
-                    Assert.Null(e.NullableInt_GetAndSet);
-                }
-
-                {
-                    var e = target.WriteRow(new object[] { "Hello again", 82 });
-                    Assert.Null(e.String_GetOnly);
-                    Assert.Null(e.Get_String_SetOnly_Value());
-                    Assert.Null(e.String_GetAndSet);
-                    Assert.Equal(0, e.Int_GetAndSet);
-                    Assert.Equal(0, e.AnotherInt_GetAndSet);
-                    Assert.Null(e.NullableInt_GetAndSet);
-                }
-
-                target.Complete();
+            {
+                var e = target.WriteRow(new object[] { "Hello", 42 });
+                Assert.Null(e.String_GetOnly);
+                Assert.Null(e.Get_String_SetOnly_Value());
+                Assert.Null(e.String_GetAndSet);
+                Assert.Equal(0, e.Int_GetAndSet);
+                Assert.Equal(0, e.AnotherInt_GetAndSet);
+                Assert.Null(e.NullableInt_GetAndSet);
             }
+
+            {
+                var e = target.WriteRow(new object[] { "Hello again", 82 });
+                Assert.Null(e.String_GetOnly);
+                Assert.Null(e.Get_String_SetOnly_Value());
+                Assert.Null(e.String_GetAndSet);
+                Assert.Equal(0, e.Int_GetAndSet);
+                Assert.Equal(0, e.AnotherInt_GetAndSet);
+                Assert.Null(e.NullableInt_GetAndSet);
+            }
+
+            target.Complete();
         }
 
         [Fact]
         public void WithMatchingProperties_Test()
         {
-            using (var target = new PropertyReflectionTarget<UnitTestDummy>())
-            {
-                target.Init(new ColumnInfo[]{
+            var target = new PropertyReflectionTarget<UnitTestDummy>();
+
+            target.Init(new ColumnInfo[]{
                     new ColumnInfo(name: "string_SETONLY", typeof(string)),
                     new ColumnInfo(name: "and_this_one_does_not_match_anything", typeof(string)),
                     new ColumnInfo(name: "int_getandset", typeof(int))
                 });
 
-                {
-                    var e = target.WriteRow(new object[] { "Hello", "ignored", 42 });
-                    Assert.Null(e.String_GetOnly);
-                    Assert.Equal("Hello", e.Get_String_SetOnly_Value());
-                    Assert.Null(e.String_GetAndSet);
-                    Assert.Equal(42, e.Int_GetAndSet);
-                    Assert.Equal(0, e.AnotherInt_GetAndSet);
-                    Assert.Null(e.NullableInt_GetAndSet);
-                }
-
-                {
-                    var e = target.WriteRow(new object[] { "Hello again", "ignored", 82 });
-                    Assert.Null(e.String_GetOnly);
-                    Assert.Equal("Hello again", e.Get_String_SetOnly_Value());
-                    Assert.Null(e.String_GetAndSet);
-                    Assert.Equal(82, e.Int_GetAndSet);
-                    Assert.Equal(0, e.AnotherInt_GetAndSet);
-                    Assert.Null(e.NullableInt_GetAndSet);
-                }
-
-                target.Complete();
+            {
+                var e = target.WriteRow(new object[] { "Hello", "ignored", 42 });
+                Assert.Null(e.String_GetOnly);
+                Assert.Equal("Hello", e.Get_String_SetOnly_Value());
+                Assert.Null(e.String_GetAndSet);
+                Assert.Equal(42, e.Int_GetAndSet);
+                Assert.Equal(0, e.AnotherInt_GetAndSet);
+                Assert.Null(e.NullableInt_GetAndSet);
             }
+
+            {
+                var e = target.WriteRow(new object[] { "Hello again", "ignored", 82 });
+                Assert.Null(e.String_GetOnly);
+                Assert.Equal("Hello again", e.Get_String_SetOnly_Value());
+                Assert.Null(e.String_GetAndSet);
+                Assert.Equal(82, e.Int_GetAndSet);
+                Assert.Equal(0, e.AnotherInt_GetAndSet);
+                Assert.Null(e.NullableInt_GetAndSet);
+            }
+
+            target.Complete();
         }
 
         [Fact]
         public void NullableIntOnProperty_NotNullableIntInSource_EnsureWorks_Test()
         {
-            using (var target = new PropertyReflectionTarget<UnitTestDummy>())
-            {
-                target.Init(new ColumnInfo[]{
+            var target = new PropertyReflectionTarget<UnitTestDummy>();
+
+            target.Init(new ColumnInfo[]{
                     new ColumnInfo(name: "NullableInt_GetAndSet", typeof(int))
                 });
 
-                var dummy = target.WriteRow(new object[] { 42 });
+            var dummy = target.WriteRow(new object[] { 42 });
 
-                target.Complete();
+            target.Complete();
 
-                Assert.Equal(42, dummy.NullableInt_GetAndSet);
-            }
+            Assert.Equal(42, dummy.NullableInt_GetAndSet);
+
         }
 
         [Theory]
@@ -106,18 +104,17 @@ namespace Rowbot.Test.Core.Targets
         [InlineData(null)]
         public void NullableIntOnProperty_NullableIntInSource_EnsureWorks_Test(int? inputValue)
         {
-            using (var target = new PropertyReflectionTarget<UnitTestDummy>())
-            {
-                target.Init(new ColumnInfo[]{
+            var target = new PropertyReflectionTarget<UnitTestDummy>();
+
+            target.Init(new ColumnInfo[]{
                     new ColumnInfo(name: "NullableInt_GetAndSet", typeof(int?))
                 });
 
-                var dummy = target.WriteRow(new object?[] { inputValue });
+            var dummy = target.WriteRow(new object?[] { inputValue });
 
-                target.Complete();
+            target.Complete();
 
-                Assert.Equal(inputValue, dummy.NullableInt_GetAndSet);
-            }
+            Assert.Equal(inputValue, dummy.NullableInt_GetAndSet);
         }
 
         [Theory]
@@ -125,38 +122,35 @@ namespace Rowbot.Test.Core.Targets
         [InlineData(null, false)]
         public void IntOnProperty_NullableIntInSource_EnsureValuesAreCopiedWhenNotNullInSource_Test(int? inputValue, bool expectSuccess)
         {
-            using (var target = new PropertyReflectionTarget<UnitTestDummy>())
-            {
-                target.Init(new ColumnInfo[]{
+            var target = new PropertyReflectionTarget<UnitTestDummy>();
+
+            target.Init(new ColumnInfo[]{
                     new ColumnInfo(name: "Int_GetAndSet", typeof(int?))
                 });
 
-                if (expectSuccess)
-                {
-                    var dummy = target.WriteRow(new object?[] { inputValue });
+            if (expectSuccess)
+            {
+                var dummy = target.WriteRow(new object?[] { inputValue });
 
-                    target.Complete();
+                target.Complete();
 
-                    Assert.Equal(inputValue, dummy.Int_GetAndSet);
-                }
-                else
+                Assert.Equal(inputValue, dummy.Int_GetAndSet);
+            }
+            else
+            {
+                // Expect exception when setting to null
+                Assert.Throws<ArgumentNullException>(() =>
                 {
-                    // Expect exception when setting to null
-                    Assert.Throws<ArgumentNullException>(() =>
-                    {
-                        target.WriteRow(new object?[] { inputValue });
-                    });
-                }
+                    target.WriteRow(new object?[] { inputValue });
+                });
             }
         }
 
         [Fact]
         public void TypeMismatch_Test()
         {
-            using (var target = new PropertyReflectionTarget<UnitTestDummy>())
-            {
-                Assert.Throws<TypeMismatchException>(() => target.Init(new ColumnInfo[] { new ColumnInfo(name: "string_SETONLY", typeof(int)) }));
-            }
+            var target = new PropertyReflectionTarget<UnitTestDummy>();
+            Assert.Throws<TypeMismatchException>(() => target.Init(new ColumnInfo[] { new ColumnInfo(name: "string_SETONLY", typeof(int)) }));
         }
     }
 

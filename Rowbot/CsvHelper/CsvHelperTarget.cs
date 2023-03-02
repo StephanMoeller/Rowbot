@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Rowbot.CsvHelper
 {
-    public class CsvHelperTarget : IRowTarget
+    public class CsvHelperTarget : IRowTarget, IDisposable
     {
         private readonly CsvWriter _csvWriter;
         private readonly bool _writeHeaders;

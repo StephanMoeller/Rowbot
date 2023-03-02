@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Rowbot
 {
-    public interface IRowSource : IDisposable
+    public interface IRowSource
     {
         ColumnInfo[] InitAndGetColumns();
         bool ReadRow(object[] values);
