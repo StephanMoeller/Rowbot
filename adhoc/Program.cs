@@ -10,7 +10,6 @@ namespace AdhocConsole
         {
             new RowbotExecutorBuilder()
                 .FromDataReader(null)
-                .ToCsv(null, null, true)
                 .Execute();
 
             using (var outputStream = File.Create("c:\\temp\\test1.xlsx"))
