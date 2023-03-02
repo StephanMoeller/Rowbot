@@ -5,9 +5,9 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 # Benchmarks
 Objects => Excel
 
-``
+
 |                               Method |         Mean |      Error |     StdDev |
-|------------------------------------- |-------------:|-----------:|-----------:|
+|-------------------------------------:|-------------:|-----------:|-----------:|
 |      Rowbot_AnonymousToExcel_1k_Rows |     12.89 ms |   0.079 ms |   0.066 ms |
 |   MiniExcel_AnonymousToExcel_1k_Rows |     27.57 ms |   0.182 ms |   0.161 ms |
 |   ClosedXml_AnonymousToExcel_1k_Rows |     50.04 ms |   0.915 ms |   0.811 ms |
@@ -17,7 +17,6 @@ Objects => Excel
 |      Rowbot_AnonymousToExcel_1M_Rows | 11,417.82 ms |  22.955 ms |  20.349 ms |
 |   MiniExcel_AnonymousToExcel_1M_Rows | 23,939.30 ms | 109.274 ms | 102.215 ms |
 |   ClosedXml_AnonymousToExcel_1M_Rows | 53,443.07 ms |  73.527 ms |  61.399 ms |
-``
 
 # Design decisions
 
