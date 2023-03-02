@@ -12,17 +12,23 @@ namespace Benchmarks.Excel
         [Benchmark]
         public void Rowbot_AnonymousToExcel_1k_Rows() => Rowbot_AnonymousToExcel_Internal(rowCount: 1_000);
         [Benchmark]
+        public void MiniExcel_AnonymousToExcel_1k_Rows() => MiniExcel_AnonymouseToExcel_Internal(rowCount: 1_000);
+        [Benchmark]
         public void ClosedXml_AnonymousToExcel_1k_Rows() => ClosedXml_AnonymouseToExcel_Internal(rowCount: 1_000);
 
         [Benchmark]
         public void Rowbot_AnonymousToExcel_100k_Rows() => Rowbot_AnonymousToExcel_Internal(rowCount: 100_000);
         [Benchmark]
+        public void MiniExcel_AnonymousToExcel_100k_Rows() => MiniExcel_AnonymouseToExcel_Internal(rowCount: 100_000);
+        [Benchmark]
         public void ClosedXml_AnonymousToExcel_100k_Rows() => ClosedXml_AnonymouseToExcel_Internal(rowCount: 100_000);
 
         [Benchmark]
-        public void Rowbot_AnonymousToExcel_1m_Rows() => Rowbot_AnonymousToExcel_Internal(rowCount: 1_000_000);
+        public void Rowbot_AnonymousToExcel_1M_Rows() => Rowbot_AnonymousToExcel_Internal(rowCount: 1_000_000);
         [Benchmark]
-        public void ClosedXml_AnonymousToExcel_1m_Rows() => ClosedXml_AnonymouseToExcel_Internal(rowCount: 1_000_000);
+        public void MiniExcel_AnonymousToExcel_1M_Rows() => MiniExcel_AnonymouseToExcel_Internal(rowCount: 1_000_000);
+        [Benchmark]
+        public void ClosedXml_AnonymousToExcel_1M_Rows() => ClosedXml_AnonymouseToExcel_Internal(rowCount: 1_000_000);
 
         public void Rowbot_AnonymousToExcel_Internal(int rowCount)
         {
@@ -45,10 +51,16 @@ namespace Benchmarks.Excel
             wbook.SaveAs("c:\\temp\\closedXml.xlsx");
         }
 
+        public void MiniExcel_AnonymouseToExcel_Internal(int rowCount)
+        {
+            var objects = Enumerable.Range(0, rowCount).Select(num => new MyObject());
+            MiniExcelLibs.MiniExcel.SaveAs(path: "c:\\temp\\miniexcel.xlsx", value: objects, printHeader: true, overwriteFile: true);
+        }
+
         static void Main(string[] args)
         {
             var summary = BenchmarkRunner.Run<Program>();
-            Console.WriteLine("");
+            //Console.WriteLine("");
             Console.ReadLine();
         }
     }
