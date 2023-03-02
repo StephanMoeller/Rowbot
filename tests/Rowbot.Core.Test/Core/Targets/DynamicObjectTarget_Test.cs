@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rowbot.Test.Targets
+namespace Rowbot.Test.Core.Targets
 {
     public class DynamicObjectTarget_Test
     {

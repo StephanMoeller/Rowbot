@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rowbot.Test.Sources
+namespace Rowbot.Test.Core.Sources
 {
     public class DataReaderSource_Test
     {
@@ -30,7 +30,7 @@ namespace Rowbot.Test.Sources
             AssertColumn<string>(columns[3], "Column1");
             AssertColumn<string>(columns[4], "Column number four");
             AssertColumn<string>(columns[5], "Column2");
-            
+
             var rows = TestUtils.ReadAllLines(source, columnCount: columns.Length);
             Assert.Empty(rows);
         }
@@ -39,7 +39,7 @@ namespace Rowbot.Test.Sources
         {
             Assert.NotNull(col);
             Assert.NotNull(expectedName);
-            
+
             Assert.Equal(expectedName, col.Name);
             Assert.Equal(typeof(T), col.ValueType);
         }

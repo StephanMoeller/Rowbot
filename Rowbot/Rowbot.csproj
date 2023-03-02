@@ -4,8 +4,4 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\src\Rowbot.Core\Rowbot.Core.csproj" />
-  </ItemGroup>
-
 </Project>

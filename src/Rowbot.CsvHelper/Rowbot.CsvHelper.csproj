@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Rowbot.Core\Rowbot.Core.csproj" />
+    <ProjectReference Include="..\..\Rowbot\Rowbot.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rowbot.Test.Targets
+namespace Rowbot.Test.Core.Targets
 {
     public class PropertyReflectionTarget_Test
     {
@@ -142,7 +142,8 @@ namespace Rowbot.Test.Targets
                 else
                 {
                     // Expect exception when setting to null
-                    Assert.Throws<ArgumentNullException>(() => {
+                    Assert.Throws<ArgumentNullException>(() =>
+                    {
                         target.WriteRow(new object?[] { inputValue });
                     });
                 }
@@ -159,7 +160,7 @@ namespace Rowbot.Test.Targets
         }
     }
 
-    #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public class UnitTestDummy_NoSetters
     {
         public string GetOnly { get; }
@@ -178,5 +179,5 @@ namespace Rowbot.Test.Targets
             return String_SetOnly;
         }
     }
-    #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 }

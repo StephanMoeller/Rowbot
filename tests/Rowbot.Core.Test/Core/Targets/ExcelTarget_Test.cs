@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rowbot.Core.Test.Targets
+namespace Rowbot.Test.Core.Targets
 {
     public class ExcelTarget_Test
     {
@@ -120,35 +120,35 @@ namespace Rowbot.Core.Test.Targets
         [Fact]
         public void DataTypeTesting_String()
         {
-            RunTypeTest<string>(value: "Hello there with line break \r\n and < and > and also a \" for that it not shall be a lie",
+            RunTypeTest(value: "Hello there with line break \r\n and < and > and also a \" for that it not shall be a lie",
                                 expectedValue: "Hello there with line break \r\n and < and > and also a \" for that it not shall be a lie");
         }
 
         [Fact]
         public void DataTypeTesting_IntFamily()
         {
-            RunTypeTest<SByte>(12, 12);
-            RunTypeTest<Byte>(12, 12);
-            RunTypeTest<Int16>(12, 12);
-            RunTypeTest<UInt16>(12, 12);
-            RunTypeTest<Int32>(12, 12);
-            RunTypeTest<UInt32>(12, 12);
-            RunTypeTest<Int64>(12, 12);
-            RunTypeTest<UInt64>(12, 12);
+            RunTypeTest<sbyte>(12, 12);
+            RunTypeTest<byte>(12, 12);
+            RunTypeTest<short>(12, 12);
+            RunTypeTest<ushort>(12, 12);
+            RunTypeTest(12, 12);
+            RunTypeTest<uint>(12, 12);
+            RunTypeTest<long>(12, 12);
+            RunTypeTest<ulong>(12, 12);
         }
 
         [Fact]
         public void DataTypeTesting_DecimalFamily()
         {
-            RunTypeTest<Decimal>(12.3456m, 12.3456m);
-            RunTypeTest<Single>(12.3456f, 12.3456f, numberCompareTolerance: 0.00001);
-            RunTypeTest<Double>(12.3456, 12.3456, numberCompareTolerance: 0.00001);
+            RunTypeTest(12.3456m, 12.3456m);
+            RunTypeTest(12.3456f, 12.3456f, numberCompareTolerance: 0.00001);
+            RunTypeTest(12.3456, 12.3456, numberCompareTolerance: 0.00001);
         }
 
         [Fact]
         public void DataTypeTesting_DateTime()
         {
-            RunTypeTest<DateTime>(value: new DateTime(2001, 02, 03, 04, 05, 06),
+            RunTypeTest(value: new DateTime(2001, 02, 03, 04, 05, 06),
                                 expectedValue: new DateTime(2001, 02, 03, 04, 05, 06));
 
             throw new NotImplementedException("Why does this work??");
@@ -164,7 +164,7 @@ namespace Rowbot.Core.Test.Targets
                 });
 
                 target.WriteRow(new object?[] { value });
-                
+
                 target.Complete();
 
                 EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new XLCellValue[][]{
@@ -260,7 +260,7 @@ namespace Rowbot.Core.Test.Targets
 
                         // If value type is double or single, compare with a little tolerance
                         var expectedValue = expectedRow[columnIndex];
-                        if(expectedValue.IsNumber)
+                        if (expectedValue.IsNumber)
                         {
                             var expectedNumberValue = expectedValue.GetNumber();
                             Assert.Equal(expectedNumberValue, (double)value, tolerance: numberCompareTolerance);

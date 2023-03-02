@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rowbot.Core.Test.Execution
+namespace Rowbot.Test.Core.Execution
 {
     public class IEnumerableTargetGuards_Test
     {

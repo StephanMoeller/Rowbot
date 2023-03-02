@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rowbot.Test
+namespace Rowbot.Test.Core
 {
     internal class TestUtils
     {
@@ -12,7 +12,8 @@ namespace Rowbot.Test
         {
             var allLines = new List<object[]>();
             var buffer = new object[columnCount];
-            while(source.ReadRow(buffer)){
+            while (source.ReadRow(buffer))
+            {
                 allLines.Add(buffer.ToArray());
             }
             return allLines.ToArray();

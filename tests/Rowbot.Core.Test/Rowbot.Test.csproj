@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Rowbot.Core\Rowbot.Core.csproj" />
+    <ProjectReference Include="..\..\Rowbot\Rowbot.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rowbot.Test.Utils
+namespace Rowbot.Test.Core.Utils
 {
     public class NumberToStringBytesSerializer_Test
     {
@@ -42,8 +42,8 @@ namespace Rowbot.Test.Utils
             int byteCount1 = encoding.GetBytes(val.ToString(), buffer1);
             int byteCount2 = serializer.SerializeToStringToBytes(val: val, buffer: buffer2, offset: 0);
 
-            var str1 = String.Join(" ", buffer1.Take(byteCount1));
-            var str2 = String.Join(" ", buffer2.Take(byteCount2));
+            var str1 = string.Join(" ", buffer1.Take(byteCount1));
+            var str2 = string.Join(" ", buffer2.Take(byteCount2));
             Assert.Equal(str1, str2);
         }
 
@@ -81,8 +81,8 @@ namespace Rowbot.Test.Utils
             int byteCount1 = encoding.GetBytes(val.ToString(), buffer1);
             int byteCount2 = serializer.SerializeToStringToBytes(val: val, buffer: buffer2, offset: offset);
 
-            var str1 = String.Join(" ", buffer1.Take(byteCount1));
-            var str2 = String.Join(" ", buffer2.Skip(offset).Take(byteCount2));
+            var str1 = string.Join(" ", buffer1.Take(byteCount1));
+            var str2 = string.Join(" ", buffer2.Skip(offset).Take(byteCount2));
             for (var i = 0; i < offset; i++)
             {
                 Assert.Equal(0, buffer2[i]); // Ensure before offset is untouched

@@ -2,7 +2,7 @@
 using System.Data;
 using System.Net.Http.Headers;
 
-namespace Rowbot.Test.Targets
+namespace Rowbot.Test.Core.Targets
 {
     public class DataTableTarget_Test
     {

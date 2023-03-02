@@ -1,7 +1,7 @@
 ﻿using Rowbot.Sources;
 using System.Data;
 
-namespace Rowbot.Test.Sources
+namespace Rowbot.Test.Core.Sources
 {
     public class PropertyReflectionSource_Test
     {
@@ -24,16 +24,16 @@ namespace Rowbot.Test.Sources
             Assert.Equal(typeof(int), columns[0].ValueType);
 
             Assert.Equal("myString", columns[1].Name);
-            Assert.Equal(typeof(String), columns[1].ValueType);
+            Assert.Equal(typeof(string), columns[1].ValueType);
 
             Assert.Equal("myDecimal", columns[2].Name);
-            Assert.Equal(typeof(Decimal), columns[2].ValueType);
+            Assert.Equal(typeof(decimal), columns[2].ValueType);
 
             Assert.Equal("myNullableDecimal", columns[3].Name);
-            Assert.Equal(typeof(Decimal?), columns[3].ValueType);
+            Assert.Equal(typeof(decimal?), columns[3].ValueType);
 
             Assert.Equal("æøÅÆØÅSpecial", columns[4].Name);
-            Assert.Equal(typeof(String), columns[4].ValueType);
+            Assert.Equal(typeof(string), columns[4].ValueType);
 
             var rows = TestUtils.ReadAllLines(source, columnCount: columns.Length);
             Assert.Empty(rows);
@@ -66,13 +66,13 @@ namespace Rowbot.Test.Sources
             Assert.Equal(typeof(int), columns[0].ValueType);
 
             Assert.Equal("myString", columns[1].Name);
-            Assert.Equal(typeof(String), columns[1].ValueType);
+            Assert.Equal(typeof(string), columns[1].ValueType);
 
             Assert.Equal("myDecimal", columns[2].Name);
-            Assert.Equal(typeof(Decimal), columns[2].ValueType);
+            Assert.Equal(typeof(decimal), columns[2].ValueType);
 
             Assert.Equal("myNullableDecimal", columns[3].Name);
-            Assert.Equal(typeof(Decimal?), columns[3].ValueType);
+            Assert.Equal(typeof(decimal?), columns[3].ValueType);
 
             Assert.Equal("æøÅÆØÅSpecial", columns[4].Name);
             Assert.Equal(typeof(DateTime), columns[4].ValueType);

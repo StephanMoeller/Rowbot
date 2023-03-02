@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rowbot.Test.Targets
+namespace Rowbot.Test.Core.Targets
 {
     public class CsvTarget_Test
     {
@@ -57,7 +57,7 @@ namespace Rowbot.Test.Targets
                 target.Complete();
 
                 var result = Encoding.UTF8.GetString(ms.ToArray());
-                if(writeHeaders != false) // Null is expected to be treated as true
+                if (writeHeaders != false) // Null is expected to be treated as true
                 {
                     Assert.Equal("Col1;Col2;Col3;'Col æøå 3; and this is an inline quote: '' awdawd'\r\n"
                                + "Hello there æå 1;-12,45;hi;there\r\n"
@@ -65,14 +65,16 @@ namespace Rowbot.Test.Targets
                                + "Hello there æå 3;;'This text has a '' in it.';'And this has a \r CR'\r\n"
                                + "'Here is a \n LF';0;'And this one has\r\n both CRLF';'This one has \r\n multiple \r \r occurrenced \n \n of each'\r\n"
                                + "'This one contains the delimier as value; hence it should also be wrapped in quotes';0;Hey;Hoo", result);
-                }else{
+                }
+                else
+                {
                     Assert.Equal("Hello there æå 1;-12,45;hi;there\r\n"
                                 + "Hello there æå 2;12,45;;\r\n"
                                 + "Hello there æå 3;;'This text has a '' in it.';'And this has a \r CR'\r\n"
                                 + "'Here is a \n LF';0;'And this one has\r\n both CRLF';'This one has \r\n multiple \r \r occurrenced \n \n of each'\r\n"
                                 + "'This one contains the delimier as value; hence it should also be wrapped in quotes';0;Hey;Hoo", result);
                 }
-                
+
             }
         }
 
@@ -90,7 +92,7 @@ namespace Rowbot.Test.Targets
                 });
 
                 target.WriteRow(new object?[] { -12.4567m }); // non-strings
-                
+
                 target.Complete();
 
                 var result = Encoding.UTF8.GetString(ms.ToArray());
