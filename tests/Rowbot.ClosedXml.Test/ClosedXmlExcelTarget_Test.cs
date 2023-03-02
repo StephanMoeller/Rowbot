@@ -222,7 +222,7 @@ namespace Rowbot.ClosedXml.Test
         }
 
         // This method has been copied from 
-        private static XLCellValue CreateCellValue(object value)
+        private static XLCellValue CreateCellValue(object? value)
         {
             // This list of cases has been copied from the OpenXML source code directly (From inside XLWorksheet.cs)
             if (value == null) return Blank.Value;
