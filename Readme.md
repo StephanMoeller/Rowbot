@@ -26,7 +26,7 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 |   MiniExcel_ObjectsToExcel_1M_Rows | 23,939.30 ms | 109.274 ms | 102.215 ms |
 |   ClosedXml_ObjectsToExcel_1M_Rows | 53,443.07 ms |  73.527 ms |  61.399 ms |
 
-Link to source for this benchmark:
+[Benchmark source code](https://github.com/StephanMoeller/Rowbot/blob/main/Benchmarks.Excel/Program.cs)
 
 # Design decisions
 
