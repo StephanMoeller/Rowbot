@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Rowbot.Execution
 {
-    public class RowbotExecutor
+    public sealed class RowbotExecutor : IDisposable
     {
         private readonly IRowSource _source;
         private readonly IRowTarget _target;
@@ -16,6 +16,25 @@ namespace Rowbot.Execution
         {
             _source = new SourceGuards(source);
             _target = new TargetGuards(target);
+        }
+
+        public void Dispose()
+        {
+#pragma warning disable S2486 // Generic exceptions should not be ignored
+#pragma warning disable S108 // Nested blocks of code should not be left empty
+            try
+            {
+                _source?.Dispose();
+            }
+            catch { }
+
+            try
+            {
+                _target?.Dispose();
+            }
+            catch { }
+#pragma warning restore S108 // Nested blocks of code should not be left empty
+#pragma warning restore S2486 // Generic exceptions should not be ignored
         }
 
         public void Execute()
@@ -33,21 +52,28 @@ namespace Rowbot.Execution
 
             _source.Complete();
             _target.Complete();
+
+            Dispose();
         }
     }
 
-    public class RowbotExecutor<TElement>
+    public sealed class RowbotEnumerableExecutor<TElement> : IDisposable
     {
         private readonly SourceGuards _source;
         private readonly IEnumerableTargetGuards<TElement> _target;
 
-        public RowbotExecutor(IRowSource source, IEnumerableRowTarget<TElement> target)
+        public RowbotEnumerableExecutor(IRowSource source, IEnumerableRowTarget<TElement> target)
         {
             _source = new SourceGuards(source);
             _target = new IEnumerableTargetGuards<TElement>(target);
         }
 
-        public IEnumerable<TElement> CreateEnumerable()
+        public void Execute(Action<IEnumerable<TElement>> consumer)
+        {
+            consumer(ExecuteInternal());
+        }
+
+        private IEnumerable<TElement> ExecuteInternal()
         {
             // Columns
             var columnNames = _source.InitAndGetColumns();
@@ -62,6 +88,28 @@ namespace Rowbot.Execution
 
             _source.Complete();
             _target.Complete();
+
+            Dispose();
         }
+
+        public void Dispose()
+        {
+#pragma warning disable S2486 // Generic exceptions should not be ignored
+#pragma warning disable S108 // Nested blocks of code should not be left empty
+            try
+            {
+                _source?.Dispose();
+            }
+            catch { }
+
+            try
+            {
+                _target?.Dispose();
+            }
+            catch { }
+#pragma warning restore S108 // Nested blocks of code should not be left empty
+#pragma warning restore S2486 // Generic exceptions should not be ignored
+        }
+
     }
 }
