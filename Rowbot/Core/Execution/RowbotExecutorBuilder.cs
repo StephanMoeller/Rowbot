@@ -41,6 +41,13 @@ namespace Rowbot.Core.Execution
             return ToCustomTarget(new CsvTarget(outputStream: outputStream, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: true));
         }
 
+        public RowbotExecutor ToCsv(string filepath, CsvConfig config, bool writeHeaders)
+        {
+            var fs = File.Create(filepath);
+            return ToCustomTarget(new CsvTarget(outputStream: fs, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: false));
+        }
+
+
         public RowbotExecutor ToExcel(Stream outputStream, string sheetName, bool writeHeaders)
         {
             return ToCustomTarget(new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: true));

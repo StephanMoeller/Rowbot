@@ -59,8 +59,8 @@ namespace Benchmarks.Excel
 
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<Program>();
-            //Console.WriteLine("");
+            new Program().MiniExcel_ObjectseToExcel_Internal(1_000_000);
+            
             Console.ReadLine();
         }
     }
