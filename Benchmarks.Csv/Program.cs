@@ -64,6 +64,23 @@ namespace Benchmarks.Csv
                     .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "MySheet", writeHeaders: true)
                     .Execute();
             }
+
+            // DataTable => List of objects (Space complexity: O(1))
+            new RowbotExecutorBuilder()
+                .FromDataTable(myDataTable)
+                .ToObjects<Customer>()
+                .Execute(objects =>
+                {
+                    foreach (var customer in objects)
+                    {
+                        // Do something with the customer here
+                    }
+                });
         }
+    }
+
+    public class Customer
+    {
+
     }
 }

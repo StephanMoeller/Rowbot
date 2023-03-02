@@ -98,6 +98,19 @@ using (var conn = new SqlConnection(myConnectionString))
 }
 ```
 
+``` csharp
+// DataTable => List of objects (Space complexity: O(1))
+new RowbotExecutorBuilder()
+    .FromDataTable(myDataTable)
+    .ToObjects<Customer>()
+    .Execute(objects =>
+    {
+        foreach (var customer in objects)
+        {
+            // Do something with the customer here
+        }
+    });
+```
 
 # Design decisions
 
@@ -112,9 +125,6 @@ using (var conn = new SqlConnection(myConnectionString))
 
 - Todos
     - O(1) space allocation for e.g. Csv => Objects / Dynamic
-    - Add csvHelper source and targets
-    - Add som excel source and targets
-    - Create tests for execution methods
     - CancellationToken in ReadRow and WriteRow?
     - Add a DynamicTarget (just because it would be an easy thing to do)
     - Add a test with Sqlite loading data and processing it to excel as a real life usage case test
