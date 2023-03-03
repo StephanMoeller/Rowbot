@@ -2,7 +2,7 @@
 
 
 # What is Rowbot?
-A fast non-garbage-allocating helper, that will take any source combined with any target nad execute a transfer with a space complexity of O(1) meaning the use of memory will not rise by working with bigger amounts of data.
+A fast non-garbage-allocating helper, that will take any source combined with any target and execute a transfer with a space complexity of O(1) meaning the use of memory will not rise by working with bigger amounts of data.
 
 # Why use Rowbot?
 - Fastest dotnet Excel writer on the market
