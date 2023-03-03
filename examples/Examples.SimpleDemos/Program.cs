@@ -1,8 +1,12 @@
-﻿using Dapper;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using Dapper;
+using Rowbot.CsvHelper;
 using Rowbot.Execution;
 using Rowbot.Targets;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 
 namespace Examples.SimpleDemos
 {
@@ -23,13 +27,13 @@ namespace Examples.SimpleDemos
             // Objects => CSV (Space complexity: O(1))
             new RowbotExecutorBuilder()
                 .FromObjects(myObjects)
-                .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "Sheet1", writeHeaders: true)
+                .ToExcel(filepath: "c:\\temp\\rowbot.csv", sheetName: "Sheet1", writeHeaders: true)
                 .Execute();
 
             // Objects => Excel (Space complexity: O(1))
             new RowbotExecutorBuilder()
                 .FromObjects(myObjects)
-                .ToCsv(filepath: "c:\\temp\\rowbot.csv", config: new CsvConfig() { Delimiter = ';', Quote = '\'' }, writeHeaders: true)
+                .ToCsv(filepath: "c:\\temp\\rowbot.xlsx", config: new CsvConfig() { Delimiter = ';', Quote = '\'' }, writeHeaders: true)
                 .Execute();
 
             // DataTable => CSV (Space complexity: O(1))
@@ -73,6 +77,21 @@ namespace Examples.SimpleDemos
             // DataTable => List of objects (Space complexity: O(1))
             new RowbotExecutorBuilder()
                 .FromDataTable(myDataTable)
+                .ToObjects<Customer>()
+                .Execute(objects =>
+                {
+                    // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
+                    // It is NOT possible to iterate this more than once.
+                    foreach (var customer in objects)
+                    {
+                        // Do something with the customer here
+                    }
+                });
+
+            // Csv => DataTable
+
+            new RowbotExecutorBuilder()
+                .From(new CsvHelperSource(stream: File.Open("path//to//file.csv", FileMode.Open), configuration: new CsvConfiguration(CultureInfo.InvariantCulture), readFirstLineAsHeaders: true))
                 .ToObjects<Customer>()
                 .Execute(objects =>
                 {

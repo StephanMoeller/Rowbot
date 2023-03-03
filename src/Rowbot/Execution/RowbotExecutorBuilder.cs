@@ -19,7 +19,7 @@ namespace Rowbot.Execution
         public RowbotExecutorBuilder FromDataTable(DataTable dataTable) => SetSource(new DataReaderSource(dataTable.CreateDataReader()));
         public RowbotExecutorBuilder FromDataReader(IDataReader dataReader) => SetSource(new DataReaderSource(dataReader));
         public RowbotExecutorBuilder FromObjects<TObjectType>(IEnumerable<TObjectType> objects) => SetSource(PropertyReflectionSource.Create(objects));
-        public RowbotExecutorBuilder FromCustomSource(IRowSource customRowSource) => SetSource(customRowSource);
+        public RowbotExecutorBuilder From(IRowSource customRowSource) => SetSource(customRowSource);
         private RowbotExecutorBuilder SetSource(IRowSource rowSource)
         {
             if (rowSource is null)
@@ -36,30 +36,30 @@ namespace Rowbot.Execution
 
         public RowbotExecutor ToCsv(Stream outputStream, CsvConfig config, bool writeHeaders)
         {
-            return ToCustomTarget(new CsvTarget(outputStream: outputStream, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: true));
+            return To(new CsvTarget(outputStream: outputStream, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: true));
         }
 
         public RowbotExecutor ToCsv(string filepath, CsvConfig config, bool writeHeaders)
         {
             var fs = File.Create(filepath);
-            return ToCustomTarget(new CsvTarget(outputStream: fs, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: false));
+            return To(new CsvTarget(outputStream: fs, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: false));
         }
 
 
         public RowbotExecutor ToExcel(Stream outputStream, string sheetName, bool writeHeaders)
         {
-            return ToCustomTarget(new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: true));
+            return To(new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: true));
         }
 
         public RowbotExecutor ToExcel(string filepath, string sheetName, bool writeHeaders)
         {
             var fs = File.Create(filepath);
-            return ToCustomTarget(new ExcelTarget(outputStream: fs, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: false));
+            return To(new ExcelTarget(outputStream: fs, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: false));
         }
 
         public RowbotExecutor ToDataTable(DataTable tableToFill)
         {
-            return ToCustomTarget(new DataTableTarget(tableToFill));
+            return To(new DataTableTarget(tableToFill));
         }
 
         public RowbotExecutor ToDataReader()
@@ -72,7 +72,7 @@ namespace Rowbot.Execution
             return ToCustomTarget(new PropertyReflectionTarget<TObjectType>());
         }
 
-        public RowbotExecutor ToCustomTarget(IRowTarget target)
+        public RowbotExecutor To(IRowTarget target)
         {
             return new RowbotExecutor(_rowSource, target);
         }
