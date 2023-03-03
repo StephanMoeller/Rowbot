@@ -306,8 +306,6 @@ namespace Rowbot.Core.Targets
             _zipOutputStream.Flush();
         }
 
-        private Dictionary<string, byte[]> _stringToBytesCache = new Dictionary<string, byte[]>();
-
         private void WriteSheetBytes(params string[] strings)
         {
             foreach (var str in strings)

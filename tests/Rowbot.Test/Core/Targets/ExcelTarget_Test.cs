@@ -119,7 +119,9 @@ namespace Rowbot.Test.Core.Targets
         }
 
         [Theory]
-        [InlineData("Line\r\nbreak")]
+        [InlineData("Carriage\rreturn")]
+        [InlineData("New\nline")]
+        [InlineData("CR\r\nLF")]
         [InlineData("Hello < and > there")]
         [InlineData("Hello \"there\"")]
         public void DataTypeTesting_String_Quotes(string value)
@@ -249,7 +251,7 @@ namespace Rowbot.Test.Core.Targets
                 {
                     //Read the first Sheet from Excel file.
                     Assert.Equal(1, workBook.Worksheets.Count); // Ensure only one sheet in thing to open
-
+                    
                     IXLWorksheet workSheet = workBook.Worksheet(1);
                     Assert.Equal(expectedSheetName, workSheet.Name);
 
