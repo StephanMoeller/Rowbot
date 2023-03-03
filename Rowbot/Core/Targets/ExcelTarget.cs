@@ -1,4 +1,5 @@
-﻿using Rowbot.Core.Utils;
+﻿using ICSharpCode.SharpZipLib.Zip;
+using Rowbot.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,11 +13,12 @@ namespace Rowbot.Core.Targets
 {
     public class ExcelTarget : IRowTarget, IDisposable
     {
+        private readonly Stream _outputStream;
         private readonly string _sheetName;
         private readonly bool _writeHeaders;
+        private readonly bool _leaveOpen;
         private ColumnInfo[] _columns;
-        private ZipArchive _zipArchive;
-        private Stream _sheetStream;
+        private ZipOutputStream _zipOutputStream;
         private UTF8Encoding _utf8;
         private byte[] _buffer = new byte[1024];
         private int _bufferIndex = 0;
@@ -24,23 +26,38 @@ namespace Rowbot.Core.Targets
         private string[] _excelColumnNames = null;
         private int _rowIndex = 0;
         private string _cache_minMaxColString;
-        public ExcelTarget(Stream outputStream, string sheetName, bool writeHeaders, bool leaveOpen = false)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="outputStream"></param>
+        /// <param name="sheetName"></param>
+        /// <param name="writeHeaders"></param>
+        /// <param name="leaveOpen"></param>
+        /// <param name="compressionLevel">A number from 0-9 where 0 means no compression and 9 means max. The higher the number, the smaller output size, but the more execution time.</param>
+        /// <exception cref="ArgumentException"></exception>
+        public ExcelTarget(Stream outputStream, string sheetName, bool writeHeaders, bool leaveOpen = false, int compressionLevel = 1)
         {
             if (string.IsNullOrEmpty(sheetName))
             {
                 throw new ArgumentException($"'{nameof(sheetName)}' cannot be null or empty.", nameof(sheetName));
             }
 
-            _zipArchive = new ZipArchive(outputStream, ZipArchiveMode.Create, leaveOpen: leaveOpen);
+            _zipOutputStream = new ZipOutputStream(baseOutputStream: outputStream, bufferSize: 8_000_000); // 8MB buffer choosen out of blue air
+            _zipOutputStream.SetLevel(compressionLevel);
+            _outputStream = outputStream;
             _sheetName = sheetName;
             _writeHeaders = writeHeaders;
+            _leaveOpen = leaveOpen;
             _utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
         }
 
         public void Dispose()
         {
-            _zipArchive?.Dispose();
-            _sheetStream?.Dispose();
+            _zipOutputStream?.Dispose();
+            if (!_leaveOpen)
+            {
+                _outputStream.Dispose();
+            }
         }
 
         public static string GetColumnName(int oneBasedColumnIndex)
@@ -62,8 +79,7 @@ namespace Rowbot.Core.Targets
             _columns = columns;
             WriteStaticFilesToArchive();
 
-            var entry = _zipArchive.CreateEntry("xl/worksheets/sheet1.xml");
-            _sheetStream = entry.Open();
+            _zipOutputStream.PutNextEntry(new ZipEntry("xl/worksheets/sheet1.xml"));
 
             WriteSheetStartToSheetStream();
             _excelColumnNames = new string[columns.Length];
@@ -89,9 +105,11 @@ namespace Rowbot.Core.Targets
         {
             WriteSheetEndToSheetStream();
             Flush();
-            _sheetStream.Close();
-            _zipArchive.Dispose();
-
+            _zipOutputStream.Close();
+            if (!_leaveOpen)
+            {
+                _outputStream.Close();
+            }
         }
 
         private CultureInfo _numberFormatter = new CultureInfo("en-US");
@@ -130,6 +148,7 @@ namespace Rowbot.Core.Targets
                 {
                     switch (value)
                     {
+
                         case bool boolVal:
                             if (boolVal)
                             {
@@ -223,7 +242,7 @@ namespace Rowbot.Core.Targets
 
         private void WriteStaticFilesToArchive()
         {
-            WriteStatic(path: "[Content_Types].xml", @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>
+            WriteCompleteFile(path: "[Content_Types].xml", @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>
 <Types xmlns=""http://schemas.openxmlformats.org/package/2006/content-types"">
     <Default Extension=""rels"" ContentType=""application/vnd.openxmlformats-package.relationships+xml""/>
     <Default Extension=""xml"" ContentType=""application/xml""/>
@@ -231,18 +250,18 @@ namespace Rowbot.Core.Targets
     <Override PartName=""/xl/worksheets/sheet1.xml"" ContentType=""application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml""/>
 </Types>");
 
-            WriteStatic(path: "_rels/.rels", @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>
+            WriteCompleteFile(path: "_rels/.rels", @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>
 <Relationships xmlns=""http://schemas.openxmlformats.org/package/2006/relationships"">
     <Relationship Id=""rId1"" Type=""http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"" Target=""xl/workbook.xml""/>
 </Relationships>");
 
-            WriteStatic(path: "xl/_rels/workbook.xml.rels", @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>
+            WriteCompleteFile(path: "xl/_rels/workbook.xml.rels", @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>
 <Relationships xmlns=""http://schemas.openxmlformats.org/package/2006/relationships"">
     <Relationship Id=""rId1"" Type=""http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"" Target=""worksheets/sheet1.xml""/>
 </Relationships>");
 
             var escapedSheetname = _sheetName.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
-            WriteStatic(path: "xl/workbook.xml", @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>
+            WriteCompleteFile(path: "xl/workbook.xml", @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""yes""?>
 <workbook xmlns=""http://schemas.openxmlformats.org/spreadsheetml/2006/main"" xmlns:r=""http://schemas.openxmlformats.org/officeDocument/2006/relationships"" xmlns:mc=""http://schemas.openxmlformats.org/markup-compatibility/2006"" mc:Ignorable=""x15 xr xr6 xr10 xr2"" xmlns:x15=""http://schemas.microsoft.com/office/spreadsheetml/2010/11/main"" xmlns:xr=""http://schemas.microsoft.com/office/spreadsheetml/2014/revision"" xmlns:xr6=""http://schemas.microsoft.com/office/spreadsheetml/2016/revision6"" xmlns:xr10=""http://schemas.microsoft.com/office/spreadsheetml/2016/revision10"" xmlns:xr2=""http://schemas.microsoft.com/office/spreadsheetml/2015/revision2"">
     <fileVersion appName=""xl"" lastEdited=""7"" lowestEdited=""7"" rupBuild=""26026""/>
     <workbookPr defaultThemeVersion=""166925""/>
@@ -278,15 +297,12 @@ namespace Rowbot.Core.Targets
 </workbook>");
         }
 
-        private void WriteStatic(string path, string completeContent)
+        private void WriteCompleteFile(string path, string completeContent)
         {
-            var entry = _zipArchive.CreateEntry(path);
-            using (var entryStream = entry.Open())
-            {
-                var buffer = _utf8.GetBytes(completeContent);
-                entryStream.Write(buffer, 0, buffer.Length);
-                entryStream.Flush();
-            }
+            _zipOutputStream.PutNextEntry(new ZipEntry(path));
+            var buffer = _utf8.GetBytes(completeContent);
+            _zipOutputStream.Write(buffer, 0, buffer.Length);
+            _zipOutputStream.Flush();
         }
 
         private Dictionary<string, byte[]> _stringToBytesCache = new Dictionary<string, byte[]>();
@@ -317,8 +333,8 @@ namespace Rowbot.Core.Targets
 
         private void Flush()
         {
-            _sheetStream.Write(_buffer, 0, _bufferIndex);
-            _sheetStream.Flush();
+            _zipOutputStream.Write(_buffer, 0, _bufferIndex);
+            _zipOutputStream.Flush();
             _bufferIndex = 0;
         }
     }
