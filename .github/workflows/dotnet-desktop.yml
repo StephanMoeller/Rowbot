@@ -43,7 +43,7 @@ jobs:
 #    - name: Build
 #      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG --no-restore
     - name: Build
-      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=$RELEASE_VERSION --no-restore
+      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{ github.ref_name }} --no-restore
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
