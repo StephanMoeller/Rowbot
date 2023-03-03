@@ -44,7 +44,7 @@ jobs:
       run: dotnet test
       
   deploy_to_nuget:
-    if: '$TRIGGER_EVENT_NAME' == 'release'
+    #if: '$TRIGGER_EVENT_NAME' == 'release'
     needs: [run_tests]
     runs-on: ubuntu-latest
     env:
