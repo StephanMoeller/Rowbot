@@ -118,11 +118,13 @@ namespace Rowbot.Test.Core.Targets
             RunTypeTest<UnitTestCustomType>(null, expectedValue: Blank.Value);
         }
 
-        [Fact]
-        public void DataTypeTesting_String()
+        [Theory]
+        [InlineData("Line\r\nbreak")]
+        [InlineData("Hello < and > there")]
+        [InlineData("Hello \"there\"")]
+        public void DataTypeTesting_String_Quotes(string value)
         {
-            RunTypeTest(value: "Hello there with line break \r\n and < and > and also a \" for that it not shall be a lie",
-                                expectedValue: "Hello there with line break \r\n and < and > and also a \" for that it not shall be a lie");
+            RunTypeTest(value: value, expectedValue: value);
         }
 
         [Fact]
