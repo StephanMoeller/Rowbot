@@ -11,14 +11,14 @@ namespace Rowbot.CsvHelper
         private readonly CsvReader _csvReader;
         private readonly bool _readFirstLineAsHeaders = false;
         private int _readCallCount = 0;
-        public CsvHelperSource(Stream stream, CsvConfiguration configuration, bool readFirstLineAsHeaders) : this(new CsvReader(new StreamReader(stream), configuration))
-        {
-            _readFirstLineAsHeaders = readFirstLineAsHeaders;
+        public CsvHelperSource(Stream stream, CsvConfiguration configuration, bool readFirstLineAsHeaders) : this(new CsvReader(new StreamReader(stream), configuration), readFirstLineAsHeaders: readFirstLineAsHeaders)
+        {            
         }
 
-        public CsvHelperSource(CsvReader csvReader)
+        public CsvHelperSource(CsvReader csvReader, bool readFirstLineAsHeaders)
         {
             _csvReader = csvReader;
+            _readFirstLineAsHeaders = readFirstLineAsHeaders;
         }
 
         public void Dispose()

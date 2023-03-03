@@ -7,6 +7,7 @@ using Rowbot.Targets;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.IO;
 
 namespace Examples.SimpleDemos
 {
@@ -88,20 +89,11 @@ namespace Examples.SimpleDemos
                     }
                 });
 
-            // Csv => DataTable
-
+            // Csv => Excel
             new RowbotExecutorBuilder()
-                .From(new CsvHelperSource(stream: File.Open("path//to//file.csv", FileMode.Open), configuration: new CsvConfiguration(CultureInfo.InvariantCulture), readFirstLineAsHeaders: true))
-                .ToObjects<Customer>()
-                .Execute(objects =>
-                {
-                    // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
-                    // It is NOT possible to iterate this more than once.
-                    foreach (var customer in objects)
-                    {
-                        // Do something with the customer here
-                    }
-                });
+                .From(new CsvHelperSource(new CsvReader(new StreamReader(File.Open("path//to//file.csv", FileMode.Open)), configuration: new CsvConfiguration(CultureInfo.InvariantCulture)), readFirstLineAsHeaders: true))
+                .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "MySheet", writeHeaders: true)
+                .Execute();
         }
 
         public class Customer

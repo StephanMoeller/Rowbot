@@ -108,22 +108,13 @@ new RowbotExecutorBuilder()
     });
 ```
 
-### Example: Custom source
-
-Rowbot does not currently have a CSV target, but what if you just need a such? No problem. Here follows and example for creating a source we created using CsvHelper:
+### Example: Csv => Excel
+(Currently, the only csv source available has a dependency on CsvHelper)
 ``` csharp
 new RowbotExecutorBuilder()
-    .From(new CsvHelperSource(stream: File.Open("path//to//file.csv", FileMode.Open), configuration: new CsvConfiguration(CultureInfo.InvariantCulture), readFirstLineAsHeaders: true))
-    .ToObjects<Customer>()
-    .Execute(objects =>
-    {
-        // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
-        // It is NOT possible to iterate this more than once.
-        foreach (var customer in objects)
-        {
-            // Do something with the customer here
-        }
-    });
+    .From(new CsvHelperSource(new CsvReader(new StreamReader(File.Open("path//to//file.csv", FileMode.Open)), configuration: new CsvConfiguration(CultureInfo.InvariantCulture)), readFirstLineAsHeaders: true))
+    .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "MySheet", writeHeaders: true)
+    .Execute();
 ```
 
 
