@@ -12,7 +12,6 @@ namespace Rowbot.Test.Core.Execution
         [Fact(Skip = "To be implemented")]
         public void Foo()
         {
-            new RowbotExecutorBuilder().ToCustomTarget
             throw new NotImplementedException();
         }
     }
