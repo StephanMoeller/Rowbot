@@ -1,6 +1,6 @@
 ﻿using Dapper;
-using Rowbot.Core.Execution;
-using Rowbot.Core.Targets;
+using Rowbot.Execution;
+using Rowbot.Targets;
 using System.Data;
 using System.Data.SqlClient;
 

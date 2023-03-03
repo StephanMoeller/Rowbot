@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using ClosedXML.Excel;
-using Rowbot.Core.Execution;
+using Rowbot.Execution;
 
 namespace Benchmarks.Excel
 {

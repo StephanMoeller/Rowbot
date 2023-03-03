@@ -1,10 +1,10 @@
 ﻿using Rowbot;
-using Rowbot.Core.Targets;
 using BenchmarkDotNet.Attributes;
 using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
 using System.Diagnostics;
 using BenchmarkDotNet.Running;
+using Rowbot.Targets;
 
 namespace AdhocConsole
 {

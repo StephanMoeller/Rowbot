@@ -9,6 +9,7 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 - Extremely low memory consumption
 - Can output csv and excel directly to asp.net OutputStream (both Framework and new dotnet)
 - Modular composition - combine any existing source with any existing target - or even create you own source/target
+- No native dependency to any 3rd party packages
 
 # Installation
 ```
@@ -106,6 +107,12 @@ new RowbotExecutorBuilder()
         }
     });
 ```
+
+### Example: Custom source
+
+Rowbot does not currently have a CSV target, but what if you just need a such? No problem. Here follows and example for creating a custom csv source using CsvHelper:
+
+
 
 # Notes
 
