@@ -12,8 +12,15 @@ on:
 
 env:
     SOLUTION: 'Rowbot.sln'
+    TRIGGER_EVENT: ${{ github.event.action }}
 
 jobs:
+  print_trigger:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Print trigger w
+      run: echo "TRIGGER_EVENT $TRIGGER_EVENT"
+    
   run_tests:
   
     runs-on: ubuntu-latest
