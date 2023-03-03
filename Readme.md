@@ -25,6 +25,7 @@ new RowbotExecutorBuilder()
     .Execute();
 ```
 
+# Speed comparison
 ![Excel write benchmark](benchmarks/excel_benchmark_result.png "Benchmark result")
 
 [Benchmark source code](https://github.com/StephanMoeller/Rowbot/blob/main/benchmarks/Benchmarks.Excel/Program.cs)
