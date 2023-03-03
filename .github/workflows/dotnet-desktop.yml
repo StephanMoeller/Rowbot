@@ -39,10 +39,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RELEASE_VERSION: ${{ github.ref_name }}
+
     steps:
+    - name: Print version
+      run: echo "RELEASE_VERSION $RELEASE_VERSION"
 
-    - name: Publish
-      run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
-
-    - name: Build_with_version
+    - name: Build with version
       run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=$RELEASE_VERSION --no-restore
+      
+    - name: Publish to nuget
+      run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
