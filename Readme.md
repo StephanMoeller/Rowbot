@@ -6,6 +6,8 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 
 # Why use Rowbot?
 - Fastest dotnet Excel writer on the market
+- Extremely low memory consumption
+- Can output csv and excel directly to asp.net OutputStream (both Framework and new dotnet)
 - Modular composition - combine any existing source with any existing target - or even create you own source/target
 
 # Installation
