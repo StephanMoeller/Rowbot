@@ -103,6 +103,7 @@ new RowbotExecutorBuilder()
     .Execute(objects =>
     {
         // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
+        // It is NOT possible to iterate this more than once.
         foreach (var customer in objects)
         {
             // Do something with the customer here
