@@ -12,14 +12,13 @@ on:
 
 env:
     SOLUTION: 'Rowbot.sln'
-    TRIGGER_EVENT_NAME: ${{ github.event_name }}
 
 jobs:
   print_trigger:
     runs-on: ubuntu-latest
     steps:
     - name: Print trigger name
-      run: echo "TRIGGER_EVENT_NAME $TRIGGER_EVENT_NAME"
+      run: echo ${{ github.event_name }}
     - name: Output Run ID
       run: echo ${{ github.run_id }}
     - name: Output Run Number
@@ -44,7 +43,7 @@ jobs:
       run: dotnet test
       
   deploy_to_nuget:
-    #if: '$TRIGGER_EVENT_NAME' == 'release'
+    if: ${{ github.event_name }} == 'release'
     needs: [run_tests]
     runs-on: ubuntu-latest
     env:
