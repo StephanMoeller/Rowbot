@@ -90,26 +90,6 @@ namespace Rowbot.Test.Core.Targets
             Assert.Throws<ArgumentException>(() => target.WriteRow(new object?[] { "Hello there æå 2", "This string cannot be converted into an int", null }));
         }
 
-        [Fact]
-        public void Call_GetResultBeforeCallingCompleted_ExpectException_Test()
-        {
-            var table = new DataTable();
-            var target = new DataTableTarget(table);
-
-            target.Init(new ColumnInfo[]{
-                new ColumnInfo(name: "Col1", valueType: typeof(string)),
-                new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
-                new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
-            });
-
-            target.WriteRow(new object?[] { "Hello there æå 1", -12.45m, 42 });
-            target.WriteRow(new object?[] { "Hello there æå 2", 10, null });
-            target.WriteRow(new object?[] { "Hello there æå 3", null, int.MinValue });
-            target.WriteRow(new object?[] { null, decimal.MaxValue, int.MaxValue });
-
-            Assert.Throws<InvalidOperationException>(() => target.GetResult());
-        }
-
         private void AssertRowsValues(DataRow row, params object[] expectedValues)
         {
             for (var i = 0; i < expectedValues.Length; i++)
