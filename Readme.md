@@ -122,6 +122,7 @@ new RowbotExecutorBuilder()
     - Less code to grasp at once, making it easier to understand, improve and test. E.g. you can look at one element, say a DataReaderSource, in isolation and all improvements to this will be beneficial to everyone using this source no matter what executor and/or target they combine it with.
 
 - Todos
+    - Fix problem with Exceltarget always closing stream
     - Stats for execution (Wait times per source + entry counts processed)
     - CancellationToken in ReadRow and WriteRow?
     - Add a test with Sqlite loading data and processing it to excel as a real life usage case test
