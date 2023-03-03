@@ -8,11 +8,11 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 ## Examples
 ### Create Excel file from list of objects
 ``` csharp
-	// Objects => Excel
-	new RowbotExecutorBuilder()
-       .FromObjects(objects)
-       .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "Sheet1", writeHeaders: true)
-       .Execute();
+// Objects => Excel
+new RowbotExecutorBuilder()
+    .FromObjects(objects)
+    .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "Sheet1", writeHeaders: true)
+    .Execute();
 ```
 
 ![Excel write benchmark](benchmarks/excel_benchmark_result.png "Benchmark result")
