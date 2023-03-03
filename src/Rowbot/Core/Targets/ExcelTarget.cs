@@ -44,6 +44,7 @@ namespace Rowbot.Core.Targets
 
             _zipOutputStream = new ZipOutputStream(baseOutputStream: outputStream, bufferSize: 8_000_000); // 8MB buffer choosen out of blue air
             _zipOutputStream.SetLevel(compressionLevel);
+            _zipOutputStream.IsStreamOwner = !leaveOpen;
             _outputStream = outputStream;
             _sheetName = sheetName;
             _writeHeaders = writeHeaders;
