@@ -17,19 +17,19 @@ jobs:
   debug_printing:
     runs-on: ubuntu-latest
     steps:
-    - name: echo ${{ github.event_name }}
+    - name: echo "github.event_name"
       run:  echo ${{ github.event_name }}
 
-    - name: echo ${{ github.run_id }}
+    - name: echo "github.run_id"
       run:  echo ${{ github.run_id }}
 
-    - name: echo ${{ github.run_number }}
+    - name: echo "github.run_number"
       run:  echo ${{ github.run_number }}
 
-    - name: echo ${{ github.run_attempt }}
+    - name: echo "github.run_attempt"
       run:  echo ${{ github.run_attempt }}
 
-    - name: echo ${{ github.ref_name }}
+    - name: echo "github.ref_name"
       run:  echo ${{ github.ref_name }}
 
   run_tests:
