@@ -12,14 +12,14 @@ on:
 
 env:
     SOLUTION: 'Rowbot.sln'
-    TRIGGER_EVENT: ${{ github.event.action }}
+    TRIGGER_EVENT_NAME: ${{ github.event_name }}
 
 jobs:
   print_trigger:
     runs-on: ubuntu-latest
     steps:
-    - name: Print trigger w
-      run: echo "TRIGGER_EVENT $TRIGGER_EVENT"
+    - name: Print trigger name
+      run: echo "TRIGGER_EVENT_NAME $TRIGGER_EVENT_NAME"
     
   run_tests:
   
