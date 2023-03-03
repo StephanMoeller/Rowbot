@@ -4,6 +4,9 @@ on:
   push:
     branches:
     - main
+    paths:
+    - '*'
+    - '!/docs/*' # Don't run workflow when files are only in the /docs directory (Copied from https://github.com/DapperLib/Dapper/blob/main/.github/workflows/main.yml)
   pull_request:
     branches:
     - main
