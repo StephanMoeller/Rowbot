@@ -119,15 +119,26 @@ namespace Rowbot.Test.Core.Targets
         }
 
         [Theory]
-        [InlineData("Carriage\rreturn")]
-        [InlineData("New\nline")]
-        [InlineData("CR\r\nLF")]
         [InlineData("Hello < and > there")]
         [InlineData("Hello \"there\"")]
-        public void DataTypeTesting_String_Quotes(string value)
+        public void DataTypeTesting_String(string value)
         {
             RunTypeTest(value: value, expectedValue: value);
         }
+
+        [Fact]
+        public void DataTypeTesting_NewLines()
+        {
+            //NOTE: This test uses ClosedXml to reload the excel data.
+            // On load, ClosedXml will adjust any line breaks (\n or \r\n) and replace them with the value of Environment.Newline.
+            // This causes different results when run on linux and windows machines.
+            RunTypeTest(value: "New\nline", expectedValue: $"New{Environment.NewLine}line");
+            RunTypeTest(value: "CR\r\nLF", expectedValue: $"CR{Environment.NewLine}LF");
+        }
+
+        [InlineData("Carriage\rreturn")]
+        [InlineData("")]
+        [InlineData("CR\r\nLF")]
 
         [Fact]
         public void DataTypeTesting_IntFamily()
