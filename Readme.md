@@ -19,7 +19,7 @@ dotnet add package Rowbot
 ### Example: Objects => Excel
 ``` csharp
 new RowbotExecutorBuilder()
-    .FromObjects(objects)
+    .FromObjects(myObjects)
     .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "Sheet1", writeHeaders: true)
     .Execute();
 ```
