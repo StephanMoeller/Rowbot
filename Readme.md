@@ -9,6 +9,7 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 - Extremely low memory consumption
 - Can output csv and excel directly to asp.net OutputStream (both Framework and new dotnet)
 - Modular composition - combine any existing source with any existing target - or even create you own source/target
+- All csv work is based on the proven CsvHelper.
 
 # Installation
 ```
@@ -20,7 +21,7 @@ dotnet add package Rowbot
 ``` csharp
 new RowbotExecutorBuilder()
     .FromObjects(myObjects)
-    .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "Sheet1", writeHeaders: true)
+    .ToExcel(filepath: "c:\\temp\\result.xlsx", sheetName: "Sheet1", writeHeaders: true)
     .Execute();
 ```
 
@@ -29,51 +30,28 @@ new RowbotExecutorBuilder()
 
 [Benchmark source code](https://github.com/StephanMoeller/Rowbot/blob/main/benchmarks/Benchmarks.Excel/Program.cs)
 
-### Example: Objects => CSV (Memory space complexity: O(1))
+### Example: Objects => Csv (Memory space complexity: O(1))
 ``` csharp
 new RowbotExecutorBuilder()
     .FromObjects(myObjects)
-    .ToCsv(filepath: "c:\\temp\\rowbot.csv", config: new CsvConfig() { Delimiter = ';', Quote = '\'' }, writeHeaders: true)
-    .Execute();
-```
-
-### Example: Objects => Excel (Space complexity: O(1))
-``` csharp
-new RowbotExecutorBuilder()
-    .FromObjects(myObjects)
-    .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "MySheet", writeHeaders: true)
-    .Execute();
-```
-
-### Example: DataTable => CSV (Space complexity: O(1))
-``` csharp
-new RowbotExecutorBuilder()
-    .FromDataTable(myDataTable)
-    .ToCsv(filepath: "c:\\temp\\rowbot.csv", config: new CsvConfig() { Delimiter = ';', Quote = '\'' }, writeHeaders: true)
+    .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
     .Execute();
 ```
 
 ### Example: DataTable => Excel (Space complexity: O(1))
 ``` csharp
 new RowbotExecutorBuilder()
-    .FromDataTable(myDataTable)
-    .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "MySheet", writeHeaders: true)
+    .FromObjects(myObjects)
+    .ToExcel(filepath: "c:\\temp\\output.xlsx", sheetName: "MySheet", writeHeaders: true)
     .Execute();
 ```
 
-### Example: Database => CSV (Space complexity: O(1))
+### Example: DataTable => Csv (Space complexity: O(1))
 ``` csharp
-using Dapper;
-using (var conn = new SqlConnection(myConnectionString))
-{
-    conn.Open();
-    var dataReader = conn.ExecuteReader("SELECT * FROM Orders WHERE CustomerId = @customerId", new { customerId = 123 });
-
-    new RowbotExecutorBuilder()
-        .FromDataReader(dataReader)
-        .ToCsv(filepath: "c:\\temp\\rowbot.csv", config: new CsvConfig() { Delimiter = ';', Quote = '\'' }, writeHeaders: true)
-        .Execute();
-}
+new RowbotExecutorBuilder()
+    .FromDataTable(myDataTable)
+    .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
+    .Execute();
 ```
 
 ### Example: Database => Excel (Space complexity: O(1))
@@ -86,7 +64,22 @@ using (var conn = new SqlConnection(myConnectionString))
 
     new RowbotExecutorBuilder()
         .FromDataReader(dataReader)
-        .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "MySheet", writeHeaders: true)
+        .ToExcel(filepath: "c:\\temp\\output.xlsx", sheetName: "MySheet", writeHeaders: true)
+        .Execute();
+}
+```
+
+### Example: Database => Csv (Space complexity: O(1))
+``` csharp
+using Dapper;
+using (var conn = new SqlConnection(myConnectionString))
+{
+    conn.Open();
+    var dataReader = conn.ExecuteReader("SELECT * FROM Orders WHERE CustomerId = @customerId", new { customerId = 123 });
+
+    new RowbotExecutorBuilder()
+        .FromDataReader(dataReader)
+        .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
         .Execute();
 }
 ```
@@ -108,11 +101,10 @@ new RowbotExecutorBuilder()
 ```
 
 ### Example: Csv => Excel (Space complexity: O(1))
-(Currently, the only csv source available has a dependency on CsvHelper)
 ``` csharp
 new RowbotExecutorBuilder()
-    .From(new CsvHelperSource(new CsvReader(new StreamReader(File.Open("path//to//file.csv", FileMode.Open)), configuration: new CsvConfiguration(CultureInfo.InvariantCulture)), readFirstLineAsHeaders: true))
-    .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "MySheet", writeHeaders: true)
+    .FromCsvByCsvHelper(inputStream: File.Open("path//to//file.csv", FileMode.Open), csvConfiguration: new CsvConfiguration(CultureInfo.InvariantCulture), readFirstLineAsHeaders: true)
+    .ToExcel(filepath: "c:\\temp\\output.xlsx", sheetName: "MySheet", writeHeaders: true)
     .Execute();
 ```
 

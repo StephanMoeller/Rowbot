@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.Configuration;
 using Rowbot.Execution;
 using System.Globalization;
@@ -40,7 +41,7 @@ namespace Benchmarks.Excel
             {
                 new RowbotExecutorBuilder()
                     .FromObjects(objects)
-                    .ToCsv(ms, new Rowbot.Targets.CsvConfig(), writeHeaders: true)
+                    .ToCsvUsingCsvHelper(ms, new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true, leaveOpen: true)
                     .Execute();
             }
                 

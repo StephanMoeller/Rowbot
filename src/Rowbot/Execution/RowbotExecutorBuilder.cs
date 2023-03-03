@@ -1,4 +1,6 @@
-﻿using Rowbot.Sources;
+﻿using CsvHelper.Configuration;
+using Rowbot.CsvHelper;
+using Rowbot.Sources;
 using Rowbot.Targets;
 using System;
 using System.Collections.Generic;
@@ -16,10 +18,32 @@ namespace Rowbot.Execution
         {
         }
 
-        public RowbotExecutorBuilder FromDataTable(DataTable dataTable) => SetSource(new DataReaderSource(dataTable.CreateDataReader()));
-        public RowbotExecutorBuilder FromDataReader(IDataReader dataReader) => SetSource(new DataReaderSource(dataReader));
-        public RowbotExecutorBuilder FromObjects<TObjectType>(IEnumerable<TObjectType> objects) => SetSource(PropertyReflectionSource.Create(objects));
-        public RowbotExecutorBuilder From(IRowSource customRowSource) => SetSource(customRowSource);
+        public RowbotExecutorBuilder FromDataTable(DataTable dataTable)
+        {
+            return SetSource(new DataReaderSource(dataTable.CreateDataReader()));
+        }
+        public RowbotExecutorBuilder FromDataReader(IDataReader dataReader)
+        {
+            return SetSource(new DataReaderSource(dataReader));
+        }
+        public RowbotExecutorBuilder FromObjects<TObjectType>(IEnumerable<TObjectType> objects)
+        {
+            return SetSource(PropertyReflectionSource.Create(objects));
+        }
+        public RowbotExecutorBuilder FromCsvByCsvHelper(Stream inputStream, CsvConfiguration csvConfiguration, bool readFirstLineAsHeaders)
+        {
+            return SetSource(new CsvHelperSource(stream: inputStream, configuration: csvConfiguration, readFirstLineAsHeaders: readFirstLineAsHeaders));
+        }
+        public RowbotExecutorBuilder FromCsvByCsvHelper(string filepath, CsvConfiguration csvConfiguration, bool readFirstLineAsHeaders)
+        {
+            var fs = File.Create(filepath);
+            return SetSource(new CsvHelperSource(stream: fs, configuration: csvConfiguration, readFirstLineAsHeaders: readFirstLineAsHeaders));
+        }
+        public RowbotExecutorBuilder From(IRowSource customRowSource)
+        {
+            return SetSource(customRowSource);
+        }
+
         private RowbotExecutorBuilder SetSource(IRowSource rowSource)
         {
             if (rowSource is null)
@@ -34,21 +58,20 @@ namespace Rowbot.Execution
             return this;
         }
 
-        public RowbotExecutor ToCsv(Stream outputStream, CsvConfig config, bool writeHeaders)
+        public RowbotExecutor ToCsvUsingCsvHelper(Stream outputStream, CsvConfiguration config, bool writeHeaders, bool leaveOpen = false)
         {
-            return To(new CsvTarget(outputStream: outputStream, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: true));
+            return To(new CsvHelperTarget(stream: outputStream, configuration: config, writeHeaders: writeHeaders, leaveOpen: leaveOpen));
         }
 
-        public RowbotExecutor ToCsv(string filepath, CsvConfig config, bool writeHeaders)
+        public RowbotExecutor ToCsvUsingCsvHelper(string filepath, CsvConfiguration config, bool writeHeaders)
         {
             var fs = File.Create(filepath);
-            return To(new CsvTarget(outputStream: fs, csvConfig: config, writeHeaders: writeHeaders, leaveOpen: false));
+            return To(new CsvHelperTarget(stream: fs, configuration: config, writeHeaders: writeHeaders, leaveOpen: false));
         }
 
-
-        public RowbotExecutor ToExcel(Stream outputStream, string sheetName, bool writeHeaders)
+        public RowbotExecutor ToExcel(Stream outputStream, string sheetName, bool writeHeaders, bool leaveOpen = false)
         {
-            return To(new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: true));
+            return To(new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: leaveOpen));
         }
 
         public RowbotExecutor ToExcel(string filepath, string sheetName, bool writeHeaders)
