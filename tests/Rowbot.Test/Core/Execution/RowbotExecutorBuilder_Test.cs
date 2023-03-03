@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rowbot.Core.Execution;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,10 @@ namespace Rowbot.Test.Core.Execution
 {
     public class RowbotExecutorBuilder_Test
     {
-        [Fact]
+        [Fact(Skip = "To be implemented")]
         public void Foo()
         {
+            new RowbotExecutorBuilder().ToCustomTarget
             throw new NotImplementedException();
         }
     }
