@@ -94,7 +94,7 @@ namespace Rowbot.Targets
 
         private void FlushIfNeeded()
         {
-            if (_bufferIndex > 500_000)
+            if (_bufferIndex > 10_000)
             {
                 Flush();
             }

@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rowbot", "src\Rowbot\Rowbot
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rowbot.Test", "tests\Rowbot.Test\Rowbot.Test.csproj", "{5C5DFC50-86A8-48AA-BDC0-403029B06657}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks.Csv", "benchmarks\Benchmarks.Csv\Benchmarks.Csv.csproj", "{AC4328AB-E5BA-4109-A48B-4E4A70EE6EDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{5C5DFC50-86A8-48AA-BDC0-403029B06657}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C5DFC50-86A8-48AA-BDC0-403029B06657}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C5DFC50-86A8-48AA-BDC0-403029B06657}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC4328AB-E5BA-4109-A48B-4E4A70EE6EDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC4328AB-E5BA-4109-A48B-4E4A70EE6EDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC4328AB-E5BA-4109-A48B-4E4A70EE6EDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC4328AB-E5BA-4109-A48B-4E4A70EE6EDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,6 +85,7 @@ Global
 		{23FDE1D1-F934-4C35-A66E-BC2531126BCF} = {E2985BB1-AA39-4560-9764-F8915379FF75}
 		{54571189-6A82-4CA5-A1C2-804A9C4DB713} = {9EDB4D6B-58BC-41E6-A92A-AA360454C426}
 		{5C5DFC50-86A8-48AA-BDC0-403029B06657} = {74C2EA94-FD86-4AFE-AAFE-40F7F1C6939B}
+		{AC4328AB-E5BA-4109-A48B-4E4A70EE6EDF} = {0AE70E4B-BD39-46B6-99C1-76F7907C5120}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7606E3C0-4954-4B32-8771-25B94B90D2B1}
