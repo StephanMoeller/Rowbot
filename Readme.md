@@ -25,6 +25,10 @@ Other features when writing excel from objects:
 |-----------------------------------:|-------------:|-----------:|-----------:|
 |                       Memory usage |         O(1) |       O(1) |       O(n) |
 |  Can write to asp.net OutputStream |     		Yes |   	  No | 		   No |
+|  Supports cell stylings   		 |   	     No | 		   ? |        Yes |
+|  Supports referencing   		     |   	     No | 		   ? |        Yes |
+|  Supports multi tables   		     |   	     No | 		   ? |        Yes |
+|  Supports computed cells		     |   	     No | 		   ? |        Yes |
 
 ### More examples
 ``` csharp
