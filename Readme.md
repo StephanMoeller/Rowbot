@@ -16,7 +16,8 @@ dotnet add package Rowbot
 ```
 
 # Examples
-### Create Excel file from list of objects
+## Objects => Excel
+### Example
 ``` csharp
 // Objects => Excel
 new RowbotExecutorBuilder()
@@ -25,7 +26,7 @@ new RowbotExecutorBuilder()
     .Execute();
 ```
 
-# Speed comparison
+### Speed comparison
 ![Excel write benchmark](benchmarks/excel_benchmark_result.png "Benchmark result")
 
 [Benchmark source code](https://github.com/StephanMoeller/Rowbot/blob/main/benchmarks/Benchmarks.Excel/Program.cs)

@@ -56,7 +56,7 @@ namespace Examples.SimpleDemos
             using (var conn = new SqlConnection(myConnectionString))
             {
                 conn.Open();
-                var dataReader = conn.ExecuteReader("SELECT * FROM Orders WHERE CustomerId = @customerId", new { customerId = 123 });
+                var dataReader = conn.ExecuteReader("SELECT OrderId, TotalAmount, CreatedDate FROM Orders WHERE CustomerId = @customerId", new { customerId = 123 });
 
                 new RowbotExecutorBuilder()
                     .FromDataReader(dataReader)
