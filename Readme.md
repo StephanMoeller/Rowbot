@@ -29,54 +29,40 @@ new RowbotExecutorBuilder()
 
 [Benchmark source code](https://github.com/StephanMoeller/Rowbot/blob/main/benchmarks/Benchmarks.Excel/Program.cs)
 
-### Feature comparison
-
-So, Rowbot is the fastest on the market for this exact task. But speed and features are often tradeoffs.
-
-|                                             |       RowBot |  MiniExcel |  ClosedXml |
-|--------------------------------------------:|-------------:|-----------:|-----------:|
-|                                Memory usage |         O(1) |       O(1) |       O(n) |
-|  Can write directly to asp.net OutputStream |          Yes |   	   No | 		No |
-|  Supports cell stylings   		          |   	      No | 		    ? |        Yes |
-|  Supports referencing   		              |   	      No | 		    ? |        Yes |
-|  Supports multi tables   		              |   	      No | 		    ? |        Yes |
-|  Supports computed cells		              |   	      No | 		    ? |        Yes |
-
-### More examples
+### Example: Objects => CSV (Memory space complexity: O(1))
 ``` csharp
-// Objects => CSV (Space complexity: O(1))
 new RowbotExecutorBuilder()
     .FromObjects(myObjects)
     .ToCsv(filepath: "c:\\temp\\rowbot.csv", config: new CsvConfig() { Delimiter = ';', Quote = '\'' }, writeHeaders: true)
     .Execute();
 ```
 
+### Example: Objects => Excel (Space complexity: O(1))
 ``` csharp
-// Objects => Excel (Space complexity: O(1))
 new RowbotExecutorBuilder()
     .FromObjects(myObjects)
     .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "MySheet", writeHeaders: true)
     .Execute();
 ```
 
+### Example: DataTable => CSV (Space complexity: O(1))
 ``` csharp
-// DataTable => CSV (Space complexity: O(1))
 new RowbotExecutorBuilder()
     .FromDataTable(myDataTable)
     .ToCsv(filepath: "c:\\temp\\rowbot.csv", config: new CsvConfig() { Delimiter = ';', Quote = '\'' }, writeHeaders: true)
     .Execute();
 ```
 
+### Example: DataTable => Excel (Space complexity: O(1))
 ``` csharp
-// DataTable => Excel (Space complexity: O(1))
 new RowbotExecutorBuilder()
     .FromDataTable(myDataTable)
     .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "MySheet", writeHeaders: true)
     .Execute();
 ```
 
+### Example: Database => CSV (Space complexity: O(1))
 ``` csharp
-// Database => CSV (Space complexity: O(1))
 using Dapper;
 using (var conn = new SqlConnection(myConnectionString))
 {
@@ -90,8 +76,8 @@ using (var conn = new SqlConnection(myConnectionString))
 }
 ```
 
+### Example: Database => Excel (Space complexity: O(1))
 ``` csharp
-// Database => Excel (Space complexity: O(1))
 using Dapper;
 using (var conn = new SqlConnection(myConnectionString))
 {
@@ -105,8 +91,8 @@ using (var conn = new SqlConnection(myConnectionString))
 }
 ```
 
+### Example: DataTable => List of objects (Space complexity: O(1))
 ``` csharp
-// DataTable => List of objects (Space complexity: O(1))
 new RowbotExecutorBuilder()
     .FromDataTable(myDataTable)
     .ToObjects<Customer>()
