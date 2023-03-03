@@ -2,8 +2,6 @@
 using BenchmarkDotNet.Running;
 using ClosedXML.Excel;
 using Rowbot.Core.Execution;
-using System.Text;
-using ClosedXML.Excel;
 
 namespace Benchmarks.Excel
 {
