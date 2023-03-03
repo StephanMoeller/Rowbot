@@ -107,7 +107,7 @@ new RowbotExecutorBuilder()
     });
 ```
 
-### Example: Csv => Excel
+### Example: Csv => Excel (Space complexity: O(1))
 (Currently, the only csv source available has a dependency on CsvHelper)
 ``` csharp
 new RowbotExecutorBuilder()
