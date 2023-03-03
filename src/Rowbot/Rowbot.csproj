@@ -3,6 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IsPublishable>True</IsPublishable>
+    <Title>Rowbot</Title>
+    <Company>$(Authors)</Company>
+    <Authors>Stephan Møller</Authors>
   </PropertyGroup>
 
   <ItemGroup>
