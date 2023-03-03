@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="https:\github.com\StephanMoeller\Rowbot\blob\main\Readme.md" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
   </ItemGroup>
