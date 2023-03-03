@@ -19,7 +19,6 @@ jobs:
     env:
       BUILD_CONFIG: 'Release'
       SOLUTION: 'Rowbot.sln'
-      RELEASE_VERSION: ${{ github.ref_name }}
 
     runs-on: ubuntu-latest
 
@@ -50,5 +49,13 @@ jobs:
     - name: Execute unit tests
       run: dotnet test
       
+
+  deploy_to_nuget:
+    needs: [build]
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ github.ref_name }}
+    steps:
+
     - name: Publish
       run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
