@@ -20,7 +20,13 @@ jobs:
     steps:
     - name: Print trigger name
       run: echo "TRIGGER_EVENT_NAME $TRIGGER_EVENT_NAME"
-    
+    - name: Output Run ID
+      run: echo ${{ github.run_id }}
+    - name: Output Run Number
+      run: echo ${{ github.run_number }}
+    - name: Output Run Attempt
+      run: echo ${{ github.run_attempt }}
+
   run_tests:
   
     runs-on: ubuntu-latest
