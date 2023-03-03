@@ -19,7 +19,7 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 
 [Benchmark source code](https://github.com/StephanMoeller/Rowbot/blob/main/benchmarks/Benchmarks.Excel/Program.cs)
 
-Other features when writing excel from objects:
+So, Rowbot is the fastest on the market for this exact task. But what are the pros and cons?
 
 |                                    |       RowBot |  MiniExcel |  ClosedXml |
 |-----------------------------------:|-------------:|-----------:|-----------:|
