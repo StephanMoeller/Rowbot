@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Rowbot.Test.Core.Targets
 {
-    public class ExcelTarget_Test
+    public class ExcelTargetV2_Test
     {
         [Theory]
         [InlineData("A", 1)]
@@ -52,7 +52,7 @@ namespace Rowbot.Test.Core.Targets
         [InlineData("CA", 26 + 26 + 26 + 1)]
         public void GetColumnName(string expectedName, int oneBasedIndex)
         {
-            var name = ExcelTarget.GetColumnName(oneBasedIndex);
+            var name = ExcelTargetV2.GetColumnName(oneBasedIndex);
             Assert.Equal(expectedName, name);
         }
 
@@ -62,7 +62,7 @@ namespace Rowbot.Test.Core.Targets
         public void EmptyColumns_ExpectNoRowsAsExcelDoesNotHaveTheConceptOfEmptySheetWithRows_Test(bool writeHeaders)
         {
             using (var ms = new MemoryStream())
-            using (var target = new ExcelTarget(ms, sheetName: "My sheet < > \" and Φ╚", writeHeaders: writeHeaders, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            using (var target = new ExcelTargetV2(ms, sheetName: "My sheet < > \" and Φ╚", writeHeaders: writeHeaders, leaveOpen: true)) // Leave open to be able to read from the stream after completion
             {
                 target.Init(new ColumnInfo[] { });
 
@@ -71,7 +71,7 @@ namespace Rowbot.Test.Core.Targets
 
                 target.Complete();
 
-                EnsureExcelContent(ms, expectedSheetName: "My sheet < > \" and Φ╚", expectedRowValues: new XLCellValue[0][]);
+                EnsureExcelContent(ms.ToArray(), expectedSheetName: "My sheet < > \" and Φ╚", expectedRowValues: new XLCellValue[0][]);
             }
         }
 
@@ -81,7 +81,7 @@ namespace Rowbot.Test.Core.Targets
         public void SimpleTest_WithColumns(bool writeHeaders)
         {
             using (var ms = new MemoryStream())
-            using (var target = new ExcelTarget(ms, sheetName: "My sheet", writeHeaders: writeHeaders, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            using (var target = new ExcelTargetV2(ms, sheetName: "My sheet", writeHeaders: writeHeaders, leaveOpen: true)) // Leave open to be able to read from the stream after completion
             {
                 target.Init(new ColumnInfo[] { new ColumnInfo(name: "ColA", typeof(string)), new ColumnInfo(name: "Hey ÆØÅ <", typeof(string)) });
 
@@ -92,7 +92,7 @@ namespace Rowbot.Test.Core.Targets
 
                 if (writeHeaders)
                 {
-                    EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new XLCellValue[][]{
+                    EnsureExcelContent(ms.ToArray(), expectedSheetName: "My sheet", expectedRowValues: new XLCellValue[][]{
                         new XLCellValue[]{ "ColA", "Hey ÆØÅ <" },
                         new XLCellValue[]{ "Hey \" and < and > in the text", "There" },
                         new XLCellValue[] { "There", "Over there" }
@@ -100,7 +100,7 @@ namespace Rowbot.Test.Core.Targets
                 }
                 else
                 {
-                    EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new XLCellValue[][]{
+                    EnsureExcelContent(ms.ToArray(), expectedSheetName: "My sheet", expectedRowValues: new XLCellValue[][]{
                         new XLCellValue[]{ "Hey \" and < and > in the text", "There" },
                         new XLCellValue[] { "There", "Over there" }
                     });
@@ -157,7 +157,7 @@ namespace Rowbot.Test.Core.Targets
         private void RunTypeTest<T>(T? value, XLCellValue expectedValue, double numberCompareTolerance = 0.0)
         {
             using (var ms = new MemoryStream())
-            using (var target = new ExcelTarget(ms, sheetName: "My sheet", writeHeaders: true, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            using (var target = new ExcelTargetV2(ms, sheetName: "My sheet", writeHeaders: true, leaveOpen: true)) // Leave open to be able to read from the stream after completion
             {
                 target.Init(new ColumnInfo[] {
                     new ColumnInfo(name: "ColA", typeof(T))
@@ -167,7 +167,7 @@ namespace Rowbot.Test.Core.Targets
 
                 target.Complete();
 
-                EnsureExcelContent(ms, expectedSheetName: "My sheet", expectedRowValues: new XLCellValue[][]{
+                EnsureExcelContent(ms.ToArray(), expectedSheetName: "My sheet", expectedRowValues: new XLCellValue[][]{
                         new XLCellValue[]{ "ColA" },
                         new XLCellValue[]{ expectedValue }
                     }, numberCompareTolerance: numberCompareTolerance);
@@ -188,15 +188,15 @@ namespace Rowbot.Test.Core.Targets
         {
             using (var ms = new MemoryStream())
             {
-                ExcelTarget target;
+                ExcelTargetV2 target;
                 if (leaveOpen == null)
                 {
                     // Rely on default behaviour
-                    target = new ExcelTarget(ms, sheetName: "My sheet", writeHeaders: true);
+                    target = new ExcelTargetV2(ms, sheetName: "My sheet", writeHeaders: true);
                 }
                 else
                 {
-                    target = new ExcelTarget(ms, sheetName: "My sheet", writeHeaders: true, leaveOpen: leaveOpen.Value);
+                    target = new ExcelTargetV2(ms, sheetName: "My sheet", writeHeaders: true, leaveOpen: leaveOpen.Value);
                 }
 
                 using (target)
@@ -235,50 +235,50 @@ namespace Rowbot.Test.Core.Targets
         }
 
 
-        private void EnsureExcelContent(MemoryStream ms, string expectedSheetName, XLCellValue[][] expectedRowValues, double numberCompareTolerance = 0.0)
+        private void EnsureExcelContent(byte[] excelData, string expectedSheetName, XLCellValue[][] expectedRowValues, double numberCompareTolerance = 0.0)
         {
-            ms.Position = 0;
-
-            // Code copied from https://www.aspsnippets.com/Articles/Read-and-Import-Excel-data-to-DataTable-using-ClosedXml-in-ASPNet-with-C-and-VBNet.aspx
-
-            //Open the Excel file using ClosedXML.
-            using (XLWorkbook workBook = new XLWorkbook(ms))
+            using(var ms = new MemoryStream(excelData))
             {
-                //Read the first Sheet from Excel file.
-                Assert.Equal(1, workBook.Worksheets.Count); // Ensure only one sheet in thing to open
 
-                IXLWorksheet workSheet = workBook.Worksheet(1);
-                Assert.Equal(expectedSheetName, workSheet.Name);
+                // Code copied from https://www.aspsnippets.com/Articles/Read-and-Import-Excel-data-to-DataTable-using-ClosedXml-in-ASPNet-with-C-and-VBNet.aspx
 
-                //Loop through the Worksheet rows.
-                for (var rowIndex = 0; rowIndex < expectedRowValues.Length; rowIndex++)
+                //Open the Excel file using ClosedXML.
+                using (XLWorkbook workBook = new XLWorkbook(ms))
                 {
-                    var expectedRow = expectedRowValues[rowIndex];
-                    for (var columnIndex = 0; columnIndex < expectedRow.Length; columnIndex++)
-                    {
-                        var value = workSheet.Cell(row: rowIndex + 1, column: columnIndex + 1).Value;
+                    //Read the first Sheet from Excel file.
+                    Assert.Equal(1, workBook.Worksheets.Count); // Ensure only one sheet in thing to open
 
-                        // If value type is double or single, compare with a little tolerance
-                        var expectedValue = expectedRow[columnIndex];
-                        if (expectedValue.IsNumber)
+                    IXLWorksheet workSheet = workBook.Worksheet(1);
+                    Assert.Equal(expectedSheetName, workSheet.Name);
+
+                    //Loop through the Worksheet rows.
+                    for (var rowIndex = 0; rowIndex < expectedRowValues.Length; rowIndex++)
+                    {
+                        var expectedRow = expectedRowValues[rowIndex];
+                        for (var columnIndex = 0; columnIndex < expectedRow.Length; columnIndex++)
                         {
-                            var expectedNumberValue = expectedValue.GetNumber();
-                            Assert.Equal(expectedNumberValue, (double)value, tolerance: numberCompareTolerance);
-                        }
-                        else
-                        {
-                            Assert.Equal(expectedValue, value);
+                            var value = workSheet.Cell(row: rowIndex + 1, column: columnIndex + 1).Value;
+
+                            // If value type is double or single, compare with a little tolerance
+                            var expectedValue = expectedRow[columnIndex];
+                            if (expectedValue.IsNumber)
+                            {
+                                var expectedNumberValue = expectedValue.GetNumber();
+                                Assert.Equal(expectedNumberValue, (double)value, tolerance: numberCompareTolerance);
+                            }
+                            else
+                            {
+                                Assert.Equal(expectedValue, value);
+                            }
                         }
                     }
                 }
-            }
+            }   
         }
-
 
         public class UnitTestCustomType
         {
 
         }
     }
-
 }

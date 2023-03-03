@@ -125,3 +125,4 @@ new RowbotExecutorBuilder()
     - Stats for execution (Wait times per source + entry counts processed)
     - CancellationToken in ReadRow and WriteRow?
     - Add a test with Sqlite loading data and processing it to excel as a real life usage case test
+    - Exceltarget: Test with reuse of array instead of creating new params-arrays over and over

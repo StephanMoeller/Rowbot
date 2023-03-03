@@ -1,12 +1,6 @@
 ﻿using Rowbot;
 using Rowbot.Core.Targets;
 using BenchmarkDotNet.Attributes;
-using Rowbot.Core.Execution;
-using System.IO.Compression;
-using System;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Presentation;
-using System.Text.Unicode;
 using System.Text;
 using ICSharpCode.SharpZipLib.Zip;
 
@@ -16,65 +10,22 @@ namespace AdhocConsole
     {
         static void Main(string[] args)
         {
-            //using (FileStream zipToOpen = new FileStream("c:\\temp\\hello.zip", FileMode.Create))
-            //{
-            //    using (ZipArchive archive = new ZipArchive(new LoggingStream(zipToOpen, logMsg => Console.WriteLine(logMsg)), ZipArchiveMode.Update))
-            //    {
-            //        ZipArchiveEntry readmeEntry = archive.CreateEntry("Readme.txt");
-            //        using (StreamWriter writer = new StreamWriter(readmeEntry.Open()))
-            //        {
-            //            writer.WriteLine("Information about this package.");
-            //            writer.WriteLine("========================");
-            //        }
-            //    }
-            //}
+            int colCount = 25;
+            int rowCount = 100;
 
+            var columns = Enumerable.Range(0, 25).Select(num => new ColumnInfo(name: "Col" + num, valueType: typeof(string))).ToArray();
+            var data = Enumerable.Range(0, 25).Select(num => new string('a', 100)).Cast<object>().ToArray();
 
-
-
-
-
-
-            // 'using' statements guarantee the stream is closed properly which is a big source
-            // of problems otherwise.  Its exception safe as well which is great.
-            using (ZipOutputStream OutputStream = new ZipOutputStream(new LoggingStream(File.Create("c:\\temp\\hello2.zip"), logMsg => Console.WriteLine(logMsg))))
+            using (var fs = File.Create("c:\\temp\\outputv1.xlsx"))
+            using (var target = new ExcelTargetV2(fs, sheetName: "My sheet", writeHeaders: true, leaveOpen: true))
             {
-                // Define the compression level
-                // 0 - store only to 9 - means best compression
-                OutputStream.SetLevel(9);
-
-                byte[] buffer = new byte[4096];
-
-                // Using GetFileName makes the result compatible with XP
-                // as the resulting path is not absolute.
-                ZipEntry entry = new ZipEntry("Hello.txt");
-
-                // Setup the entry data as required.
-
-                // Crc and size are handled by the library for seakable streams
-                // so no need to do them here.
-
-                // Could also use the last write time or similar for the file.
-                entry.DateTime = DateTime.Now;
-                OutputStream.PutNextEntry(entry);
-
-                var bytes = Encoding.UTF8.GetBytes("Hello!");
-                OutputStream.Write(bytes, 0, bytes.Length);
-
-                // Finish/Close arent needed strictly as the using statement does this automatically
-
-                // Finish is important to ensure trailing information for a Zip file is appended.  Without this
-                // the created file would be invalid.
-                OutputStream.Finish();
-
-                // Close is important to wrap things up and unlock the file.
-                OutputStream.Close();
-
-                Console.WriteLine("Files successfully compressed");
+                target.Init(columns);
+                for (var i = 0; i < rowCount; i++)
+                {
+                    target.WriteRow(data);
+                }
+                target.Complete();
             }
-
-
-
 
 
             Console.WriteLine("done");
