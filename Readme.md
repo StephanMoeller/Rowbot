@@ -15,8 +15,7 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 dotnet add package Rowbot
 ```
 
-# Rowbot
-## Examples
+# Examples
 ### Create Excel file from list of objects
 ``` csharp
 // Objects => Excel
