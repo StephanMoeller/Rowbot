@@ -16,10 +16,8 @@ dotnet add package Rowbot
 ```
 
 # Examples
-## Objects => Excel
-### Example
+### Example: Objects => Excel
 ``` csharp
-// Objects => Excel
 new RowbotExecutorBuilder()
     .FromObjects(objects)
     .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "Sheet1", writeHeaders: true)
