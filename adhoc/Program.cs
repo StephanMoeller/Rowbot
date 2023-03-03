@@ -14,7 +14,7 @@ namespace AdhocConsole
         {
             var summary = BenchmarkRunner.Run<ExcelTargetBenchmark>();
             Console.ReadLine();
-
+            // Testing checkins
             //int colCount = 25;
             //for (var compressionLevel = 0; compressionLevel <= 9; compressionLevel++)
             //{
