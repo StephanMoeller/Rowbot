@@ -14,20 +14,12 @@ on:
     - main
     
 jobs:
-  debug_echo:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Any Name Bash Test Step
-        shell: bash
-        run: |
-          echo "FOO_VALUE: $FOO_VALUE"
-        env:
-          FOO_VALUE: ${{ github.ref_name }}
   build:
 
     env:
       BUILD_CONFIG: 'Release'
       SOLUTION: 'Rowbot.sln'
+      RELEASE_VERSION: ${{ github.ref_name }}
 
     runs-on: ubuntu-latest
 
@@ -52,7 +44,7 @@ jobs:
 #    - name: Build
 #      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG --no-restore
     - name: Build
-      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=${{ github.ref_name }} --no-restore
+      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=$RELEASE_VERSION --no-restore
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
