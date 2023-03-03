@@ -40,10 +40,10 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
-    - name: Build
-      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG --no-restore
 #    - name: Build
-#      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=$BUILD_VERSION --no-restore
+#      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG --no-restore
+    - name: Build
+      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=$RELEASE_VERSION --no-restore
 
     # Execute all unit tests in the solution
     - name: Execute unit tests
