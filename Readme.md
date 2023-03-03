@@ -19,8 +19,9 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 
 [Benchmark source code](https://github.com/StephanMoeller/Rowbot/blob/main/benchmarks/Benchmarks.Excel/Program.cs)
 
+### Feature comparison
+
 So, Rowbot is the fastest on the market for this exact task. But speed and features are often tradeoffs.
-Feature comparison:
 
 |                                    |       RowBot |  MiniExcel |  ClosedXml |
 |-----------------------------------:|-------------:|-----------:|-----------:|
