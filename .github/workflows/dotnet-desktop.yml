@@ -14,6 +14,15 @@ on:
     - main
     
 jobs:
+  debug_echo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Any Name Bash Test Step
+        shell: bash
+        run: |
+          echo "FOO_VALUE: $FOO_VALUE"
+        env:
+          FOO_VALUE: ${{ github.ref_name }}
   build:
 
     env:
