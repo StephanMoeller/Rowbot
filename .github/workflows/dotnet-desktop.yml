@@ -14,7 +14,7 @@ env:
     SOLUTION: 'Rowbot.sln'
 
 jobs:
-  print_trigger:
+  debug_printing:
     runs-on: ubuntu-latest
     steps:
     - name: Print trigger name
