@@ -21,6 +21,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rowbot.ClosedXml.Test", "tests\Rowbot.ClosedXml.Test\Rowbot.ClosedXml.Test.csproj", "{7932C696-1E52-4038-A128-6F18F92526DA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{0AE70E4B-BD39-46B6-99C1-76F7907C5120}"
+	ProjectSection(SolutionItems) = preProject
+		benchmarks\excel_benchmark_result.png = benchmarks\excel_benchmark_result.png
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{E2985BB1-AA39-4560-9764-F8915379FF75}"
 EndProject

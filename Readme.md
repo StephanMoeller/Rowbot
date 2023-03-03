@@ -14,6 +14,9 @@ A fast non-garbage-allocating helper, that will take any source combined with an
        .ToExcel(filepath: "c:\\temp\\rowbot.xlsx", sheetName: "Sheet1", writeHeaders: true)
        .Execute();
 ```
+
+![Excel write benchmark](benchmarks/excel_benchmark_result.png "Benchmark result")
+
 |                               Method |         Mean |      Error |     StdDev |
 |-------------------------------------:|-------------:|-----------:|-----------:|
 |      Rowbot_ObjectsToExcel_1k_Rows |     12.89 ms |   0.079 ms |   0.066 ms |
