@@ -14,7 +14,7 @@ on:
     - main
     
 jobs:
-  build:
+  run_tests:
 
     env:
       BUILD_CONFIG: 'Release'
@@ -25,31 +25,15 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v1.0.5
-
-    - name: Restore dependencies
-      run: nuget restore $SOLUTION
-      
-    # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
-
-#    - name: Build
-#      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG --no-restore
-    - name: Build
-      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=$RELEASE_VERSION --no-restore
-
-    # Execute all unit tests in the solution
+        
     - name: Execute unit tests
       run: dotnet test
       
-
   deploy_to_nuget:
     needs: [build]
     runs-on: ubuntu-latest
@@ -59,3 +43,6 @@ jobs:
 
     - name: Publish
       run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
+
+    - name: Build_with_version
+      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG -p:Version=$RELEASE_VERSION --no-restore
