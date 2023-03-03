@@ -6,7 +6,7 @@
     <IsPublishable>True</IsPublishable>
     <Title>Rowbot</Title>
     <Company>$(Authors)</Company>
-    <Authors>Stephan Møller</Authors>
+    <Authors>Stephan Moeller</Authors>
     <PackageProjectUrl>https://github.com/StephanMoeller/Rowbot</PackageProjectUrl>
   </PropertyGroup>
 
