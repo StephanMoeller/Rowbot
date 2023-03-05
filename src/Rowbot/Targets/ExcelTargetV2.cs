@@ -1,4 +1,5 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
+using Rowbot.Utils;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -25,6 +26,7 @@ namespace Rowbot.Targets
         private byte[][] _excelColumnNameBytes = null;
         private int _rowIndex = 0;
         private string _cache_minMaxColString;
+        private NumberToStringBytesSerializer _numberToStringBytesSerializer;
         /// <summary>
         /// 
         /// </summary>
@@ -40,7 +42,7 @@ namespace Rowbot.Targets
             {
                 throw new ArgumentException($"'{nameof(sheetName)}' cannot be null or empty.", nameof(sheetName));
             }
-            
+
             _zipOutputStream = new ZipOutputStream(baseOutputStream: outputStream, bufferSize: 8_000_000); // 8MB buffer choosen out of blue air
             _zipOutputStream.SetLevel(compressionLevel);
             _zipOutputStream.IsStreamOwner = !leaveOpen;
@@ -49,6 +51,7 @@ namespace Rowbot.Targets
             _writeHeaders = writeHeaders;
             _leaveOpen = leaveOpen;
             _utf8 = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+            _numberToStringBytesSerializer = new NumberToStringBytesSerializer(_utf8);
         }
 
         public void Dispose()
@@ -126,12 +129,11 @@ namespace Rowbot.Targets
             WriteSheetBytes((_rowStartBeginBytes = _rowStartBeginBytes ?? _utf8.GetBytes(@"<row r=""")));
 
             // <row r="123
-            WriteSheetBytes(_rowIndex.ToString());
+            WriteNumber(_rowIndex);
 
             // <row r="123" spans"1:123" x14ac:dyDescent="0.25">
             WriteSheetBytes((_rowStartEndBytes = _rowStartEndBytes ?? _utf8.GetBytes(@""" spans=""" + _cache_minMaxColString + @""" x14ac:dyDescent=""0.25"">")));
-            var rowIndexBytes = _utf8.GetBytes(_rowIndex.ToString());
-
+            
             for (var i = 0; i < values.Length; i++)
             {
                 // <c r="
@@ -141,7 +143,7 @@ namespace Rowbot.Targets
                 WriteSheetBytes(_excelColumnNameBytes[i]);
 
                 // <c r="AB123
-                WriteSheetBytes(rowIndexBytes);
+                WriteNumber(_rowIndex);
 
                 var value = values[i];
                 if (value == null)
@@ -177,7 +179,9 @@ namespace Rowbot.Targets
                             WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
                             break;
                         case int val:
-                            WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
+                            WriteSheetBytes(@"""><v>");
+                            WriteNumber(val);
+                            WriteSheetBytes("</v></c>");
                             break;
                         case uint val:
                             WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
@@ -336,6 +340,18 @@ namespace Rowbot.Targets
             }
             Array.Copy(sourceArray: bytes, sourceIndex: 0, destinationArray: _buffer, destinationIndex: _bufferIndex, length: bytes.Length);
             _bufferIndex += bytes.Length;
+        }
+
+        private void WriteNumber(int val)
+        {
+            // Grow buffer
+            if (_bufferIndex + 10 > _buffer.Length - 1)
+            {
+                int newSize = _buffer.Length * 2;
+                Array.Resize(ref _buffer, newSize);
+            }
+
+            _bufferIndex += _numberToStringBytesSerializer.SerializeToStringToBytes(val: val, buffer: _buffer, offset: _bufferIndex);
         }
 
         private void FlushSheetStreamIfNeeded()

@@ -14,24 +14,33 @@ namespace Benchmarks.Excel
         //[Benchmark]
         //public void ClosedXml_ObjectsToExcel_1k_Rows() => ClosedXml_ObjectseToExcel_Internal(rowCount: 1_000);
 
-        [Benchmark]
-        public void Rowbot_ObjectsToExcel_100k_Rows_LongStrings() => Rowbot_ObjectsToExcel_Internal<MyObjectLongStrings>(rowCount: 100_000);
-        [Benchmark]
-        public void RowbotV2_ObjectsToExcel_100k_Rows_LongStrings() => Rowbot_ObjectsToExcel_Internal_V2<MyObjectLongStrings>(rowCount: 100_000);
+        public const int runCount = 100_000;
+
+        //[Benchmark]
+        //public void Rowbot_ObjectsToExcel_100k_Rows_LongStrings() => Rowbot_ObjectsToExcel_Internal<MyObjectLongStrings>(rowCount: runCount);
+        //[Benchmark]
+        //public void RowbotV2_ObjectsToExcel_100k_Rows_LongStrings() => Rowbot_ObjectsToExcel_Internal_V2<MyObjectLongStrings>(rowCount: runCount);
+        //[Benchmark]
+        //public void Rowbot_ObjectsToExcel_100k_Rows_LongStrings_Again() => Rowbot_ObjectsToExcel_Internal<MyObjectLongStrings>(rowCount: runCount);
+
         //[Benchmark]
         //public void MiniExcel_ObjectsToExcel_100k_Rows_LongStrings() => MiniExcel_ObjectseToExcel_Internal<MyObjectLongStrings>(rowCount: 100_000);
 
-        [Benchmark]
-        public void Rowbot_ObjectsToExcel_100k_Rows_ShortStrings() => Rowbot_ObjectsToExcel_Internal<MyObjectShortStrings>(rowCount: 100_000);
-        [Benchmark]
-        public void RowbotV2_ObjectsToExcel_100k_Rows_ShortStrings() => Rowbot_ObjectsToExcel_Internal_V2<MyObjectShortStrings>(rowCount: 100_000);
+        //[Benchmark]
+        //public void Rowbot_ObjectsToExcel_100k_Rows_ShortStrings() => Rowbot_ObjectsToExcel_Internal<MyObjectShortStrings>(rowCount: runCount);
+        //[Benchmark]
+        //public void RowbotV2_ObjectsToExcel_100k_Rows_ShortStrings() => Rowbot_ObjectsToExcel_Internal_V2<MyObjectShortStrings>(rowCount: runCount);
+        //[Benchmark]
+        //public void Rowbot_ObjectsToExcel_100k_Rows_ShortStrings_Again() => Rowbot_ObjectsToExcel_Internal<MyObjectShortStrings>(rowCount: runCount);
         //[Benchmark]
         //public void MiniExcel_ObjectsToExcel_100k_Rows_ShortStrings() => MiniExcel_ObjectseToExcel_Internal<MyObjectShortStrings>(rowCount: 100_000);
 
         [Benchmark]
-        public void Rowbot_ObjectsToExcel_100k_Rows_Ints() => Rowbot_ObjectsToExcel_Internal<MyObjectInts>(rowCount: 100_000);
+        public void Rowbot_ObjectsToExcel_100k_Rows_Ints() => Rowbot_ObjectsToExcel_Internal<MyObjectInts>(rowCount: runCount);
         [Benchmark]
-        public void RowbotV2_ObjectsToExcel_100k_Rows_Ints() => Rowbot_ObjectsToExcel_Internal_V2<MyObjectInts>(rowCount: 100_000);
+        public void RowbotV2_ObjectsToExcel_100k_Rows_Ints() => Rowbot_ObjectsToExcel_Internal_V2<MyObjectInts>(rowCount: runCount);
+        [Benchmark]
+        public void RowbotV2_ObjectsToExcel_100k_Rows_Ints_Again() => Rowbot_ObjectsToExcel_Internal<MyObjectInts>(rowCount: runCount);
         //[Benchmark]
         //public void MiniExcel_ObjectsToExcel_100k_Rows_Ints() => MiniExcel_ObjectseToExcel_Internal<MyObjectInts>(rowCount: 100_000);
         //[Benchmark]
@@ -85,7 +94,8 @@ namespace Benchmarks.Excel
 
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<Program>();
+            new Program().Rowbot_ObjectsToExcel_Internal_V2<MyObjectInts>(rowCount: runCount);
+                var summary = BenchmarkRunner.Run<Program>();
             Console.ReadLine();
         }
     }
