@@ -22,7 +22,7 @@ namespace Rowbot.Targets
         private byte[] _buffer = new byte[1024];
         private int _bufferIndex = 0;
         private static readonly string _columnChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private string[] _excelColumnNames = null;
+        private byte[][] _excelColumnNameBytes = null;
         private int _rowIndex = 0;
         private string _cache_minMaxColString;
         /// <summary>
@@ -74,6 +74,7 @@ namespace Rowbot.Targets
             return sb.ToString();
         }
 
+
         public void Init(ColumnInfo[] columns)
         {
             _columns = columns;
@@ -82,11 +83,11 @@ namespace Rowbot.Targets
             _zipOutputStream.PutNextEntry(new ZipEntry("xl/worksheets/sheet1.xml"));
 
             WriteSheetStartToSheetStream();
-            _excelColumnNames = new string[columns.Length];
+            _excelColumnNameBytes = new byte[columns.Length][];
 
             for (int i = 0; i < columns.Length; i++)
             {
-                _excelColumnNames[i] = GetColumnName(oneBasedColumnIndex: i + 1);
+                _excelColumnNameBytes[i] = _utf8.GetBytes(GetColumnName(oneBasedColumnIndex: i + 1));
             };
 
             _rowIndex = 1;
@@ -113,36 +114,40 @@ namespace Rowbot.Targets
         }
 
         private CultureInfo _numberFormatter = new CultureInfo("en-US");
+
+        private byte[] _rowStartBeginBytes;
+        private byte[] _rowStartEndBytes;
+        private byte[] _rowEndBytes;
+        private byte[] _colStartBytes;
+
         public void WriteRow(object[] values)
         {
-            WriteSheetBytes(@"<row r=""", _rowIndex.ToString(), @""" spans=""", _cache_minMaxColString, @""" x14ac:dyDescent=""0.25"">");
+            // <row r="
+            WriteSheetBytes((_rowStartBeginBytes = _rowStartBeginBytes ?? _utf8.GetBytes(@"<row r=""")));
 
-            // Blank:
-            // null
+            // <row r="123
+            WriteSheetBytes(_rowIndex.ToString());
 
-            // Boolean:
-            // bool
-
-            // Number:
-            // SByte, Byte, Int16, UInt16, Int32, UInt32, Int64, UInt64
-            // Single, Double, Decimal
-
-            // Text
-            // String
-            // Fallback .ToString()
-
-            // DateTime
-            // DateTime, DateTimeOffset
-
-            // TimeSpan
-            // TimeSpan
+            // <row r="123" spans"1:123" x14ac:dyDescent="0.25">
+            WriteSheetBytes((_rowStartEndBytes = _rowStartEndBytes ?? _utf8.GetBytes(@""" spans=""" + _cache_minMaxColString + @""" x14ac:dyDescent=""0.25"">")));
+            var rowIndexBytes = _utf8.GetBytes(_rowIndex.ToString());
 
             for (var i = 0; i < values.Length; i++)
             {
+                // <c r="
+                WriteSheetBytes((_colStartBytes = _colStartBytes ?? _utf8.GetBytes(@"<c r=""")));
+
+                // <c r="AB
+                WriteSheetBytes(_excelColumnNameBytes[i]);
+
+                // <c r="AB123
+                WriteSheetBytes(rowIndexBytes);
+
                 var value = values[i];
                 if (value == null)
                 {
-                    WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""></c>");
+
+                    WriteSheetBytes(@"""></c>");
                 }
                 else
                 {
@@ -152,60 +157,60 @@ namespace Rowbot.Targets
                         case bool boolVal:
                             if (boolVal)
                             {
-                                WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @""" t=""b""><v>1</v></c>");
+                                WriteSheetBytes(@""" t=""b""><v>1</v></c>");
                             }
                             else
                             {
-                                WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @""" t=""b""><v>0</v></c>");
+                                WriteSheetBytes(@""" t=""b""><v>0</v></c>");
                             }
                             break;
                         case sbyte val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
                             break;
                         case byte val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
                             break;
                         case short val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
                             break;
                         case ushort val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
                             break;
                         case int val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
                             break;
                         case uint val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
                             break;
                         case long val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
                             break;
                         case ulong val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(), "</v></c>");
                             break;
                         case float val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(_numberFormatter), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(_numberFormatter), "</v></c>");
                             break;
                         case double val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(_numberFormatter), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(_numberFormatter), "</v></c>");
                             break;
                         case decimal val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @"""><v>", val.ToString(_numberFormatter), "</v></c>");
+                            WriteSheetBytes(@"""><v>", val.ToString(_numberFormatter), "</v></c>");
                             break;
                         case string str:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @""" t=""inlineStr""><is><t>", Escape(str), "</t></is></c>");
+                            WriteSheetBytes(@""" t=""inlineStr""><is><t>", Escape(str), "</t></is></c>");
                             break;
                         case DateTime val:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @""" t=""inlineStr""><is><t>", val.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"), "</t></is></c>");
+                            WriteSheetBytes(@""" t=""inlineStr""><is><t>", val.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"), "</t></is></c>");
                             break;
                         default:
-                            WriteSheetBytes(@"<c r=""", _excelColumnNames[i], _rowIndex.ToString(), @""" t=""inlineStr""><is><t>", Escape(value.ToString()), "</t></is></c>");
+                            WriteSheetBytes(@""" t=""inlineStr""><is><t>", Escape(value.ToString()), "</t></is></c>");
                             break;
                     }
                 };
             }
 
-            WriteSheetBytes("</row>");
+            WriteSheetBytes((_rowEndBytes = _rowEndBytes ?? _utf8.GetBytes("</row>")));
 
             _rowIndex++;
             if (_rowIndex % 1000 == 0)
@@ -321,6 +326,18 @@ namespace Rowbot.Targets
             }
         }
 
+        private void WriteSheetBytes(byte[] bytes)
+        {
+            // Grow buffer
+            if (_bufferIndex + bytes.Length > _buffer.Length - 1)
+            {
+                int newSize = Math.Max(_bufferIndex + bytes.Length, _buffer.Length * 2);
+                Array.Resize(ref _buffer, newSize);
+            }
+            Array.Copy(sourceArray: bytes, sourceIndex: 0, destinationArray: _buffer, destinationIndex: _bufferIndex, length: bytes.Length);
+            _bufferIndex += bytes.Length;
+        }
+
         private void FlushSheetStreamIfNeeded()
         {
             if (_bufferIndex > 8_000_000)
@@ -333,6 +350,7 @@ namespace Rowbot.Targets
         {
             _zipOutputStream.Write(_buffer, 0, _bufferIndex);
             _zipOutputStream.Flush();
+            // Hint: Next improvement? _zipOutputStream.BeginWrite(_buffer, 0, _bufferIndex)
             _bufferIndex = 0;
         }
     }
