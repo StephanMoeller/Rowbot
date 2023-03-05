@@ -57,6 +57,12 @@ namespace Rowbot.Execution
             return To(new ExcelTarget(outputStream: fs, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: false));
         }
 
+        public RowbotExecutor ToExcelV2(string filepath, string sheetName, bool writeHeaders)
+        {
+            var fs = File.Create(filepath);
+            return To(new ExcelTargetV2(outputStream: fs, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: false));
+        }
+
         public RowbotExecutor ToDataTable(DataTable tableToFill)
         {
             return To(new DataTableTarget(tableToFill));
