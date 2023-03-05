@@ -40,7 +40,7 @@ namespace Rowbot.Targets
             {
                 throw new ArgumentException($"'{nameof(sheetName)}' cannot be null or empty.", nameof(sheetName));
             }
-
+            
             _zipOutputStream = new ZipOutputStream(baseOutputStream: outputStream, bufferSize: 8_000_000); // 8MB buffer choosen out of blue air
             _zipOutputStream.SetLevel(compressionLevel);
             _zipOutputStream.IsStreamOwner = !leaveOpen;
@@ -350,6 +350,7 @@ namespace Rowbot.Targets
         {
             _zipOutputStream.Write(_buffer, 0, _bufferIndex);
             _zipOutputStream.Flush();
+            // Hint: Next improvement? _zipOutputStream.BeginWrite(_buffer, 0, _bufferIndex)
             _bufferIndex = 0;
         }
     }
