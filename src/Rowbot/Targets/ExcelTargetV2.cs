@@ -122,34 +122,25 @@ namespace Rowbot.Targets
 
         public void WriteRow(object[] values)
         {
+            // <row r="
             WriteSheetBytes((_rowStartBeginBytes = _rowStartBeginBytes ?? _utf8.GetBytes(@"<row r=""")));
+
+            // <row r="123
             WriteSheetBytes(_rowIndex.ToString());
+
+            // <row r="123" spans"1:123" x14ac:dyDescent="0.25">
             WriteSheetBytes((_rowStartEndBytes = _rowStartEndBytes ?? _utf8.GetBytes(@""" spans=""" + _cache_minMaxColString + @""" x14ac:dyDescent=""0.25"">")));
             var rowIndexBytes = _utf8.GetBytes(_rowIndex.ToString());
-            // Blank:
-            // null
-
-            // Boolean:
-            // bool
-
-            // Number:
-            // SByte, Byte, Int16, UInt16, Int32, UInt32, Int64, UInt64
-            // Single, Double, Decimal
-
-            // Text
-            // String
-            // Fallback .ToString()
-
-            // DateTime
-            // DateTime, DateTimeOffset
-
-            // TimeSpan
-            // TimeSpan
 
             for (var i = 0; i < values.Length; i++)
             {
+                // <c r="
                 WriteSheetBytes((_colStartBytes = _colStartBytes ?? _utf8.GetBytes(@"<c r=""")));
+
+                // <c r="AB
                 WriteSheetBytes(_excelColumnNameBytes[i]);
+
+                // <c r="AB123
                 WriteSheetBytes(rowIndexBytes);
 
                 var value = values[i];
