@@ -215,7 +215,7 @@ namespace Rowbot.Targets
 
         private static string Escape(string text)
         {
-            return text.Replace("<", "&lt;").Replace(">", "&gt;");
+            return text.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("'", "&apos;").Replace("\"", "&quot;");
         }
 
 
