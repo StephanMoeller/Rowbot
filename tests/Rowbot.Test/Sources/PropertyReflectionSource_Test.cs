@@ -17,15 +17,7 @@ namespace Rowbot.Test.Sources
                 return runTimeObject;
             }).ToArray();
 
-            var source = PropertyReflectionSource.Create(elements: dynamicObjects);
-            var columns = source.InitAndGetColumns().ToArray();
-
-            Assert.Equal(2, columns.Length);
-            Assert.Equal("Name", columns[0].Name);
-            Assert.Equal(typeof(string), columns[0].ValueType);
-
-            Assert.Equal("Value", columns[1].Name);
-            Assert.Equal(typeof(int), columns[1].ValueType);
+            Assert.Throws< ArgumentException>(() => PropertyReflectionSource.Create(elements: dynamicObjects));
         }
 
         [Fact]
