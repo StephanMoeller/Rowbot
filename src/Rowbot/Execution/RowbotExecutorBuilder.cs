@@ -30,6 +30,12 @@ namespace Rowbot.Execution
         {
             return SetSource(PropertyReflectionSource.Create(objects));
         }
+
+        public RowbotExecutorBuilder FromDynamic(IEnumerable<dynamic> objects)
+        {
+            return SetSource(new DynamicObjectSource(objects));
+        }
+
         public RowbotExecutorBuilder FromCsvByCsvHelper(Stream inputStream, CsvConfiguration csvConfiguration, bool readFirstLineAsHeaders)
         {
             return SetSource(new CsvHelperSource(stream: inputStream, configuration: csvConfiguration, readFirstLineAsHeaders: readFirstLineAsHeaders));
