@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using System.Dynamic;
 
 namespace Rowbot.Sources
 {
@@ -30,6 +31,10 @@ namespace Rowbot.Sources
 
         public static PropertyReflectionSource Create<T>(IEnumerable<T> elements)
         {
+            var t = typeof(T);
+            if (t == typeof(object)) // Good enough. This will cover the dynamic case but also if someone adds raw object elements which would make no sense anyway.
+                throw new ArgumentException("Dynamic objects not supported in " + nameof(PropertyReflectionSource) + ".");
+
             if (elements is null)
             {
                 throw new ArgumentNullException(nameof(elements));

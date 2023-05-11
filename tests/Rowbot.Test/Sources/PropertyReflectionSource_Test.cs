@@ -1,10 +1,33 @@
 ﻿using Rowbot.Sources;
 using System.Data;
+using System.Dynamic;
 
 namespace Rowbot.Test.Sources
 {
     public class PropertyReflectionSource_Test
     {
+        [Fact]
+        public void TestWithDynamicObjects()
+        {
+            var dynamicObjects = Enumerable.Range(1, 10).Select(x =>
+            {
+                dynamic runTimeObject = new ExpandoObject();
+                runTimeObject.Name = "OnTheFlyFooObject";
+                runTimeObject.Value = 123;
+                return runTimeObject;
+            }).ToArray();
+
+            var source = PropertyReflectionSource.Create(elements: dynamicObjects);
+            var columns = source.InitAndGetColumns().ToArray();
+
+            Assert.Equal(2, columns.Length);
+            Assert.Equal("Name", columns[0].Name);
+            Assert.Equal(typeof(string), columns[0].ValueType);
+
+            Assert.Equal("Value", columns[1].Name);
+            Assert.Equal(typeof(int), columns[1].ValueType);
+        }
+
         [Fact]
         public void GetColumnsAndRows_NoRows_Test()
         {
