@@ -55,7 +55,7 @@ namespace Rowbot.Test.Sources
         }
 
         [Fact]
-        public void GetColumnsAndRows_NoColumns_ExpectException_Test()
+        public void GetColumnsAndRows_NoColumns_Test()
         {
             var anonymouseObjects = Enumerable.Range(0, 3).Select(e => new { });
             var reader = PropertyReflectionSource.Create(elements: anonymouseObjects);
