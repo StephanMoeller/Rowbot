@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using CsvHelper.Configuration.Attributes;
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Rowbot.Targets;
 using System;
 using System.Collections.Generic;
@@ -73,6 +74,49 @@ namespace Rowbot.Test.Targets
                 target.Complete();
 
                 EnsureExcelContent(ms.ToArray(), expectedSheetName: "My sheet < > \" and Φ╚", expectedRowValues: new XLCellValue[0][]);
+            }
+        }
+
+        [Theory]
+        [InlineData("Me & My")]
+        [InlineData("Me and \"My\"")]
+        [InlineData("Me and 'My'")]
+        [InlineData("Me and < My")]
+        [InlineData("Me and > My")]
+        public void SpecialCharactersInCell_Test(string data)
+        {
+            using (var ms = new MemoryStream())
+            using (var target = new ExcelTarget(ms, sheetName: "My sheet < > \" and Φ╚", writeHeaders: false, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            {
+                target.Init(new ColumnInfo[] { new ColumnInfo(name: "MyColumn123", valueType: typeof(string)) });
+
+                target.WriteRow(new object[] { data });
+                target.WriteRow(new object[] { data });
+
+                target.Complete();
+
+                EnsureExcelContent(ms.ToArray(), expectedSheetName: "My sheet < > \" and Φ╚", expectedRowValues: new XLCellValue[][] { new XLCellValue[] { data }, new XLCellValue[] { data } });
+            }
+        }
+
+        [Theory]
+        [InlineData("Me & My")]
+        [InlineData("Me and \"My\"")]
+        [InlineData("Me and 'My'")]
+        [InlineData("Me and < My")]
+        [InlineData("Me and > My")]
+        public void SpecialCharactersInColumn_Test(string columnName)
+        {
+            using (var ms = new MemoryStream())
+            using (var target = new ExcelTarget(ms, sheetName: "My sheet < > \" and Φ╚", writeHeaders: true, leaveOpen: true)) // Leave open to be able to read from the stream after completion
+            {
+                target.Init(new ColumnInfo[] { new ColumnInfo(name: columnName, valueType: typeof(string)) });
+
+                target.WriteRow(new object[] { "Hello1" });
+                
+                target.Complete();
+
+                EnsureExcelContent(ms.ToArray(), expectedSheetName: "My sheet < > \" and Φ╚", expectedRowValues: new XLCellValue[][] { new XLCellValue[] { columnName }, new XLCellValue[] { "Hello1" } });
             }
         }
 
@@ -288,7 +332,15 @@ namespace Rowbot.Test.Targets
                                 Assert.Equal(expectedValue, value);
                             }
                         }
+
+                        // Ensure no more columns than expected
+                        var valueInNextCellToTheRight = workSheet.Cell(row: rowIndex + 1, column: expectedRowValues.Length + 1).Value;
+                        Assert.True(valueInNextCellToTheRight.IsBlank);
                     }
+
+                    // Ensure no more rows than expected
+                    var valueInNextRow = workSheet.Cell(row: expectedRowValues.Length + 1, column: 1).Value;
+                    Assert.True(valueInNextRow.IsBlank);
                 }
             }
         }
