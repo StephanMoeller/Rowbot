@@ -27,4 +27,10 @@
     <ProjectReference Include="..\..\src\Rowbot\Rowbot.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="_gitignore\test.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

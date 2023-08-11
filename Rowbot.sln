@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{710AAE57-9463-4A3D-9DAF-45FB678983E9}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
 		.github\workflows\dotnet-desktop.yml = .github\workflows\dotnet-desktop.yml
 		Readme.md = Readme.md
 	EndProjectSection
@@ -33,7 +35,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rowbot", "src\Rowbot\Rowbot
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rowbot.Test", "tests\Rowbot.Test\Rowbot.Test.csproj", "{5C5DFC50-86A8-48AA-BDC0-403029B06657}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks.Csv", "benchmarks\Benchmarks.Csv\Benchmarks.Csv.csproj", "{AC4328AB-E5BA-4109-A48B-4E4A70EE6EDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks.Csv", "benchmarks\Benchmarks.Csv\Benchmarks.Csv.csproj", "{AC4328AB-E5BA-4109-A48B-4E4A70EE6EDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
