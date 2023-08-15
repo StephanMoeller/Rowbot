@@ -27,8 +27,4 @@
     <ProjectReference Include="..\..\src\Rowbot\Rowbot.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="_gitignore\" />
-  </ItemGroup>
-
 </Project>
