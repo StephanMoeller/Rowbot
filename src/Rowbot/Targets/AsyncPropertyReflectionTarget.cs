@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Rowbot.Targets
 {
-    public class PropertyReflectionTarget<T> : IEnumerableRowTarget<T> where T : new()
+    public class AsyncPropertyReflectionTarget<T> : IAsyncEnumerableRowTarget<T> where T : new()
     {
         private PropertyInfo[] _propertiesByColumnIndex;
         private int[] _supportedIndexes;
         private bool[] _throwIfSourceValuesIsNullByIndex;
-        public PropertyReflectionTarget()
+        public AsyncPropertyReflectionTarget()
         {
             // Sanity check that there is anything to write on this object
             var allWritableProperties = typeof(T).GetProperties().Where(p => p.CanWrite).ToArray();
@@ -19,12 +19,13 @@ namespace Rowbot.Targets
                 throw new ArgumentException($"No writable properties found on type {typeof(T).FullName}");
         }
 
-        public void Complete()
+        public Task CompleteAsync()
         {
             // Nothing to complete in this source
+            return Task.CompletedTask;
         }
 
-        public void Init(ColumnInfo[] columns)
+        public Task InitAsync(ColumnInfo[] columns)
         {
             _propertiesByColumnIndex = new PropertyInfo[columns.Length];
             _throwIfSourceValuesIsNullByIndex = new bool[columns.Length];
@@ -42,6 +43,8 @@ namespace Rowbot.Targets
             }
 
             _supportedIndexes = supportedColumnIndexes.ToArray();
+
+            return Task.CompletedTask;
         }
 
         private PropertyInfo FindPropertyOrNull(ColumnInfo columnInfo, int columnIndex, PropertyInfo[] allProperties)
@@ -83,7 +86,7 @@ namespace Rowbot.Targets
             throw new TypeMismatchException($"Column with name {columnInfo.Name} at index {columnIndex} is of type {columnInfo.ValueType.FullName} but matching property on type {typeof(T).FullName} is of type {property.PropertyType.FullName}");
         }
 
-        public T WriteRow(object[] values)
+        public Task<T> WriteRowAsync(object[] values)
         {
             var element = new T();
             for (var i = 0; i < _supportedIndexes.Length; i++)
@@ -95,7 +98,8 @@ namespace Rowbot.Targets
                     throw new ArgumentNullException($"Property {property.Name} on type {typeof(T).FullName} cannot be set to NULL");
                 property.SetValue(element, value);
             }
-            return element;
+            
+            return Task.FromResult(element);
         }
     }
 }

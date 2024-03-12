@@ -1,14 +1,8 @@
 ﻿using Rowbot.Execution;
-using Rowbot.Targets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rowbot.Test.Execution
 {
-    public class SourceGuard_Test
+    public class SourceGuards_Test
     {
         [Fact]
         public void Call_InitAndGetColumns_EnsureArrayPassedThrough()
@@ -133,7 +127,8 @@ namespace Rowbot.Test.Execution
 
             var columns = guard.InitAndGetColumns();
 
-            Assert.NotEqual(columns.Length, arraySize);// Sanity testing that we don't test with the actual expected array size
+            Assert.NotEqual(columns.Length,
+                arraySize); // Sanity testing that we don't test with the actual expected array size
             Assert.True(source.ReadRow(new object[columns.Length]));
             Assert.Throws<InvalidOperationException>(() => guard.ReadRow(new object[arraySize]));
         }
@@ -161,61 +156,64 @@ namespace Rowbot.Test.Execution
 
             Assert.Equal(2, source.DisposeCallCount);
         }
-    }
 
-
-    public class UnitTestSource : IRowSource
-    {
-        public int OnCompleteCallCount = 0;
-        public int OnInitCallCount = 0;
-        public int OnReadRowCallCount = 0;
-        public ColumnInfo[] Columns = new ColumnInfo[] { new ColumnInfo("col1", typeof(string)), new ColumnInfo("col2", typeof(int)) };
-        private bool _nextReadReturnValue = true;
-        public void SetNextReadReturnValue(bool nextReadReturnValue)
+        private class UnitTestSource : IRowSource
         {
-            _nextReadReturnValue = nextReadReturnValue;
+            public int OnCompleteCallCount = 0;
+            public int OnInitCallCount = 0;
+            public int OnReadRowCallCount = 0;
+
+            public ColumnInfo[] Columns = new ColumnInfo[]
+                { new ColumnInfo("col1", typeof(string)), new ColumnInfo("col2", typeof(int)) };
+
+            private bool _nextReadReturnValue = true;
+
+            public void SetNextReadReturnValue(bool nextReadReturnValue)
+            {
+                _nextReadReturnValue = nextReadReturnValue;
+            }
+
+            public void Complete()
+            {
+                OnCompleteCallCount++;
+            }
+
+            public ColumnInfo[] InitAndGetColumns()
+            {
+                OnInitCallCount++;
+                return Columns;
+            }
+
+            public bool ReadRow(object[] values)
+            {
+                OnReadRowCallCount++;
+                return _nextReadReturnValue;
+            }
         }
 
-        public void Complete()
+        private sealed class UnitTestSourceWithDispose : IRowSource, IDisposable
         {
-            OnCompleteCallCount++;
-        }
+            public int DisposeCallCount { get; private set; } = 0;
 
-        public ColumnInfo[] InitAndGetColumns()
-        {
-            OnInitCallCount++;
-            return Columns;
-        }
+            public void Complete()
+            {
+                //
+            }
 
-        public bool ReadRow(object[] values)
-        {
-            OnReadRowCallCount++;
-            return _nextReadReturnValue;
-        }
-    }
+            public ColumnInfo[] InitAndGetColumns()
+            {
+                return new ColumnInfo[0];
+            }
 
-    public sealed class UnitTestSourceWithDispose : IRowSource, IDisposable
-    {
-        public int DisposeCallCount { get; private set; } = 0;
+            public bool ReadRow(object[] values)
+            {
+                return true;
+            }
 
-        public void Complete()
-        {
-            //
-        }
-
-        public ColumnInfo[] InitAndGetColumns()
-        {
-            return new ColumnInfo[0];
-        }
-
-        public bool ReadRow(object[] values)
-        {
-            return true;
-        }
-
-        public void Dispose()
-        {
-            DisposeCallCount++;
+            public void Dispose()
+            {
+                DisposeCallCount++;
+            }
         }
     }
 }

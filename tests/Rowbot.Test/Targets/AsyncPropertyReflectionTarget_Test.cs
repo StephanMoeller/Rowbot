@@ -2,27 +2,27 @@
 
 namespace Rowbot.Test.Targets
 {
-    public class PropertyReflectionTarget_Test
+    public class AsyncPropertyReflectionTarget_Test
     {
         [Fact]
-        public void Constructor_NoSetablePropertiesOnGenericType_ExpectException_Test()
+        public void Constructor_NoSettablePropertiesOnGenericType_ExpectException_Test()
         {
-            Assert.Throws<ArgumentException>(() => new PropertyReflectionTarget<UnitTestDummy_NoSetters>());
+            Assert.Throws<ArgumentException>(() => new AsyncPropertyReflectionTarget<UnitTestDummy_NoSetters>());
         }
 
         [Fact]
-        public void NoMatchingPropertiesWithColumnNames_Test()
+        public async Task NoMatchingPropertiesWithColumnNames_Test()
         {
-            var target = new PropertyReflectionTarget<UnitTestDummy>();
+            var target = new AsyncPropertyReflectionTarget<UnitTestDummy>();
 
-            target.Init(new ColumnInfo[]
+            await target.InitAsync(new ColumnInfo[]
             {
                 new ColumnInfo(name: "A", typeof(string)),
                 new ColumnInfo(name: "B", typeof(int))
             });
 
             {
-                var e = target.WriteRow(new object[] { "Hello", 42 });
+                var e = await target.WriteRowAsync(new object[] { "Hello", 42 });
                 Assert.Null(e.String_GetOnly);
                 Assert.Null(e.Get_String_SetOnly_Value());
                 Assert.Null(e.String_GetAndSet);
@@ -32,7 +32,7 @@ namespace Rowbot.Test.Targets
             }
 
             {
-                var e = target.WriteRow(new object[] { "Hello again", 82 });
+                var e = await target.WriteRowAsync(new object[] { "Hello again", 82 });
                 Assert.Null(e.String_GetOnly);
                 Assert.Null(e.Get_String_SetOnly_Value());
                 Assert.Null(e.String_GetAndSet);
@@ -41,15 +41,15 @@ namespace Rowbot.Test.Targets
                 Assert.Null(e.NullableInt_GetAndSet);
             }
 
-            target.Complete();
+            await target.CompleteAsync();
         }
 
         [Fact]
-        public void WithMatchingProperties_Test()
+        public async Task WithMatchingProperties_Test()
         {
-            var target = new PropertyReflectionTarget<UnitTestDummy>();
+            var target = new AsyncPropertyReflectionTarget<UnitTestDummy>();
 
-            target.Init(new ColumnInfo[]
+            await target.InitAsync(new ColumnInfo[]
             {
                 new ColumnInfo(name: "string_SETONLY", typeof(string)),
                 new ColumnInfo(name: "and_this_one_does_not_match_anything", typeof(string)),
@@ -57,7 +57,7 @@ namespace Rowbot.Test.Targets
             });
 
             {
-                var e = target.WriteRow(new object[] { "Hello", "ignored", 42 });
+                var e = await target.WriteRowAsync(new object[] { "Hello", "ignored", 42 });
                 Assert.Null(e.String_GetOnly);
                 Assert.Equal("Hello", e.Get_String_SetOnly_Value());
                 Assert.Null(e.String_GetAndSet);
@@ -67,7 +67,7 @@ namespace Rowbot.Test.Targets
             }
 
             {
-                var e = target.WriteRow(new object[] { "Hello again", "ignored", 82 });
+                var e = await target.WriteRowAsync(new object[] { "Hello again", "ignored", 82 });
                 Assert.Null(e.String_GetOnly);
                 Assert.Equal("Hello again", e.Get_String_SetOnly_Value());
                 Assert.Null(e.String_GetAndSet);
@@ -76,22 +76,22 @@ namespace Rowbot.Test.Targets
                 Assert.Null(e.NullableInt_GetAndSet);
             }
 
-            target.Complete();
+            await target.CompleteAsync();
         }
 
         [Fact]
-        public void NullableIntOnProperty_NotNullableIntInSource_EnsureWorks_Test()
+        public async Task NullableIntOnProperty_NotNullableIntInSource_EnsureWorks_Test()
         {
-            var target = new PropertyReflectionTarget<UnitTestDummy>();
+            var target = new AsyncPropertyReflectionTarget<UnitTestDummy>();
 
-            target.Init(new ColumnInfo[]
+            await target.InitAsync(new ColumnInfo[]
             {
                 new ColumnInfo(name: "NullableInt_GetAndSet", typeof(int))
             });
 
-            var dummy = target.WriteRow(new object[] { 42 });
+            var dummy = await target.WriteRowAsync(new object[] { 42 });
 
-            target.Complete();
+            await target.CompleteAsync();
 
             Assert.Equal(42, dummy.NullableInt_GetAndSet);
         }
@@ -99,18 +99,18 @@ namespace Rowbot.Test.Targets
         [Theory]
         [InlineData(42)]
         [InlineData(null)]
-        public void NullableIntOnProperty_NullableIntInSource_EnsureWorks_Test(int? inputValue)
+        public async Task NullableIntOnProperty_NullableIntInSource_EnsureWorks_Test(int? inputValue)
         {
-            var target = new PropertyReflectionTarget<UnitTestDummy>();
+            var target = new AsyncPropertyReflectionTarget<UnitTestDummy>();
 
-            target.Init(new ColumnInfo[]
+            await target.InitAsync(new ColumnInfo[]
             {
                 new ColumnInfo(name: "NullableInt_GetAndSet", typeof(int?))
             });
 
-            var dummy = target.WriteRow(new object?[] { inputValue });
+            var dummy = await target.WriteRowAsync(new object?[] { inputValue });
 
-            target.Complete();
+            await target.CompleteAsync();
 
             Assert.Equal(inputValue, dummy.NullableInt_GetAndSet);
         }
@@ -118,37 +118,37 @@ namespace Rowbot.Test.Targets
         [Theory]
         [InlineData(42, true)]
         [InlineData(null, false)]
-        public void IntOnProperty_NullableIntInSource_EnsureValuesAreCopiedWhenNotNullInSource_Test(int? inputValue,
+        public async Task IntOnProperty_NullableIntInSource_EnsureValuesAreCopiedWhenNotNullInSource_Test(int? inputValue,
             bool expectSuccess)
         {
-            var target = new PropertyReflectionTarget<UnitTestDummy>();
+            var target = new AsyncPropertyReflectionTarget<UnitTestDummy>();
 
-            target.Init(new ColumnInfo[]
+            await target.InitAsync(new ColumnInfo[]
             {
                 new ColumnInfo(name: "Int_GetAndSet", typeof(int?))
             });
 
             if (expectSuccess)
             {
-                var dummy = target.WriteRow(new object?[] { inputValue });
+                var dummy = await target.WriteRowAsync(new object?[] { inputValue });
 
-                target.Complete();
+                await target.CompleteAsync();
 
                 Assert.Equal(inputValue, dummy.Int_GetAndSet);
             }
             else
             {
                 // Expect exception when setting to null
-                Assert.Throws<ArgumentNullException>(() => { target.WriteRow(new object?[] { inputValue }); });
+                _ = await Assert.ThrowsAsync<ArgumentNullException>(() => target.WriteRowAsync(new object?[] { inputValue }));
             }
         }
 
         [Fact]
-        public void TypeMismatch_Test()
+        public async Task TypeMismatch_Test()
         {
-            var target = new PropertyReflectionTarget<UnitTestDummy>();
-            Assert.Throws<TypeMismatchException>(() =>
-                target.Init(new ColumnInfo[] { new ColumnInfo(name: "string_SETONLY", typeof(int)) }));
+            var target = new AsyncPropertyReflectionTarget<UnitTestDummy>();
+            _ = await Assert.ThrowsAsync<TypeMismatchException>(() =>
+                target.InitAsync(new ColumnInfo[] { new ColumnInfo(name: "string_SETONLY", typeof(int)) }));
         }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
