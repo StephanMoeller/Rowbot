@@ -1,17 +1,18 @@
 ﻿using Rowbot.Execution;
+using Task = System.Threading.Tasks.Task;
 
 namespace Rowbot.Test.Execution
 {
-    public class RowbotExecutor_Test
+    public class RowbotAsyncExecutor_Test
     {
         [Fact]
-        public void Execute_Test()
+        public async Task ExecuteAsync_Test()
         {
             var source = new DisposableSource();
             var target = new DisposableTarget();
-            var executor = new RowbotExecutor(source: source, target: target);
+            var executor = new RowbotAsyncExecutor(source: source, target: target);
 
-            executor.Execute();
+            await executor.ExecuteAsync();
 
             Assert.True(source.Completed);
             Assert.True(target.Completed);
@@ -53,16 +54,17 @@ namespace Rowbot.Test.Execution
             }
         }
 
-        private sealed class DisposableTarget : IRowTarget, IDisposable
+        private sealed class DisposableTarget : IAsyncRowTarget, IDisposable
         {
             public bool Completed { get; private set; } = false;
             public bool Disposed { get; private set; } = false;
             public List<object> CallValues { get; set; } = new List<object>();
 
-            public void Complete()
+            public Task CompleteAsync()
             {
                 EnsureNotCompletedOrDisposed();
                 Completed = true;
+                return Task.CompletedTask;
             }
 
             private void EnsureNotCompletedOrDisposed()
@@ -76,18 +78,20 @@ namespace Rowbot.Test.Execution
                 Disposed = true;
             }
 
-            public void Init(ColumnInfo[] columns)
+            public Task InitAsync(ColumnInfo[] columns)
             {
                 CallValues.Add(columns.ToArray());
+                return Task.CompletedTask;
             }
 
-            public void WriteRow(object[] values)
+            public Task WriteRowAsync(object[] values)
             {
                 CallValues.Add(values.ToArray());
+                return Task.CompletedTask;
             }
         }
 
-        private sealed class DisposableSource : IRowSource, IDisposable
+        private sealed class DisposableSource : IAsyncRowSource, IDisposable
         {
             public bool Completed { get; private set; } = false;
             public bool Disposed { get; private set; } = false;
@@ -96,10 +100,11 @@ namespace Rowbot.Test.Execution
             {
             }
 
-            public void Complete()
+            public Task CompleteAsync()
             {
                 EnsureNotCompletedOrDisposed();
                 Completed = true;
+                return Task.CompletedTask;
             }
 
             private void EnsureNotCompletedOrDisposed()
@@ -113,29 +118,28 @@ namespace Rowbot.Test.Execution
                 Disposed = true;
             }
 
-            public ColumnInfo[] InitAndGetColumns()
+            public Task<ColumnInfo[]> InitAndGetColumnsAsync()
             {
                 EnsureNotCompletedOrDisposed();
-                return new ColumnInfo[]
+                return Task.FromResult(new ColumnInfo[]
                 {
                     new ColumnInfo(name: "ColA", valueType: typeof(string)),
                     new ColumnInfo(name: "ColB", valueType: typeof(int))
-                };
+                });
             }
 
             private int _rowCounter = 0;
-
-            public bool ReadRow(object[] values)
+            public Task<bool> ReadRowAsync(object[] values)
             {
                 EnsureNotCompletedOrDisposed();
                 _rowCounter++;
                 if (_rowCounter > 3)
-                    return false;
+                    return Task.FromResult(false);
 
                 Assert.Equal(2, values.Length);
                 values[0] = "Hello" + _rowCounter;
                 values[1] = _rowCounter;
-                return true;
+                return Task.FromResult(true);
             }
         }
     }

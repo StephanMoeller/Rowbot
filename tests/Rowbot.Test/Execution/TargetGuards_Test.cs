@@ -1,35 +1,29 @@
 ﻿using Rowbot.Execution;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Rowbot.Test.Execution.TargetGuards_Test;
 
 namespace Rowbot.Test.Execution
 {
-    public class EnumerableTargetGuards_Test
+    public class TargetGuards_Test
     {
         [Fact]
         public void CallingWriteRowAfterCompleted_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new EnumerableTargetGuards<int>(target);
+            var guard = new TargetGuards(target);
 
-            guard.Init(new ColumnInfo[]{
+            guard.Init(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
             });
 
-            var result1 = guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            var result2 = guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
 
-            Assert.Equal(1001, result1);
-            Assert.Equal(1002, result2);
             guard.Complete();
 
-            Assert.Throws<InvalidOperationException>(() => guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 }));
+            Assert.Throws<InvalidOperationException>(() =>
+                guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 }));
 
             Assert.Equal(2, target.OnWriteRowCallCount);
         }
@@ -38,9 +32,9 @@ namespace Rowbot.Test.Execution
         public void CallingWriteRow_NullValues_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new EnumerableTargetGuards<int>(target);
-
-            guard.Init(new ColumnInfo[]{
+            var guard = new TargetGuards(target);
+            guard.Init(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
@@ -66,9 +60,10 @@ namespace Rowbot.Test.Execution
         public void Call_WriteRowBeforeCallingInit_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new EnumerableTargetGuards<int>(target);
+            var guard = new TargetGuards(target);
 
-            Assert.Throws<InvalidOperationException>(() => guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 }));
+            Assert.Throws<InvalidOperationException>(() =>
+                guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 }));
             Assert.Equal(0, target.OnWriteRowCallCount);
         }
 
@@ -76,15 +71,17 @@ namespace Rowbot.Test.Execution
         public void Call_InitTwice_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new EnumerableTargetGuards<int>(target);
+            var guard = new TargetGuards(target);
 
-            guard.Init(new ColumnInfo[]{
+            guard.Init(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
             });
 
-            Assert.Throws<InvalidOperationException>(() => guard.Init(new ColumnInfo[]{
+            Assert.Throws<InvalidOperationException>(() => guard.Init(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
@@ -97,13 +94,14 @@ namespace Rowbot.Test.Execution
         public void Call_Init_WithNull_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new EnumerableTargetGuards<int>(target);
+            var guard = new TargetGuards(target);
 
             Assert.Throws<ArgumentNullException>(() => guard.Init(null));
             Assert.Equal(0, target.OnInitCallCount);
 
             // Ensure possible to call init once afterwards
-            guard.Init(new ColumnInfo[]{
+            guard.Init(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
@@ -115,7 +113,7 @@ namespace Rowbot.Test.Execution
         public void Call_CompleteBeforeInit_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new EnumerableTargetGuards<int>(target);
+            var guard = new TargetGuards(target);
 
             Assert.Throws<InvalidOperationException>(() => guard.Complete());
 
@@ -126,9 +124,10 @@ namespace Rowbot.Test.Execution
         public void Call_CompleteTwice_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new EnumerableTargetGuards<int>(target);
+            var guard = new TargetGuards(target);
 
-            guard.Init(new ColumnInfo[]{
+            guard.Init(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
@@ -145,7 +144,7 @@ namespace Rowbot.Test.Execution
         public void Dispose_EnsureCallingDisposeIfTargetImplementsIDisposable()
         {
             var target = new UnitTestTargetWithDispose();
-            var guard = new EnumerableTargetGuards<int>(target);
+            var guard = new TargetGuards(target);
 
             guard.Init(new ColumnInfo[0]);
             guard.WriteRow(new object[0]);
@@ -164,16 +163,12 @@ namespace Rowbot.Test.Execution
             Assert.Equal(2, target.DisposeCallCount);
         }
 
-        public sealed class UnitTestTarget : IEnumerableRowTarget<int>
+        private sealed class UnitTestTarget : IRowTarget
         {
             public int OnCompleteCallCount = 0;
             public int OnInitCallCount = 0;
             public int OnWriteRowCallCount = 0;
-            public int DispoeCallCount = 0;
-            public void Dispose()
-            {
-                DispoeCallCount++;
-            }
+            public int DisposeCallCount = 0;
 
             public void Complete()
             {
@@ -185,18 +180,16 @@ namespace Rowbot.Test.Execution
                 OnInitCallCount++;
             }
 
-            private int _writeCounter = 1000;
-            public int WriteRow(object[] values)
+            public void WriteRow(object[] values)
             {
                 OnWriteRowCallCount++;
-                _writeCounter++;
-                return _writeCounter;
             }
         }
 
-        public sealed class UnitTestTargetWithDispose : IEnumerableRowTarget<int>, IDisposable
+        private sealed class UnitTestTargetWithDispose : IRowTarget, IDisposable
         {
             public int DisposeCallCount { get; private set; } = 0;
+
             public void Dispose()
             {
                 DisposeCallCount++;
@@ -212,9 +205,9 @@ namespace Rowbot.Test.Execution
                 //
             }
 
-            public int WriteRow(object[] values)
+            public void WriteRow(object[] values)
             {
-                return 42;
+                //
             }
         }
     }

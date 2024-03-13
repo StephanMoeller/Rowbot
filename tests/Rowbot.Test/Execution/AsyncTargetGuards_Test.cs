@@ -1,86 +1,87 @@
 ﻿using Rowbot.Execution;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rowbot.Test.Execution
 {
-    public class TargetGuard_Test
+    public class AsyncTargetGuards_Test
     {
         [Fact]
-        public void CallingWriteRowAfterCompleted_ExpectException_Test()
+        public async Task CallingWriteRowAfterCompleted_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new TargetGuards(target);
+            var guard = new AsyncTargetGuards(target);
 
-            guard.Init(new ColumnInfo[]{
+            await guard.InitAsync(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
             });
 
-            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            await guard.WriteRowAsync(new object[] { "Hello there æå 1", -12.45m, 42 });
+            await guard.WriteRowAsync(new object[] { "Hello there æå 1", -12.45m, 42 });
 
-            guard.Complete();
+            await guard.CompleteAsync();
 
-            Assert.Throws<InvalidOperationException>(() => guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 }));
+            _ = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                guard.WriteRowAsync(new object[] { "Hello there æå 1", -12.45m, 42 }));
 
             Assert.Equal(2, target.OnWriteRowCallCount);
         }
 
         [Fact]
-        public void CallingWriteRow_NullValues_ExpectException_Test()
+        public async Task CallingWriteRow_NullValues_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new TargetGuards(target);
-            guard.Init(new ColumnInfo[]{
+            var guard = new AsyncTargetGuards(target);
+            await guard.InitAsync(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
             });
 
-            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            await guard.WriteRowAsync(new object[] { "Hello there æå 1", -12.45m, 42 });
+            await guard.WriteRowAsync(new object[] { "Hello there æå 1", -12.45m, 42 });
+            await guard.WriteRowAsync(new object[] { "Hello there æå 1", -12.45m, 42 });
+            await guard.WriteRowAsync(new object[] { "Hello there æå 1", -12.45m, 42 });
             Assert.Equal(4, target.OnWriteRowCallCount);
 
-            Assert.Throws<ArgumentNullException>(() => guard.WriteRow(null));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => guard.WriteRowAsync(null));
             Assert.Equal(4, target.OnWriteRowCallCount);
 
             // Ensure possible to call with non-values afterwards
-            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
-            guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 });
+            await guard.WriteRowAsync(new object[] { "Hello there æå 1", -12.45m, 42 });
+            await guard.WriteRowAsync(new object[] { "Hello there æå 1", -12.45m, 42 });
 
             Assert.Equal(6, target.OnWriteRowCallCount);
         }
 
         [Fact]
-        public void Call_WriteRowBeforeCallingInit_ExpectException_Test()
+        public async Task Call_WriteRowBeforeCallingInit_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new TargetGuards(target);
+            var guard = new AsyncTargetGuards(target);
 
-            Assert.Throws<InvalidOperationException>(() => guard.WriteRow(new object[] { "Hello there æå 1", -12.45m, 42 }));
+            _ = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                guard.WriteRowAsync(new object[] { "Hello there æå 1", -12.45m, 42 }));
             Assert.Equal(0, target.OnWriteRowCallCount);
         }
 
         [Fact]
-        public void Call_InitTwice_ExpectException_Test()
+        public async Task Call_InitTwice_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new TargetGuards(target);
+            var guard = new AsyncTargetGuards(target);
 
-            guard.Init(new ColumnInfo[]{
+            await guard.InitAsync(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
             });
 
-            Assert.Throws<InvalidOperationException>(() => guard.Init(new ColumnInfo[]{
+            _ = await Assert.ThrowsAsync<InvalidOperationException>(() => guard.InitAsync(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
@@ -90,16 +91,17 @@ namespace Rowbot.Test.Execution
         }
 
         [Fact]
-        public void Call_Init_WithNull_ExpectException_Test()
+        public async Task Call_Init_WithNull_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new TargetGuards(target);
+            var guard = new AsyncTargetGuards(target);
 
-            Assert.Throws<ArgumentNullException>(() => guard.Init(null));
+            _ = await Assert.ThrowsAsync<ArgumentNullException>(() => guard.InitAsync(null));
             Assert.Equal(0, target.OnInitCallCount);
 
             // Ensure possible to call init once afterwards
-            guard.Init(new ColumnInfo[]{
+            await guard.InitAsync(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
@@ -108,44 +110,45 @@ namespace Rowbot.Test.Execution
         }
 
         [Fact]
-        public void Call_CompleteBeforeInit_ExpectException_Test()
+        public async Task Call_CompleteBeforeInit_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new TargetGuards(target);
+            var guard = new AsyncTargetGuards(target);
 
-            Assert.Throws<InvalidOperationException>(() => guard.Complete());
+            _ = await Assert.ThrowsAsync<InvalidOperationException>(() => guard.CompleteAsync());
 
             Assert.Equal(0, target.OnCompleteCallCount);
         }
 
         [Fact]
-        public void Call_CompleteTwice_ExpectException_Test()
+        public async Task Call_CompleteTwice_ExpectException_Test()
         {
             var target = new UnitTestTarget();
-            var guard = new TargetGuards(target);
+            var guard = new AsyncTargetGuards(target);
 
-            guard.Init(new ColumnInfo[]{
+            await guard.InitAsync(new ColumnInfo[]
+            {
                 new ColumnInfo(name: "Col1", valueType: typeof(string)),
                 new ColumnInfo(name: "Col2", valueType: typeof(decimal)),
                 new ColumnInfo(name: "Col æøå 3", valueType: typeof(int)),
             });
 
-            guard.Complete();
+            await guard.CompleteAsync();
 
-            Assert.Throws<InvalidOperationException>(() => guard.Complete());
+            _ = await Assert.ThrowsAsync<InvalidOperationException>(() => guard.CompleteAsync());
 
             Assert.Equal(1, target.OnCompleteCallCount);
         }
 
         [Fact]
-        public void Dispose_EnsureCallingDisposeIfTargetImplementsIDisposable()
+        public async Task Dispose_EnsureCallingDisposeIfTargetImplementsIDisposable()
         {
             var target = new UnitTestTargetWithDispose();
-            var guard = new TargetGuards(target);
+            var guard = new AsyncTargetGuards(target);
 
-            guard.Init(new ColumnInfo[0]);
-            guard.WriteRow(new object[0]);
-            guard.Complete();
+            await guard.InitAsync(new ColumnInfo[0]);
+            await guard.WriteRowAsync(new object[0]);
+            await guard.CompleteAsync();
 
             Assert.Equal(0, target.DisposeCallCount);
 
@@ -160,52 +163,55 @@ namespace Rowbot.Test.Execution
             Assert.Equal(2, target.DisposeCallCount);
         }
 
-        public sealed class UnitTestTarget : IRowTarget
+        private sealed class UnitTestTarget : IAsyncRowTarget
         {
             public int OnCompleteCallCount = 0;
             public int OnInitCallCount = 0;
             public int OnWriteRowCallCount = 0;
             public int DisposeCallCount = 0;
 
-            public void Complete()
+            public Task CompleteAsync()
             {
                 OnCompleteCallCount++;
+                return Task.CompletedTask;
             }
 
-            public void Init(ColumnInfo[] columns)
+            public Task InitAsync(ColumnInfo[] columns)
             {
                 OnInitCallCount++;
+                return Task.CompletedTask;
             }
 
-            public void WriteRow(object[] values)
+            public Task WriteRowAsync(object[] values)
             {
                 OnWriteRowCallCount++;
+                return Task.CompletedTask;
             }
         }
 
-        public sealed class UnitTestTargetWithDispose : IRowTarget, IDisposable
+        private sealed class UnitTestTargetWithDispose : IAsyncRowTarget, IDisposable
         {
             public int DisposeCallCount { get; private set; } = 0;
+
             public void Dispose()
             {
                 DisposeCallCount++;
             }
 
-            public void Complete()
+            public Task CompleteAsync()
             {
-                //
+                return Task.CompletedTask;
             }
 
-            public void Init(ColumnInfo[] columns)
+            public Task InitAsync(ColumnInfo[] columns)
             {
-                //
+                return Task.CompletedTask;
             }
 
-            public void WriteRow(object[] values)
+            public Task WriteRowAsync(object[] values)
             {
-                //
+                return Task.CompletedTask;
             }
         }
     }
-
 }

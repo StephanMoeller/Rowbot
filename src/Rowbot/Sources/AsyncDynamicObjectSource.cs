@@ -1,33 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Rowbot.Sources
 {
-    public class DynamicObjectSource : IRowSource, IDisposable
+    public class AsyncDynamicObjectSource : IAsyncRowSource, IDisposable
     {
-        private readonly IEnumerator<dynamic> _enumerator;
+        private readonly IAsyncEnumerator<dynamic> _enumerator;
         private string[] _keys;
         private bool _hasCurrentItem = true;
-        public DynamicObjectSource(IEnumerable<dynamic> objects)
+        public AsyncDynamicObjectSource(IAsyncEnumerable<dynamic> objects)
         {
             if (objects is null)
             {
                 throw new ArgumentNullException(nameof(objects));
             }
 
-            this._enumerator = objects.GetEnumerator();
+            this._enumerator = objects.GetAsyncEnumerator();
         }
 
-        public ColumnInfo[] InitAndGetColumns()
+        public async Task<ColumnInfo[]> InitAndGetColumnsAsync()
         {
-            _hasCurrentItem = _enumerator.MoveNext();
+            _hasCurrentItem = await _enumerator.MoveNextAsync();
             if (!_hasCurrentItem)
             {
                 // There are no rows at all - return an empty column list as there are no dynamic objects available to reveal the properties
-                _keys = new string[0];
-                return new ColumnInfo[0];
+                _keys = Array.Empty<string>();
+                return Array.Empty<ColumnInfo>();
             }
 
             var current = (IDictionary<string, object>)_enumerator.Current;
@@ -35,7 +35,7 @@ namespace Rowbot.Sources
             return _keys.Select(k => new ColumnInfo(name: k, valueType: typeof(object))).ToArray();
         }
 
-        public bool ReadRow(object[] values)
+        public async Task<bool> ReadRowAsync(object[] values)
         {
             if (!_hasCurrentItem)
                 return false;
@@ -49,7 +49,7 @@ namespace Rowbot.Sources
                 values[i] = current[_keys[i]];
             }
 
-            _hasCurrentItem = _enumerator.MoveNext();
+            _hasCurrentItem = await _enumerator.MoveNextAsync();
             return true;
         }
 
@@ -69,9 +69,10 @@ namespace Rowbot.Sources
             }
         }
 
-        public void Complete()
+        public Task CompleteAsync()
         {
             // Nothing to complete
+            return Task.CompletedTask;
         }
 
         public void Dispose()

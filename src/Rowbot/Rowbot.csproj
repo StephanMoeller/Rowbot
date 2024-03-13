@@ -9,6 +9,7 @@
     <Authors>Stephan Moeller</Authors>
     <PackageProjectUrl>https://github.com/StephanMoeller/Rowbot</PackageProjectUrl>
     <Description>Fastest possible excel-writer with extremely low memory consumption.</Description>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
