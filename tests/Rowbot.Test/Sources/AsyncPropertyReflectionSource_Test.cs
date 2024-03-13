@@ -16,7 +16,7 @@ namespace Rowbot.Test.Sources
                 return runTimeObject;
             });
 
-            Assert.Throws<ArgumentException>(() => AsyncPropertyReflectionSource<dynamic>.Create(elements: dynamicObjects));
+            Assert.Throws<ArgumentException>(() => AsyncPropertyReflectionSource.Create(elements: dynamicObjects));
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace Rowbot.Test.Sources
                 æøÅÆØÅSpecial = new DateTime(2000 + e, 02, 03, 14, 05, 06)
             });
 
-            var source = AsyncPropertyReflectionSource<dynamic>.Create(elements: anonymousObjects);
+            var source = AsyncPropertyReflectionSource.Create(elements: anonymousObjects);
 
             var columns = await source.InitAndGetColumnsAsync();
             Assert.Equal("myInt", columns[0].Name);

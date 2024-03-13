@@ -6,12 +6,39 @@ using System.Threading.Tasks;
 
 namespace Rowbot.Sources
 {
+    public class AsyncPropertyReflectionSource
+    {
+        public static AsyncPropertyReflectionSource<T> Create<T>(IAsyncEnumerable<T> elements)
+        {
+            var t = typeof(T);
+            if (t == typeof(object)) // Good enough. This will cover the dynamic case but also if someone adds raw object elements which would make no sense anyway.
+                throw new ArgumentException("Dynamic objects not supported in " + nameof(PropertyReflectionSource) + ".");
+
+            if (elements is null)
+            {
+                throw new ArgumentNullException(nameof(elements));
+            }
+
+            return new AsyncPropertyReflectionSource<T>(elements.GetAsyncEnumerator(), typeof(T));
+        }
+
+        public static AsyncPropertyReflectionSource<T> Create<T>(IAsyncEnumerator<T> elements)
+        {
+            if (elements is null)
+            {
+                throw new ArgumentNullException(nameof(elements));
+            }
+
+            return new AsyncPropertyReflectionSource<T>(elements, typeof(T));
+        }
+    }
+    
     public class AsyncPropertyReflectionSource<T> : IAsyncRowSource
     {
         private readonly IAsyncEnumerator<T> _elements;
         private readonly PropertyInfo[] _properties;
         private readonly ColumnInfo[] _columns;
-        private AsyncPropertyReflectionSource(IAsyncEnumerator<T> elements, Type elementType)
+        internal AsyncPropertyReflectionSource(IAsyncEnumerator<T> elements, Type elementType)
         {
             if (elements is null)
             {
