@@ -13,7 +13,7 @@ namespace Rowbot.Test.IntegrationTests
         [Fact]
         public void Execute_AnonymousObjectsToDataTable_Test()
         {
-            var objects = Enumerable.Range(0, 3).Select(num => new { MyNum = num, MyName = $"My name is {num}" });
+            var objects = Enumerable.Range(0, 3).Select(num => new {MyNum = num, MyName = $"My name is {num}"});
             var table = new DataTable();
             new RowbotExecutorBuilder()
                 .FromObjects(objects)
@@ -39,6 +39,37 @@ namespace Rowbot.Test.IntegrationTests
 
             Assert.Equal(2, table.Rows[2]["MyNum"]);
             Assert.Equal("My name is 2", table.Rows[2]["MyName"]);
+        }
+
+        [Fact]
+        public void ExecuteAndIterate_AnonymousObjectsToDataTable_Test()
+        {
+            var objects = Enumerable.Range(0, 3).Select(num => new {MyNum = num * 10, MyName = $"My name is {num}"});
+            var itemsList = new List<UnitTestDto>();
+
+            new RowbotExecutorBuilder()
+                .FromObjects(objects)
+                .ToObjects<UnitTestDto>()
+                .Execute(items => { itemsList.AddRange(items); });
+
+            // Assert columns
+            Assert.Equal(3, itemsList.Count);
+
+            // Assert rows
+            Assert.Equal(0, itemsList[0].MyNum);
+            Assert.Equal("My name is 0", itemsList[0].MyName);
+
+            Assert.Equal(10, itemsList[1].MyNum);
+            Assert.Equal("My name is 1", itemsList[1].MyName);
+
+            Assert.Equal(20, itemsList[2].MyNum);
+            Assert.Equal("My name is 2", itemsList[2].MyName);
+        }
+
+        public class UnitTestDto
+        {
+            public int MyNum { get; set; }
+            public string MyName { get; set; }
         }
     }
 }

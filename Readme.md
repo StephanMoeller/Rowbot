@@ -27,7 +27,7 @@ new RowbotExecutorBuilder()
 
 // Async version
 await new RowbotAsyncExecutorBuilder()
-     .FromObjects(myObjects)
+     .FromObjects(myObjectsAsAsyncEnumerable)
      .ToExcel(filepath: "c:\\temp\\result.xlsx", sheetName: "Sheet1", writeHeaders: true)
      .ExecuteAsync();
 ```
@@ -47,7 +47,7 @@ new RowbotExecutorBuilder()
     
  // Async version
 await new RowbotAsyncExecutorBuilder()
-    .FromObjects(myObjects)
+    .FromObjects(myObjectsAsAsyncEnumerable)
     .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
     .ExecuteAsync();
 ```
@@ -62,7 +62,7 @@ new RowbotExecutorBuilder()
             
 // Async version
 await new RowbotAsyncExecutorBuilder()
-    .FromObjects(myObjects)
+    .FromObjects(myObjectsAsAsyncEnumerable)
     .ToExcel(filepath: "c:\\temp\\output.xlsx", sheetName: "MySheet", writeHeaders: true)
     .ExecuteAsync();
 ```
@@ -77,7 +77,7 @@ new RowbotExecutorBuilder()
             
 // Async version
 await new RowbotAsyncExecutorBuilder()
-    .FromDataTable(myDataTable)
+    .FromDataTable(myObjectsAsAsyncEnumerable)
     .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
     .ExecuteAsync();
 ```
