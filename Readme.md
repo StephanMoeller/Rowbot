@@ -19,10 +19,17 @@ dotnet add package Rowbot
 # Examples
 ### Example: Objects => Excel
 ``` csharp
+// Sync version
 new RowbotExecutorBuilder()
     .FromObjects(myObjects)
     .ToExcel(filepath: "c:\\temp\\result.xlsx", sheetName: "Sheet1", writeHeaders: true)
     .Execute();
+
+// Async version
+await new RowbotAsyncExecutorBuilder()
+     .FromObjects(myObjects)
+     .ToExcel(filepath: "c:\\temp\\result.xlsx", sheetName: "Sheet1", writeHeaders: true)
+     .ExecuteAsync();
 ```
 
 ### Benchmarks
@@ -32,30 +39,52 @@ new RowbotExecutorBuilder()
 
 ### Example: Objects => Csv (Memory space complexity: O(1))
 ``` csharp
+// Sync version
 new RowbotExecutorBuilder()
     .FromObjects(myObjects)
     .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
     .Execute();
+    
+ // Async version
+await new RowbotAsyncExecutorBuilder()
+    .FromObjects(myObjects)
+    .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
+    .ExecuteAsync();
 ```
 
 ### Example: DataTable => Excel (Space complexity: O(1))
 ``` csharp
+// Sync version
 new RowbotExecutorBuilder()
     .FromObjects(myObjects)
     .ToExcel(filepath: "c:\\temp\\output.xlsx", sheetName: "MySheet", writeHeaders: true)
     .Execute();
+            
+// Async version
+await new RowbotAsyncExecutorBuilder()
+    .FromObjects(myObjects)
+    .ToExcel(filepath: "c:\\temp\\output.xlsx", sheetName: "MySheet", writeHeaders: true)
+    .ExecuteAsync();
 ```
 
 ### Example: DataTable => Csv (Space complexity: O(1))
 ``` csharp
+// Sync version
 new RowbotExecutorBuilder()
     .FromDataTable(myDataTable)
     .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
     .Execute();
+            
+// Async version
+await new RowbotAsyncExecutorBuilder()
+    .FromDataTable(myDataTable)
+    .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
+    .ExecuteAsync();
 ```
 
 ### Example: Database => Excel (Space complexity: O(1))
 ``` csharp
+// Sync version
 using Dapper;
 using (var conn = new SqlConnection(myConnectionString))
 {
@@ -67,10 +96,26 @@ using (var conn = new SqlConnection(myConnectionString))
         .ToExcel(filepath: "c:\\temp\\output.xlsx", sheetName: "MySheet", writeHeaders: true)
         .Execute();
 }
+
+// Async version
+using Dapper;
+using (var conn = new SqlConnection(myConnectionString))
+{
+    await conn.OpenAsync();
+    var dataReader = conn.ExecuteReader("SELECT * FROM Orders WHERE CustomerId = @customerId", new { customerId = 123 });
+            
+    await new RowbotAsyncExecutorBuilder()
+        .FromDataReader(dataReader)
+        .ToExcel(filepath: "c:\\temp\\output.xlsx", sheetName: "MySheet", writeHeaders: true)
+        .ExecuteAsync();
+}
+
 ```
 
 ### Example: Database => Csv (Space complexity: O(1))
 ``` csharp
+
+// Sync version
 using Dapper;
 using (var conn = new SqlConnection(myConnectionString))
 {
@@ -82,10 +127,25 @@ using (var conn = new SqlConnection(myConnectionString))
         .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
         .Execute();
 }
+            
+// Async version 
+using Dapper;
+using (var conn = new SqlConnection(myConnectionString))
+{
+    await conn.OpenAsync();
+    var dataReader = conn.ExecuteReader("SELECT * FROM Orders WHERE CustomerId = @customerId", new { customerId = 123 });
+
+    await new RowbotAsyncExecutorBuilder()
+        .FromDataReader(dataReader)
+        .ToCsvUsingCsvHelper(filepath: "c:\\temp\\output.csv", config: new CsvConfiguration(CultureInfo.InvariantCulture), writeHeaders: true)
+        .ExecuteAsync();
+}
+
 ```
 
 ### Example: DataTable => List of objects (Space complexity: O(1))
 ``` csharp
+// Sync version
 new RowbotExecutorBuilder()
     .FromDataTable(myDataTable)
     .ToObjects<Customer>()
@@ -98,6 +158,21 @@ new RowbotExecutorBuilder()
             // Do something with the customer here
         }
     });
+    
+
+// Async version
+await new RowbotAsyncExecutorBuilder()
+    .FromDataTable(myDataTable)
+    .ToObjects<Customer>()
+    .ExecuteAsync(async objects =>
+    {
+        // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
+        // It is NOT possible to iterate this more than once.
+        await foreach (var customer in objects)
+        {
+            // Do something with the customer here
+        }
+});
 ```
 
 ### Example: Csv => Excel (Space complexity: O(1))
@@ -106,6 +181,12 @@ new RowbotExecutorBuilder()
     .FromCsvByCsvHelper(inputStream: File.Open("path//to//file.csv", FileMode.Open), csvConfiguration: new CsvConfiguration(CultureInfo.InvariantCulture), readFirstLineAsHeaders: true)
     .ToExcel(filepath: "c:\\temp\\output.xlsx", sheetName: "MySheet", writeHeaders: true)
     .Execute();
+    
+// Async version
+await new RowbotAsyncExecutorBuilder()
+    .FromCsvByCsvHelper(inputStream: File.Open("path//to//file.csv", FileMode.Open), csvConfiguration: new CsvConfiguration(CultureInfo.InvariantCulture), readFirstLineAsHeaders: true)
+    .ToExcel(filepath: "c:\\temp\\output.xlsx", sheetName: "MySheet", writeHeaders: true)
+    .ExecuteAsync();
 ```
 
 
