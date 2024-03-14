@@ -99,14 +99,5 @@ namespace Rowbot.Execution
         {
             throw new NotImplementedException();
         }
-
-        public RowbotEnumerableExecutor<TObjectType> ToObjects<TObjectType>(Action<IEnumerable<TObjectType>> consumer) where TObjectType : new()
-        {
-            return new RowbotEnumerableExecutor<TObjectType>(
-                source: _rowSource,
-                target: new PropertyReflectionTarget<TObjectType>(),
-                consumer: consumer
-            );
-        }
     }
 }

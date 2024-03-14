@@ -129,35 +129,6 @@ namespace Examples.SimpleDemos
                     .ExecuteAsync();
             }
 
-            // DataTable => List of objects (Space complexity: O(1))
-            // Sync version
-            new RowbotExecutorBuilder()
-                .FromDataTable(myDataTable)
-                .ToObjects<Customer>(objects =>
-                {
-                    // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
-                    // It is NOT possible to iterate this more than once.
-                    foreach (var customer in objects)
-                    {
-                        // Do something with the customer here
-                    }
-                })
-                .Execute();
-
-            // Async version
-            await new RowbotAsyncExecutorBuilder()
-                .FromDataTable(myDataTable)
-                .ToObjects<Customer>(async objects =>
-                {
-                    // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
-                    // It is NOT possible to iterate this more than once.
-                    await foreach (var customer in objects)
-                    {
-                        // Do something with the customer here
-                    }
-                })
-                .ExecuteAsync();
-
             // Csv => Excel
             // Sync version
             new RowbotExecutorBuilder()

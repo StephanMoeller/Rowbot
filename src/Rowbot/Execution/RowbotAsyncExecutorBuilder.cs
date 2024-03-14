@@ -100,15 +100,6 @@ namespace Rowbot.Execution
             throw new NotImplementedException();
         }
 
-        public RowbotAsyncEnumerableExecutor<TObjectType> ToObjects<TObjectType>(Func<IAsyncEnumerable<TObjectType>, Task> consumer) where TObjectType : new()
-        {
-            return new RowbotAsyncEnumerableExecutor<TObjectType>(
-                source: _rowSource,
-                target: new AsyncPropertyReflectionTarget<TObjectType>(),
-                consumer: consumer
-            );
-        }
-
         private RowbotAsyncExecutor To(IAsyncRowTarget target)
         {
             return new RowbotAsyncExecutor(_rowSource, target);

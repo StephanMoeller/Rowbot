@@ -1,10 +1,10 @@
-
-
-
 # What is Rowbot?
-A fast non-garbage-allocating helper, that will take any source combined with any target and execute a transfer with a space complexity of O(1) meaning the use of memory will not rise when working with bigger amounts of data.
+
+A fast non-garbage-allocating helper, that will take any source combined with any target and execute a transfer with a
+space complexity of O(1) meaning the use of memory will not rise when working with bigger amounts of data.
 
 # Why use Rowbot?
+
 - Rowbot has the fastest dotnet Excel writer on the market
 - Extremely low memory consumption
 - Can output csv and excel directly to asp.net OutputStream (both Framework and new dotnet)
@@ -12,12 +12,15 @@ A fast non-garbage-allocating helper, that will take any source combined with an
 - All csv work is based on the proven CsvHelper.
 
 # Installation
+
 ```
 dotnet add package Rowbot
 ```
 
 # Examples
+
 ### Example: Objects => Excel
+
 ``` csharp
 // Sync version
 new RowbotExecutorBuilder()
@@ -33,11 +36,13 @@ await new RowbotAsyncExecutorBuilder()
 ```
 
 ### Benchmarks
+
 ![Excel write benchmark](benchmarks/excel_benchmark_result.png "Benchmark result")
 
 [Benchmark source code](https://github.com/StephanMoeller/Rowbot/blob/main/benchmarks/Benchmarks.Excel/Program.cs)
 
 ### Example: Objects => Csv (Memory space complexity: O(1))
+
 ``` csharp
 // Sync version
 new RowbotExecutorBuilder()
@@ -53,6 +58,7 @@ await new RowbotAsyncExecutorBuilder()
 ```
 
 ### Example: DataTable => Excel (Space complexity: O(1))
+
 ``` csharp
 // Sync version
 new RowbotExecutorBuilder()
@@ -68,6 +74,7 @@ await new RowbotAsyncExecutorBuilder()
 ```
 
 ### Example: DataTable => Csv (Space complexity: O(1))
+
 ``` csharp
 // Sync version
 new RowbotExecutorBuilder()
@@ -83,6 +90,7 @@ await new RowbotAsyncExecutorBuilder()
 ```
 
 ### Example: Database => Excel (Space complexity: O(1))
+
 ``` csharp
 // Sync version
 using Dapper;
@@ -113,6 +121,7 @@ using (var conn = new SqlConnection(myConnectionString))
 ```
 
 ### Example: Database => Csv (Space complexity: O(1))
+
 ``` csharp
 
 // Sync version
@@ -143,39 +152,8 @@ using (var conn = new SqlConnection(myConnectionString))
 
 ```
 
-### Example: DataTable => List of objects (Space complexity: O(1))
-``` csharp
-// Sync version
-new RowbotExecutorBuilder()
-    .FromDataTable(myDataTable)
-    .ToObjects<Customer>()
-    .Execute(objects =>
-    {
-        // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
-        // It is NOT possible to iterate this more than once.
-        foreach (var customer in objects)
-        {
-            // Do something with the customer here
-        }
-    });
-    
-
-// Async version
-await new RowbotAsyncExecutorBuilder()
-    .FromDataTable(myDataTable)
-    .ToObjects<Customer>()
-    .ExecuteAsync(async objects =>
-    {
-        // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
-        // It is NOT possible to iterate this more than once.
-        await foreach (var customer in objects)
-        {
-            // Do something with the customer here
-        }
-});
-```
-
 ### Example: Csv => Excel (Space complexity: O(1))
+
 ``` csharp
 new RowbotExecutorBuilder()
     .FromCsvByCsvHelper(inputStream: File.Open("path//to//file.csv", FileMode.Open), csvConfiguration: new CsvConfiguration(CultureInfo.InvariantCulture), readFirstLineAsHeaders: true)
@@ -189,14 +167,17 @@ await new RowbotAsyncExecutorBuilder()
     .ExecuteAsync();
 ```
 
-
 # Notes
 
 - Design decision: Seperating source, execution and target
     - Easy plug and play any source with any target
-    - Exponential growth of integration possibilites when adding sources. (e.g. When creating a new source, one automatically gets N new integrations where N is the number of available targets. And vice versa, when creating a new target, one automatically gets M new integrations where M is the number of available sources.)
+    - Exponential growth of integration possibilites when adding sources. (e.g. When creating a new source, one
+      automatically gets N new integrations where N is the number of available targets. And vice versa, when creating a
+      new target, one automatically gets M new integrations where M is the number of available sources.)
     - Possible to benchmark a seperate source or target or the execution itself.
-    - Less code to grasp at once, making it easier to understand, improve and test. E.g. you can look at one element, say a DataReaderSource, in isolation and all improvements to this will be beneficial to everyone using this source no matter what executor and/or target they combine it with.
+    - Less code to grasp at once, making it easier to understand, improve and test. E.g. you can look at one element,
+      say a DataReaderSource, in isolation and all improvements to this will be beneficial to everyone using this source
+      no matter what executor and/or target they combine it with.
 
 - Todos
     - Fix problem with Exceltarget always closing stream
