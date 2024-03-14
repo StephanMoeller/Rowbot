@@ -66,7 +66,7 @@ namespace Rowbot.Test.IntegrationTests
             Assert.Equal("My name is 2", itemsList[2].MyName);
         }
 
-        public class UnitTestDto
+        private class UnitTestDto
         {
             public int MyNum { get; set; }
             public string MyName { get; set; }
