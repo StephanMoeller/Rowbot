@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Rowbot.Execution
 {
@@ -21,10 +22,12 @@ namespace Rowbot.Execution
         {
             return SetSource(new AsyncDataReaderSource(dataTable.CreateDataReader()));
         }
+
         public RowbotAsyncExecutorBuilder FromDataReader(IDataReader dataReader)
         {
             return SetSource(new AsyncDataReaderSource(dataReader));
         }
+
         public RowbotAsyncExecutorBuilder FromObjects<TObjectType>(IAsyncEnumerable<TObjectType> objects)
         {
             return SetSource(AsyncPropertyReflectionSource<TObjectType>.Create(objects));
@@ -39,11 +42,13 @@ namespace Rowbot.Execution
         {
             return SetSource(new AsyncCsvHelperSource(stream: inputStream, configuration: csvConfiguration, readFirstLineAsHeaders: readFirstLineAsHeaders));
         }
+
         public RowbotAsyncExecutorBuilder FromCsvByCsvHelper(string filepath, CsvConfiguration csvConfiguration, bool readFirstLineAsHeaders)
         {
             var fs = File.Create(filepath);
             return SetSource(new AsyncCsvHelperSource(stream: fs, configuration: csvConfiguration, readFirstLineAsHeaders: readFirstLineAsHeaders));
         }
+
         public RowbotAsyncExecutorBuilder From(IAsyncRowSource customRowSource)
         {
             return SetSource(customRowSource);
@@ -95,19 +100,18 @@ namespace Rowbot.Execution
             throw new NotImplementedException();
         }
 
-        public RowbotAsyncEnumerableExecutor<TObjectType> ToObjects<TObjectType>() where TObjectType : new()
+        public RowbotAsyncEnumerableExecutor<TObjectType> ToObjects<TObjectType>(Func<IAsyncEnumerable<TObjectType>, Task> consumer) where TObjectType : new()
         {
-            return ToCustomTarget(new AsyncPropertyReflectionTarget<TObjectType>());
+            return new RowbotAsyncEnumerableExecutor<TObjectType>(
+                source: _rowSource,
+                target: new AsyncPropertyReflectionTarget<TObjectType>(),
+                consumer: consumer
+            );
         }
 
-        public RowbotAsyncExecutor To(IAsyncRowTarget target)
+        private RowbotAsyncExecutor To(IAsyncRowTarget target)
         {
             return new RowbotAsyncExecutor(_rowSource, target);
-        }
-
-        public RowbotAsyncEnumerableExecutor<TElement> ToCustomTarget<TElement>(IAsyncEnumerableRowTarget<TElement> target)
-        {
-            return new RowbotAsyncEnumerableExecutor<TElement>(source: _rowSource, target: target);
         }
     }
 }

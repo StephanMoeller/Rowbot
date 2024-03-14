@@ -22,10 +22,12 @@ namespace Rowbot.Execution
         {
             return SetSource(new DataReaderSource(dataTable.CreateDataReader()));
         }
+
         public RowbotExecutorBuilder FromDataReader(IDataReader dataReader)
         {
             return SetSource(new DataReaderSource(dataReader));
         }
+
         public RowbotExecutorBuilder FromObjects<TObjectType>(IEnumerable<TObjectType> objects)
         {
             return SetSource(PropertyReflectionSource.Create(objects));
@@ -40,11 +42,13 @@ namespace Rowbot.Execution
         {
             return SetSource(new CsvHelperSource(stream: inputStream, configuration: csvConfiguration, readFirstLineAsHeaders: readFirstLineAsHeaders));
         }
+
         public RowbotExecutorBuilder FromCsvByCsvHelper(string filepath, CsvConfiguration csvConfiguration, bool readFirstLineAsHeaders)
         {
             var fs = File.Create(filepath);
             return SetSource(new CsvHelperSource(stream: fs, configuration: csvConfiguration, readFirstLineAsHeaders: readFirstLineAsHeaders));
         }
+
         public RowbotExecutorBuilder From(IRowSource customRowSource)
         {
             return SetSource(customRowSource);
@@ -66,29 +70,29 @@ namespace Rowbot.Execution
 
         public RowbotExecutor ToCsvUsingCsvHelper(Stream outputStream, CsvConfiguration config, bool writeHeaders, bool leaveOpen = false)
         {
-            return To(new CsvHelperTarget(stream: outputStream, configuration: config, writeHeaders: writeHeaders, leaveOpen: leaveOpen));
+            return new RowbotExecutor(_rowSource, new CsvHelperTarget(stream: outputStream, configuration: config, writeHeaders: writeHeaders, leaveOpen: leaveOpen));
         }
 
         public RowbotExecutor ToCsvUsingCsvHelper(string filepath, CsvConfiguration config, bool writeHeaders)
         {
             var fs = File.Create(filepath);
-            return To(new CsvHelperTarget(stream: fs, configuration: config, writeHeaders: writeHeaders, leaveOpen: false));
+            return new RowbotExecutor(_rowSource, new CsvHelperTarget(stream: fs, configuration: config, writeHeaders: writeHeaders, leaveOpen: false));
         }
 
         public RowbotExecutor ToExcel(Stream outputStream, string sheetName, bool writeHeaders, bool leaveOpen = false)
         {
-            return To(new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: leaveOpen));
+            return new RowbotExecutor(_rowSource, new ExcelTarget(outputStream: outputStream, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: leaveOpen));
         }
 
         public RowbotExecutor ToExcel(string filepath, string sheetName, bool writeHeaders)
         {
             var fs = File.Create(filepath);
-            return To(new ExcelTarget(outputStream: fs, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: false));
+            return new RowbotExecutor(_rowSource, new ExcelTarget(outputStream: fs, sheetName: sheetName, writeHeaders: writeHeaders, leaveOpen: false));
         }
 
         public RowbotExecutor ToDataTable(DataTable tableToFill)
         {
-            return To(new DataTableTarget(tableToFill));
+            return new RowbotExecutor(_rowSource, new DataTableTarget(tableToFill));
         }
 
         public RowbotExecutor ToDataReader()
@@ -96,19 +100,13 @@ namespace Rowbot.Execution
             throw new NotImplementedException();
         }
 
-        public RowbotEnumerableExecutor<TObjectType> ToObjects<TObjectType>() where TObjectType : new()
+        public RowbotEnumerableExecutor<TObjectType> ToObjects<TObjectType>(Action<IEnumerable<TObjectType>> consumer) where TObjectType : new()
         {
-            return ToCustomTarget(new PropertyReflectionTarget<TObjectType>());
-        }
-
-        public RowbotExecutor To(IRowTarget target)
-        {
-            return new RowbotExecutor(_rowSource, target);
-        }
-
-        public RowbotEnumerableExecutor<TElement> ToCustomTarget<TElement>(IEnumerableRowTarget<TElement> target)
-        {
-            return new RowbotEnumerableExecutor<TElement>(source: _rowSource, target: target);
+            return new RowbotEnumerableExecutor<TObjectType>(
+                source: _rowSource,
+                target: new PropertyReflectionTarget<TObjectType>(),
+                consumer: consumer
+            );
         }
     }
 }

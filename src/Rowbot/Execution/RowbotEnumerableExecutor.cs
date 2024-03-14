@@ -5,18 +5,20 @@ namespace Rowbot.Execution
 {
     public sealed class RowbotEnumerableExecutor<TElement> : IDisposable
     {
+        private readonly Action<IEnumerable<TElement>> _consumer;
         private readonly SourceGuards _source;
         private readonly EnumerableTargetGuards<TElement> _target;
 
-        public RowbotEnumerableExecutor(IRowSource source, IEnumerableRowTarget<TElement> target)
+        public RowbotEnumerableExecutor(IRowSource source, IEnumerableRowTarget<TElement> target, Action<IEnumerable<TElement>> consumer)
         {
+            _consumer = consumer;
             _source = new SourceGuards(source);
             _target = new EnumerableTargetGuards<TElement>(target);
         }
 
-        public void Execute(Action<IEnumerable<TElement>> consumer)
+        public void Execute()
         {
-            consumer(ExecuteInternal());
+            _consumer(ExecuteInternal());
         }
 
         private IEnumerable<TElement> ExecuteInternal()
@@ -46,16 +48,19 @@ namespace Rowbot.Execution
             {
                 _source.Dispose();
             }
-            catch { }
+            catch
+            {
+            }
 
             try
             {
                 _target.Dispose();
             }
-            catch { }
+            catch
+            {
+            }
 #pragma warning restore S108 // Nested blocks of code should not be left empty
 #pragma warning restore S2486 // Generic exceptions should not be ignored
         }
-
     }
 }

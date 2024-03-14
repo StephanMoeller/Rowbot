@@ -6,18 +6,20 @@ namespace Rowbot.Execution
 {
     public sealed class RowbotAsyncEnumerableExecutor<TElement> : IDisposable
     {
+        private readonly Func<IAsyncEnumerable<TElement>, Task> _consumer;
         private readonly AsyncSourceGuards _source;
         private readonly AsyncEnumerableTargetGuards<TElement> _target;
 
-        public RowbotAsyncEnumerableExecutor(IAsyncRowSource source, IAsyncEnumerableRowTarget<TElement> target)
+        public RowbotAsyncEnumerableExecutor(IAsyncRowSource source, IAsyncEnumerableRowTarget<TElement> target, Func<IAsyncEnumerable<TElement>, Task> consumer)
         {
+            _consumer = consumer;
             _source = new AsyncSourceGuards(source);
             _target = new AsyncEnumerableTargetGuards<TElement>(target);
         }
 
-        public Task ExecuteAsync(Func<IAsyncEnumerable<TElement>, Task> consumer)
+        public Task ExecuteAsync()
         {
-            return consumer(ExecuteInternal());
+            return _consumer(ExecuteInternal());
         }
 
         private async IAsyncEnumerable<TElement> ExecuteInternal()
@@ -47,13 +49,17 @@ namespace Rowbot.Execution
             {
                 _source.Dispose();
             }
-            catch { }
+            catch
+            {
+            }
 
             try
             {
                 _target.Dispose();
             }
-            catch { }
+            catch
+            {
+            }
 #pragma warning restore S108 // Nested blocks of code should not be left empty
 #pragma warning restore S2486 // Generic exceptions should not be ignored
         }

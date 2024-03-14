@@ -133,8 +133,7 @@ namespace Examples.SimpleDemos
             // Sync version
             new RowbotExecutorBuilder()
                 .FromDataTable(myDataTable)
-                .ToObjects<Customer>()
-                .Execute(objects =>
+                .ToObjects<Customer>(objects =>
                 {
                     // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
                     // It is NOT possible to iterate this more than once.
@@ -142,13 +141,13 @@ namespace Examples.SimpleDemos
                     {
                         // Do something with the customer here
                     }
-                });
+                })
+                .Execute();
 
             // Async version
             await new RowbotAsyncExecutorBuilder()
                 .FromDataTable(myDataTable)
-                .ToObjects<Customer>()
-                .ExecuteAsync(async objects =>
+                .ToObjects<Customer>(async objects =>
                 {
                     // NOTE: objects is not allocated in memory but streamed, allowing memory space complexity of O(1)
                     // It is NOT possible to iterate this more than once.
@@ -156,7 +155,8 @@ namespace Examples.SimpleDemos
                     {
                         // Do something with the customer here
                     }
-                });
+                })
+                .ExecuteAsync();
 
             // Csv => Excel
             // Sync version

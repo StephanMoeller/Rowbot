@@ -49,8 +49,8 @@ namespace Rowbot.Test.IntegrationTests
 
             new RowbotExecutorBuilder()
                 .FromObjects(objects)
-                .ToObjects<UnitTestDto>()
-                .Execute(items => { itemsList.AddRange(items); });
+                .ToObjects<UnitTestDto>(items => { itemsList.AddRange(items); })
+                .Execute();
 
             // Assert columns
             Assert.Equal(3, itemsList.Count);
